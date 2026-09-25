@@ -15,7 +15,6 @@
   </style>
 </head>
 <body>
-  <!-- Game Header -->
   <header class="game-header" id="gameHeader">
     <div style="display:flex;align-items:center;gap:0.75rem">
       <div class="avatar" id="playerAvatar" style="background:var(--baby-pink);width:36px;height:36px;font-size:0.9rem">P</div>
@@ -27,7 +26,6 @@
     </div>
   </header>
 
-  <!-- Game Content -->
   <main class="game-content" id="gameContent">
     <div style="text-align:center;padding:4rem 2rem">
       <div class="spinner" style="margin:0 auto 1rem"></div>
@@ -35,12 +33,10 @@
     </div>
   </main>
 
-  <!-- Interim Leaderboard Overlay -->
   <div id="leaderboardOverlay" style="
     position:fixed;inset:0;background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);
     z-index:500;flex-direction:column;align-items:center;padding:2rem 1rem;overflow-y:auto;
-    display:none;
-  ">
+    display:none;">
     <h2 style="font-family:var(--font-heading);font-size:2rem;margin-bottom:0.25rem">🏆 Leaderboard</h2>
     <p style="color:var(--gray);margin-bottom:2rem" id="lbSubtitle">After this round</p>
     <div id="leaderboardList" style="width:100%;max-width:500px"></div>
@@ -54,13 +50,11 @@
     </div>
   </div>
 
-  <!-- Final Results Overlay -->
   <div id="finalResults" style="
     position:fixed;inset:0;
     background:linear-gradient(135deg,#FFF0F5,#FFF8F0,#F0F8FF);
     z-index:600;flex-direction:column;align-items:center;justify-content:center;
-    padding:2rem 1rem;text-align:center;overflow-y:auto;display:none;
-  ">
+    padding:2rem 1rem;text-align:center;overflow-y:auto;display:none;">
     <div style="font-size:4rem;margin-bottom:1rem">🎉</div>
     <h1 style="font-family:var(--font-heading);font-size:2.5rem;margin-bottom:0.5rem">Game Over!</h1>
     <p style="color:var(--gray);margin-bottom:2rem">Thanks for playing K4 Game Room</p>
@@ -69,13 +63,10 @@
     <p style="color:var(--gray);font-size:0.85rem;margin-top:2rem">Powered by Kreate 4 🌸</p>
   </div>
 
-  <!-- Confetti layer -->
   <div id="confettiContainer" style="position:fixed;inset:0;pointer-events:none;z-index:9998"></div>
-
-  <!-- Toast -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- Scripts: order matters -->
+  <!-- CORRECT SCRIPT ORDER: app.js MUST be first -->
   <script src="/socket.io/socket.io.js"></script>
   <script src="/js/app.js"></script>
   <script src="/js/socket.js"></script>
