@@ -63,7 +63,7 @@
         <small style="color:var(--gray);font-size:0.8rem;margin-top:0.25rem">Share this with the event host to control games</small>
       </div>
 
-      <button class="btn btn-primary btn-full btn-lg" id="createBtn" onclick="createEvent()">
+      <button class="btn btn-primary btn-full btn-lg" id="createBtn" onclick="createK4Event()">
         Create Event Room 🎉
       </button>
     </div>
@@ -100,7 +100,7 @@
       document.getElementById('celebrantLabel').textContent = type === 'bridal' ? "Bride's Name" : "Mum-to-be's Name";
     }
 
-    async function createEvent() {
+    async function createK4Event() {
       const event_type = document.getElementById('eventType').value;
       const celebrant_name = document.getElementById('celebrantName').value.trim();
       const host_password = document.getElementById('hostPassword').value;
