@@ -1,130 +1,94 @@
-/* ============================================
-   EMOJI-NARY - GAME LOGIC
-   ============================================ */
-
+/* EMOJI-NARY — Premium UI */
 const Emojinary = {
-  gameData: null,
-  currentIndex: 0,
-  score: 0,
-  answered: new Set(),
+  gameData:null, player:null, socket:null,
+  score:0, answered:new Set(),
 
   init(gameData, player, socket) {
-    this.gameData = gameData;
-    this.player = player;
-    this.socket = socket;
-    this.currentIndex = 0;
-    this.score = 0;
-    this.answered = new Set();
-    this.renderItem(0);
-    this.bindSocketEvents();
+    this.gameData=gameData; this.player=player; this.socket=socket;
+    this.score=0; this.answered=new Set();
+    document.getElementById('gameNameText').textContent = '😂 Emoji-nary';
+    this.render(0);
+    socket.on('next_question', ({question_index}) => this.render(question_index));
   },
 
-  renderItem(index) {
+  render(idx) {
     const items = this.gameData.game.items;
-    const item = items[index];
-    if (!item) return;
-
+    const item = items[idx]; if(!item) return;
     const total = items.length;
-    const progress = Math.round((index / total) * 100);
-    const alreadyAnswered = this.answered.has(index);
+    const pct = Math.round((idx/total)*100);
+    document.getElementById('progressFill').style.width = pct+'%';
+    const already = this.answered.has(idx);
 
-    const content = document.getElementById('gameContent');
-    content.innerHTML = `
-      <div class="game-progress">
-        <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
-        <span class="progress-text">${index + 1}/${total}</span>
+    document.getElementById('gameContent').innerHTML = `
+      <div class="q-counter" style="background:rgba(155,127,212,0.12);border-color:rgba(155,127,212,0.2);color:rgba(196,168,212,0.9)">
+        Emoji ${idx+1} of ${total}
       </div>
-      <div class="emojinary-card question-enter" id="emojiCard">
-        <div class="emojinary-label">Emoji ${index + 1} of ${total}</div>
-        <div class="emojinary-emojis" id="emojiDisplay">${item.emojis}</div>
-        <p style="color:var(--gray);font-size:0.85rem;margin-top:0.5rem">What phrase or word do these emojis represent?</p>
+      <div class="emoji-card q-enter" id="emojiCard">
+        <p style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.12em;color:rgba(155,127,212,0.7);font-weight:700;margin-bottom:0.5rem">Decode the emojis! 🔍</p>
+        <div class="emoji-display" id="emojiDisplay">${item.emojis}</div>
+        <p class="emoji-hint">What phrase or word do these emojis represent?</p>
       </div>
-      <div id="answerArea">
-        ${alreadyAnswered ? `
-          <div style="text-align:center;padding:1.5rem;background:rgba(93,200,160,0.1);border-radius:var(--radius-md);color:var(--mint-green);font-weight:600">
-            ✅ Answer submitted — moving on shortly!
-          </div>
-        ` : `
-          <div class="quiz-answer-area">
-            <input type="text" class="form-input" id="emojiAnswer"
-              placeholder="Type the phrase..."
-              autocomplete="off" maxlength="100"
-              style="text-align:center;font-size:1.05rem"
-            >
-            <button class="btn btn-primary btn-full" id="emojiSubmitBtn" onclick="Emojinary.submitAnswer(${index})">
-              Submit 🎯
+      <div id="emojiAnswerWrap">
+        ${already ? `
+          <div class="result-correct" style="width:100%">
+            <div style="font-size:1.8rem;margin-bottom:0.4rem">✅</div>
+            <div style="font-weight:700">Submitted! Moving on...</div>
+          </div>` : `
+          <div class="wkb-answer-wrap">
+            <input class="wkb-input" id="emojiInput" type="text"
+              placeholder="Type the phrase or word..." maxlength="100" autocomplete="off">
+            <button class="btn btn-purple btn-full btn-lg" id="emojiBtn" onclick="Emojinary.submit(${idx})">
+              Submit Answer 🎯
             </button>
-          </div>
-        `}
-      </div>
-    `;
+          </div>`}
+      </div>`;
 
-    K4Anim.questionEnter(document.getElementById('emojiCard'));
-    const input = document.getElementById('emojiAnswer');
-    input?.addEventListener('keypress', e => { if (e.key === 'Enter') this.submitAnswer(index); });
-    setTimeout(() => input?.focus(), 400);
+    const inp = document.getElementById('emojiInput');
+    inp?.addEventListener('keypress', e => { if(e.key==='Enter') this.submit(idx); });
+    setTimeout(() => inp?.focus(), 500);
   },
 
-  submitAnswer(index) {
-    const input = document.getElementById('emojiAnswer');
-    const btn = document.getElementById('emojiSubmitBtn');
-    const answer = input?.value.trim();
+  submit(idx) {
+    const inp = document.getElementById('emojiInput');
+    const btn = document.getElementById('emojiBtn');
+    const answer = inp?.value.trim();
+    if(!answer) { K4App.toast('Type your answer!','warning'); return; }
+    if(btn) btn.disabled = true;
 
-    if (!answer) { K4App.toast('Please type your answer!', 'warning'); K4Anim.shake(input); return; }
-    if (btn) btn.disabled = true;
-
-    const item = this.gameData.game.items[index];
+    const item = this.gameData.game.items[idx];
     const correct = K4App.answersMatch(answer, item.answer);
     const score = correct ? 150 : 0;
+    this.answered.add(idx);
+    if(correct) { this.score += score; document.getElementById('currentScore').textContent = this.score; }
 
-    this.answered.add(index);
-    if (correct) { this.score += score; document.getElementById('currentScore').textContent = this.score; }
-
-    const area = document.getElementById('answerArea');
-    if (correct) {
-      area.innerHTML = `
-        <div style="text-align:center;padding:1.5rem;background:rgba(93,200,160,0.1);border-radius:var(--radius-md)">
-          <div style="font-size:2rem;margin-bottom:0.5rem">🎉</div>
-          <div style="color:var(--mint-green);font-weight:700;font-size:1.1rem">Correct! +${score} points</div>
-          <div style="color:var(--gray);font-size:0.9rem;margin-top:0.25rem">${K4App.escapeHtml(item.answer)}</div>
+    const wrap = document.getElementById('emojiAnswerWrap');
+    if(correct) {
+      wrap.innerHTML = `
+        <div class="result-correct" style="width:100%">
+          <div style="font-size:2.5rem;margin-bottom:0.5rem">🎉</div>
+          <div class="result-score" style="color:var(--mint)">+${score}</div>
+          <div style="font-size:0.9rem;opacity:0.7;margin-top:0.4rem">Answer: <strong>${K4App.escapeHtml(item.answer)}</strong></div>
         </div>`;
       K4Anim.confetti(25);
     } else {
-      area.innerHTML = `
-        <div style="text-align:center;padding:1.5rem;background:rgba(255,107,107,0.08);border-radius:var(--radius-md)">
-          <div style="font-size:1.5rem;margin-bottom:0.25rem">❌</div>
-          <div style="color:#FF6B6B;font-weight:600">Not quite!</div>
-          <div style="color:var(--gray);font-size:0.9rem;margin-top:0.25rem">Answer: <strong>${K4App.escapeHtml(item.answer)}</strong></div>
+      wrap.innerHTML = `
+        <div class="result-wrong" style="width:100%">
+          <div style="font-size:2rem;margin-bottom:0.4rem">😅</div>
+          <div style="font-weight:700">Not quite!</div>
+          <div style="font-size:0.85rem;opacity:0.6;margin-top:0.25rem">Answer: <strong>${K4App.escapeHtml(item.answer)}</strong></div>
         </div>`;
     }
 
-    // Tell server (with correct flag so server scores accurately)
     this.socket.emit('submit_answer', {
-      player_id: this.player.player_id,
-      event_id: this.player.event_id,
-      game_name: 'emojinary',
-      question_index: index,
-      answer,
-      is_correct: correct
+      player_id:this.player.player_id, event_id:this.player.event_id,
+      game_name:'emojinary', question_index:idx, answer, is_correct:correct
     });
 
-    // Auto-advance
-    const nextIndex = index + 1;
+    const next = idx + 1;
     setTimeout(() => {
-      if (nextIndex < this.gameData.game.items.length) {
-        this.renderItem(nextIndex);
-      } else {
-        area.innerHTML += `
-          <div style="text-align:center;margin-top:1rem;padding:1rem;background:rgba(196,168,212,0.1);border-radius:var(--radius-md)">
-            <div style="font-size:1.5rem">🌸</div>
-            <p style="color:var(--gray);font-size:0.9rem">All done! Waiting for host...</p>
-          </div>`;
-      }
+      if(next < this.gameData.game.items.length) this.render(next);
+      else wrap.innerHTML += `<div style="text-align:center;color:rgba(255,255,255,0.3);font-size:0.85rem;margin-top:1rem">🌸 All done! Waiting for host...</div>`;
     }, 2500);
-  },
-
-  bindSocketEvents() {
-    this.socket.on('next_question', ({ question_index }) => this.renderItem(question_index));
   },
 
   destroy() { this.socket.off('next_question'); }

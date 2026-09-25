@@ -1,152 +1,99 @@
-/* ============================================
-   WHO KNOWS BEST - GAME LOGIC
-   ============================================ */
-
+/* WHO KNOWS BEST — Premium UI */
 const WhoKnowsBest = {
-  gameData: null,
-  currentQuestion: null,
-  answered: new Set(),
-  score: 0,
+  gameData: null, player: null, socket: null,
+  answered: new Set(), score: 0, currentQ: null,
 
   init(gameData, player, socket) {
-    this.gameData = gameData;
-    this.player = player;
-    this.socket = socket;
-    this.answered = new Set();
+    this.gameData = gameData; this.player = player; this.socket = socket;
+    this.answered = new Set(); this.score = 0;
     this.renderWaiting();
-    this.bindSocketEvents();
+    socket.on('question_show', ({ question_index, question }) => this.renderQuestion(question_index, question));
+    socket.on('answer_received', ({ correct, score, question_index }) => this.onResult(correct, score, question_index));
   },
 
   renderWaiting() {
-    const content = document.getElementById('gameContent');
-    content.innerHTML = `
-      <div class="quiz-waiting fade-in">
-        <div class="quiz-waiting-icon">❓</div>
-        <h2 style="font-family:var(--font-heading);margin-bottom:0.5rem">
-          ${K4App.escapeHtml(this.gameData.game.title)}
-        </h2>
-        <p style="color:var(--gray)">${K4App.escapeHtml(this.gameData.game.subtitle)}</p>
-        <div style="margin-top:2rem;display:flex;align-items:center;justify-content:center;gap:0.5rem;color:var(--gray)">
-          <div class="dot-bounce" style="width:8px;height:8px;border-radius:50%;background:var(--baby-pink);animation:dotBounce 1.2s ease infinite"></div>
-          <div class="dot-bounce" style="width:8px;height:8px;border-radius:50%;background:var(--baby-pink);animation:dotBounce 1.2s ease infinite 0.2s"></div>
-          <div class="dot-bounce" style="width:8px;height:8px;border-radius:50%;background:var(--baby-pink);animation:dotBounce 1.2s ease infinite 0.4s"></div>
-          <span>Waiting for first question...</span>
+    document.getElementById('gameNameText').textContent = '❓ Who Knows Best';
+    document.getElementById('gameContent').innerHTML = `
+      <div class="waiting-screen fade-in">
+        <div class="waiting-icon">🤔</div>
+        <h2 class="waiting-title">${K4App.escapeHtml(this.gameData.game.title)}</h2>
+        <p class="waiting-sub" style="max-width:340px;margin:0 auto">${K4App.escapeHtml(this.gameData.game.subtitle)}</p>
+        <div class="waiting-dots" style="margin-top:2rem">
+          <div class="waiting-dot"></div><div class="waiting-dot"></div><div class="waiting-dot"></div>
         </div>
-      </div>
-    `;
+        <p style="color:rgba(255,255,255,0.3);font-size:0.82rem;margin-top:1rem">Host will send questions one at a time</p>
+      </div>`;
   },
 
-  renderQuestion(questionIndex, question) {
-    this.currentQuestion = { index: questionIndex, text: question.text || question };
+  renderQuestion(idx, question) {
+    this.currentQ = { idx, text: question.text || question };
     const total = this.gameData.game.questions.length;
-    const progress = ((questionIndex) / total) * 100;
-    const alreadyAnswered = this.answered.has(questionIndex);
+    const pct = Math.round((idx / total) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    const already = this.answered.has(idx);
 
-    const content = document.getElementById('gameContent');
-    content.innerHTML = `
-      <div class="game-progress">
-        <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
-        <span class="progress-text">${questionIndex}/${total}</span>
+    document.getElementById('gameContent').innerHTML = `
+      <div class="q-counter">Question ${idx} of ${total}</div>
+      <div class="wkb-card q-enter" id="wkbCard">
+        <p style="font-size:0.78rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:1.25rem">Who knows the celebrant best? 🌸</p>
+        <p class="wkb-question">${K4App.escapeHtml(this.currentQ.text)}</p>
       </div>
-      <div class="quiz-question-card question-enter" id="questionCard">
-        <div class="quiz-question-number">Question ${questionIndex}</div>
-        <p class="quiz-question-text">${K4App.escapeHtml(this.currentQuestion.text)}</p>
-      </div>
-      <div class="quiz-answer-area">
-        ${alreadyAnswered ? `
-          <div style="text-align:center;padding:1.5rem;background:rgba(93,200,160,0.1);border-radius:var(--radius-md);color:var(--mint-green);font-weight:600">
-            ✅ Answer submitted! Waiting for next question...
-          </div>
-        ` : `
-          <input
-            type="text"
-            class="quiz-answer-input form-input"
-            id="answerInput"
-            placeholder="Type your answer..."
-            autocomplete="off"
-            maxlength="100"
-          >
-          <button class="btn btn-primary btn-full" id="submitAnswerBtn" onclick="WhoKnowsBest.submitAnswer()">
+      <div class="wkb-answer-wrap" id="answerWrap">
+        ${already ? `
+          <div class="result-correct">
+            <div style="font-size:1.8rem;margin-bottom:0.5rem">✅</div>
+            <div style="font-weight:700;font-size:1rem">Answer submitted!</div>
+            <div style="font-size:0.82rem;opacity:0.6;margin-top:0.25rem">Waiting for next question...</div>
+          </div>` : `
+          <input class="wkb-input" id="wkbInput" type="text"
+            placeholder="Type your answer here..." maxlength="100" autocomplete="off">
+          <button class="btn btn-primary btn-full btn-lg" id="wkbBtn" onclick="WhoKnowsBest.submit()">
             Submit Answer ✓
-          </button>
-        `}
-      </div>
-    `;
+          </button>`}
+      </div>`;
 
-    // Animate in
-    K4Anim.questionEnter(document.getElementById('questionCard'));
-
-    // Enter key support
-    if (!alreadyAnswered) {
-      const input = document.getElementById('answerInput');
-      input?.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') this.submitAnswer();
-      });
-      setTimeout(() => input?.focus(), 400);
+    if (!already) {
+      const inp = document.getElementById('wkbInput');
+      inp?.addEventListener('keypress', e => { if(e.key==='Enter') this.submit(); });
+      setTimeout(() => inp?.focus(), 500);
     }
   },
 
-  async submitAnswer() {
-    const input = document.getElementById('answerInput');
-    const btn = document.getElementById('submitAnswerBtn');
-    if (!input || !btn) return;
-
-    const answer = input.value.trim();
-    if (!answer) {
-      K4App.toast('Please type your answer first!', 'warning');
-      K4Anim.shake(input);
-      return;
-    }
-
-    btn.disabled = true;
-    btn.textContent = 'Submitting...';
-
-    this.answered.add(this.currentQuestion.index);
-
+  submit() {
+    const inp = document.getElementById('wkbInput');
+    const btn = document.getElementById('wkbBtn');
+    const answer = inp?.value.trim();
+    if (!answer) { K4App.toast('Type your answer first!', 'warning'); inp?.classList.add('shake'); return; }
+    if (btn) { btn.disabled = true; btn.textContent = 'Submitting...'; }
+    this.answered.add(this.currentQ.idx);
     this.socket.emit('submit_answer', {
-      player_id: this.player.player_id,
-      event_id: this.player.event_id,
-      game_name: 'who_knows_best',
-      question_index: this.currentQuestion.index,
-      answer
+      player_id: this.player.player_id, event_id: this.player.event_id,
+      game_name: 'who_knows_best', question_index: this.currentQ.idx, answer, is_correct: false
     });
   },
 
-  onAnswerResult(correct, score) {
-    const area = document.querySelector('.quiz-answer-area');
-    if (!area) return;
-
+  onResult(correct, score) {
+    const wrap = document.getElementById('answerWrap');
+    if (!wrap) return;
     if (correct) {
       this.score += score;
-      area.innerHTML = `
-        <div style="text-align:center;padding:1.5rem;background:rgba(93,200,160,0.1);border-radius:var(--radius-md);color:var(--mint-green);font-weight:700;font-size:1.1rem">
-          ✅ Correct! +${score} points
-        </div>
-      `;
+      document.getElementById('currentScore').textContent = this.score;
+      wrap.innerHTML = `
+        <div class="result-correct">
+          <div style="font-size:2.5rem;margin-bottom:0.5rem">🎉</div>
+          <div class="result-score">+${score}</div>
+          <div style="font-size:0.9rem;opacity:0.7;margin-top:0.4rem">Correct answer!</div>
+        </div>`;
       K4Anim.confetti(30);
     } else {
-      area.innerHTML = `
-        <div style="text-align:center;padding:1.5rem;background:rgba(255,107,107,0.1);border-radius:var(--radius-md);color:#FF6B6B;font-weight:600">
-          ❌ Not quite! Waiting for next question...
-        </div>
-      `;
+      wrap.innerHTML = `
+        <div class="result-wrong">
+          <div style="font-size:2rem;margin-bottom:0.5rem">😅</div>
+          <div style="font-weight:700">Not this time!</div>
+          <div style="font-size:0.82rem;opacity:0.5;margin-top:0.25rem">Waiting for next question...</div>
+        </div>`;
     }
-
-    document.getElementById('currentScore').textContent = this.score;
   },
 
-  bindSocketEvents() {
-    this.socket.on('question_show', ({ question_index, question }) => {
-      this.renderQuestion(question_index, question);
-    });
-
-    this.socket.on('answer_received', ({ correct, score }) => {
-      this.onAnswerResult(correct, score);
-    });
-  },
-
-  destroy() {
-    this.socket.off('question_show');
-    this.socket.off('answer_received');
-  }
+  destroy() { this.socket.off('question_show'); this.socket.off('answer_received'); }
 };

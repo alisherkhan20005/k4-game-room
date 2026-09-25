@@ -3,281 +3,464 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>K4 Game Room — Kreate 4</title>
-  <meta name="description" content="Interactive event games for bridal and baby showers by Kreate 4">
+  <title>K4 Game Room — Kreate 4 Events</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/animations.css">
   <style>
-    .home-bg {
+    body { background: var(--dark); overflow: hidden; height: 100vh; }
+
+    /* ── Animated mesh background ── */
+    .bg-mesh {
+      position: fixed; inset: 0; z-index: 0;
+      background: linear-gradient(135deg, #0D0D1A 0%, #1A0A2E 40%, #0F1A3A 100%);
+    }
+    .bg-orb {
+      position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none;
+    }
+    .orb-1 { width:500px; height:500px; background:rgba(255,107,157,0.18); top:-150px; right:-100px; animation:orbFloat1 8s ease-in-out infinite; }
+    .orb-2 { width:400px; height:400px; background:rgba(107,158,255,0.15); bottom:-100px; left:-100px; animation:orbFloat2 10s ease-in-out infinite; }
+    .orb-3 { width:300px; height:300px; background:rgba(0,200,150,0.12); top:40%; left:30%; animation:orbFloat3 12s ease-in-out infinite; }
+    @keyframes orbFloat1 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-30px,20px) scale(1.1)} }
+    @keyframes orbFloat2 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(20px,-30px) scale(1.05)} }
+    @keyframes orbFloat3 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-20px,15px) scale(1.08)} }
+
+    /* ── Floating particles ── */
+    .particle {
+      position: absolute; border-radius: 50%; pointer-events: none;
+      animation: particleFloat var(--dur,6s) ease-in-out infinite;
+      animation-delay: var(--delay,0s);
+    }
+
+    /* ── Main layout ── */
+    .home-wrap {
+      position: relative; z-index: 1;
       min-height: 100vh;
-      background: linear-gradient(135deg, #FFF0F5 0%, #FFF8F0 50%, #F0F8FF 100%);
-      position: relative;
-      overflow: hidden;
-    }
-    .home-bg::before {
-      content: '';
-      position: absolute;
-      width: 400px; height: 400px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,181,200,0.25) 0%, transparent 70%);
-      top: -100px; right: -100px;
-    }
-    .home-bg::after {
-      content: '';
-      position: absolute;
-      width: 300px; height: 300px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(168,206,222,0.2) 0%, transparent 70%);
-      bottom: -50px; left: -50px;
-    }
-    .home-content {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: 1fr 480px 1fr;
+      grid-template-rows: 1fr;
       align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 2rem 1rem;
+      padding: 2rem;
+      gap: 3rem;
+    }
+
+    /* ── Left side — branding ── */
+    .brand-side {
+      grid-column: 1;
+      text-align: right;
+      color: var(--white);
+      padding-right: 2rem;
+    }
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .logo-icon-wrap {
+      width: 64px; height: 64px;
+      background: var(--grad-primary);
+      border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem;
+      box-shadow: var(--shadow-pink);
+    }
+    .brand-name {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .brand-sub {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      opacity: 0.55;
+      margin-top: 0.2rem;
+    }
+    .brand-tagline {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      color: var(--white);
+    }
+    .brand-tagline em {
+      font-style: italic;
+      background: var(--grad-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .brand-desc {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.7;
+      max-width: 360px;
+      margin-left: auto;
+    }
+    .game-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+      justify-content: flex-end;
+    }
+    .game-pill {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--r-full);
+      padding: 0.35rem 0.9rem;
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.7);
+      font-weight: 500;
+    }
+
+    /* ── Join Card ── */
+    .join-wrap { grid-column: 2; }
+    .join-card {
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 28px;
+      padding: 2.75rem 2.25rem;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .join-header {
       text-align: center;
+      margin-bottom: 2.25rem;
     }
-    .logo-area { margin-bottom: 2rem; }
-    .logo-icon {
-      width: 90px; height: 90px;
-      background: linear-gradient(135deg, var(--baby-pink), var(--peach));
-      border-radius: var(--radius-xl);
+    .join-emoji {
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 0.75rem;
+      animation: float 3s ease-in-out infinite;
+    }
+    .join-title {
+      font-family: var(--font-display);
+      font-size: 1.9rem;
+      font-weight: 900;
+      color: var(--white);
+      margin-bottom: 0.4rem;
+    }
+    .join-sub { font-size: 0.88rem; color: rgba(255,255,255,0.45); }
+
+    .dark-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.45);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .dark-input {
+      width: 100%;
+      padding: 0.9rem 1.25rem;
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(255,255,255,0.12);
+      border-radius: var(--r-md);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      outline: none;
+      transition: all var(--t-base);
+    }
+    .dark-input:focus {
+      border-color: var(--pink);
+      background: rgba(255,107,157,0.08);
+      box-shadow: 0 0 0 4px rgba(255,107,157,0.15);
+    }
+    .dark-input::placeholder { color: rgba(255,255,255,0.25); }
+    .dark-input.code-input {
+      text-align: center;
+      letter-spacing: 0.4em;
+      font-size: 2rem;
+      font-weight: 800;
+      font-family: var(--font-display);
+      text-transform: uppercase;
+    }
+
+    .divider-line {
+      display: flex; align-items: center; gap: 1rem;
+      margin: 1.5rem 0;
+      color: rgba(255,255,255,0.2);
+      font-size: 0.78rem;
+    }
+    .divider-line::before, .divider-line::after {
+      content: ''; flex: 1; height: 1px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* ── Right side — event types ── */
+    .events-side {
+      grid-column: 3;
+      padding-left: 2rem;
+    }
+    .events-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.35);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .event-type-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--r-lg);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 2.5rem;
-      margin: 0 auto 1rem;
-      box-shadow: 0 8px 30px rgba(255,181,200,0.4);
+      gap: 1rem;
+      color: var(--white);
+      transition: all var(--t-base);
     }
-    .logo-title {
-      font-family: var(--font-heading);
-      font-size: clamp(2.5rem, 7vw, 4rem);
-      background: linear-gradient(135deg, var(--baby-pink), var(--lavender));
+    .event-type-card:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.2);
+      transform: translateX(4px);
+    }
+    .et-icon {
+      width: 50px; height: 50px; border-radius: var(--r-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; flex-shrink: 0;
+    }
+    .et-bridal { background: linear-gradient(135deg, rgba(255,107,157,0.3), rgba(255,107,157,0.1)); }
+    .et-baby   { background: linear-gradient(135deg, rgba(107,158,255,0.3), rgba(107,158,255,0.1)); }
+    .et-title  { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.1rem; }
+    .et-desc   { font-size: 0.78rem; color: rgba(255,255,255,0.4); }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+    .stat-box {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: var(--r-md);
+      padding: 1rem;
+      text-align: center;
+      color: var(--white);
+    }
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 900;
+      background: var(--grad-primary);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       line-height: 1;
-      margin-bottom: 0.25rem;
     }
-    .logo-sub {
-      font-size: 0.9rem;
-      color: var(--gray);
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-    .join-card {
-      background: rgba(255,255,255,0.9);
-      backdrop-filter: blur(20px);
-      border-radius: var(--radius-xl);
-      padding: 2.5rem 2rem;
-      width: 100%;
-      max-width: 420px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-      border: 1px solid rgba(255,255,255,0.8);
-    }
-    .join-card h2 {
-      font-family: var(--font-heading);
-      font-size: 1.6rem;
-      color: var(--dark);
-      margin-bottom: 0.5rem;
-    }
-    .join-card p {
-      color: var(--gray);
-      font-size: 0.9rem;
-      margin-bottom: 2rem;
-    }
-    .room-code-input {
-      text-align: center;
-      letter-spacing: 0.3em;
-      font-size: 1.5rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      font-family: var(--font-heading);
-    }
-    .divider {
-      display: flex;
+    .stat-lbl { font-size: 0.72rem; color: rgba(255,255,255,0.35); margin-top: 0.25rem; }
+
+    /* ── Loading overlay ── */
+    .loading-overlay {
+      position: fixed; inset: 0;
+      background: rgba(13,13,26,0.9);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: none;
+      flex-direction: column;
       align-items: center;
-      gap: 1rem;
-      margin: 1.5rem 0;
-      color: var(--gray);
-      font-size: 0.8rem;
+      justify-content: center;
+      gap: 1.5rem;
     }
-    .divider::before, .divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
+    .loading-overlay.active { display: flex; }
+    .loading-spinner-lg {
+      width: 60px; height: 60px;
+      border: 4px solid rgba(255,255,255,0.1);
+      border-top-color: var(--pink);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
     }
-    .floating-elements {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      overflow: hidden;
-    }
-    .float-el {
-      position: absolute;
-      font-size: 1.5rem;
-      opacity: 0.25;
-      animation: floatEl var(--dur, 8s) ease-in-out infinite;
-      animation-delay: var(--delay, 0s);
-    }
-    @keyframes floatEl {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-20px) rotate(10deg); }
+    .loading-text { color: var(--white); font-weight: 600; font-size: 1rem; }
+
+    /* ── Responsive ── */
+    @media (max-width: 1100px) {
+      .home-wrap { grid-template-columns: 1fr; grid-template-rows: auto; padding: 2rem 1rem; gap: 2rem; }
+      .brand-side, .events-side { display: none; }
+      .join-wrap { grid-column: 1; }
+      body { overflow: auto; height: auto; }
     }
   </style>
 </head>
 <body>
-  <div class="home-bg">
-    <div class="floating-elements">
-      <span class="float-el" style="top:10%;left:5%;--dur:7s;--delay:0s">💍</span>
-      <span class="float-el" style="top:20%;right:8%;--dur:9s;--delay:1s">🌸</span>
-      <span class="float-el" style="top:60%;left:3%;--dur:8s;--delay:2s">✨</span>
-      <span class="float-el" style="top:70%;right:5%;--dur:6s;--delay:0.5s">🎀</span>
-      <span class="float-el" style="top:40%;left:8%;--dur:10s;--delay:1.5s">🌷</span>
-      <span class="float-el" style="top:85%;left:15%;--dur:7s;--delay:3s">💐</span>
-      <span class="float-el" style="top:15%;left:40%;--dur:11s;--delay:2s">⭐</span>
+
+<!-- Background -->
+<div class="bg-mesh">
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+  <!-- Particles -->
+  <div class="particle" style="width:4px;height:4px;background:rgba(255,107,157,0.6);top:20%;left:15%;--dur:7s;--delay:0s"></div>
+  <div class="particle" style="width:6px;height:6px;background:rgba(0,200,150,0.5);top:60%;left:25%;--dur:9s;--delay:1s"></div>
+  <div class="particle" style="width:3px;height:3px;background:rgba(107,158,255,0.7);top:30%;left:70%;--dur:6s;--delay:2s"></div>
+  <div class="particle" style="width:5px;height:5px;background:rgba(255,217,61,0.5);top:75%;left:60%;--dur:8s;--delay:0.5s"></div>
+  <div class="particle" style="width:4px;height:4px;background:rgba(255,107,157,0.5);top:50%;left:85%;--dur:10s;--delay:3s"></div>
+  <div class="particle" style="width:6px;height:6px;background:rgba(0,200,150,0.4);top:10%;left:55%;--dur:11s;--delay:1.5s"></div>
+</div>
+
+<main class="home-wrap">
+  <!-- LEFT: Branding -->
+  <div class="brand-side fade-in-up">
+    <div class="brand-logo" style="justify-content:flex-end">
+      <div style="text-align:right">
+        <div class="brand-name">K4 Game Room</div>
+        <div class="brand-sub">by Kreate 4</div>
+      </div>
+      <div class="logo-icon-wrap">🎮</div>
     </div>
-    <div class="home-content">
-      <div class="logo-area fade-in-down">
-        <div class="logo-icon">🎮</div>
-        <h1 class="logo-title">K4 Game Room</h1>
-        <p class="logo-sub">by Kreate 4</p>
-      </div>
-
-      <div class="join-card fade-in-up" id="joinCard">
-        <h2>Join the Fun! 🎉</h2>
-        <p>Enter your room code and name to start playing</p>
-
-        <div class="form-group">
-          <label class="form-label">Room Code</label>
-          <input
-            type="text"
-            class="form-input room-code-input"
-            id="roomCodeInput"
-            placeholder="ABC123"
-            maxlength="6"
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="characters"
-          >
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Your Name</label>
-          <input
-            type="text"
-            class="form-input"
-            id="playerNameInput"
-            placeholder="Enter your name"
-            maxlength="30"
-            autocomplete="off"
-          >
-        </div>
-
-        <button class="btn btn-primary btn-full btn-lg" id="joinBtn" onclick="joinGame()">
-          Let's Play! 🎊
-        </button>
-
-        <div class="divider">or</div>
-
-        <a href="/admin" class="btn btn-outline btn-full">
-          🎛️ Host Login
-        </a>
-      </div>
-
-      <!-- Loading State -->
-      <div class="join-card fade-in-up hidden" id="loadingCard" style="text-align:center">
-        <div class="spinner" style="margin:0 auto 1rem"></div>
-        <p style="color:var(--gray)">Joining the game room...</p>
-      </div>
+    <h1 class="brand-tagline">
+      Make Every<br>Event <em>Unforgettable</em>
+    </h1>
+    <p class="brand-desc">
+      Live multiplayer games designed for Bridal & Baby Showers.
+      Real-time scoring, live leaderboards & instant celebrations.
+    </p>
+    <div class="game-pills">
+      <span class="game-pill">🧊 Ice Breaker Bingo</span>
+      <span class="game-pill">💰 Price Check</span>
+      <span class="game-pill">❓ Who Knows Best</span>
+      <span class="game-pill">😂 Emoji-nary</span>
+      <span class="game-pill">🔤 Word Scramble</span>
     </div>
   </div>
 
-  <!-- Toast Container -->
-  <div class="toast-container" id="toastContainer"></div>
+  <!-- CENTER: Join Card -->
+  <div class="join-wrap">
+    <div class="join-card fade-in-up" id="joinCard">
+      <div class="join-header">
+        <span class="join-emoji">🎉</span>
+        <h2 class="join-title">Join the Game!</h2>
+        <p class="join-sub">Enter your room code to start playing</p>
+      </div>
 
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="/js/app.js"></script>
-  <script>
-    const roomInput = document.getElementById('roomCodeInput');
-    const nameInput = document.getElementById('playerNameInput');
+      <div class="form-group" style="margin-bottom:1.25rem">
+        <label class="dark-label">Room Code</label>
+        <input type="text" class="dark-input code-input" id="roomCodeInput"
+          placeholder="ABC123" maxlength="6"
+          autocomplete="off" autocorrect="off" autocapitalize="characters">
+      </div>
 
-    // Auto uppercase room code
-    roomInput.addEventListener('input', (e) => {
-      e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-    });
+      <div class="form-group" style="margin-bottom:1.75rem">
+        <label class="dark-label">Your Name</label>
+        <input type="text" class="dark-input" id="playerNameInput"
+          placeholder="Enter your name ✨" maxlength="30" autocomplete="off">
+      </div>
 
-    // Enter key support
-    nameInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') joinGame();
-    });
-    roomInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') nameInput.focus();
-    });
+      <button class="btn btn-primary btn-full btn-xl" id="joinBtn" onclick="joinGame()">
+        🎊 Let's Play!
+      </button>
 
-    async function joinGame() {
-      const roomCode = roomInput.value.trim();
-      const playerName = nameInput.value.trim();
+      <div class="divider-line">or</div>
 
-      if (!roomCode || roomCode.length < 6) {
-        showToast('Please enter a 6-character room code', 'error');
-        roomInput.focus();
-        return;
-      }
+      <a href="/admin/login.html" class="btn btn-ghost btn-full">
+        🎛️ I'm the Host
+      </a>
+    </div>
+  </div>
 
-      if (!playerName) {
-        showToast('Please enter your name', 'error');
-        nameInput.focus();
-        return;
-      }
+  <!-- RIGHT: Event info -->
+  <div class="events-side fade-in-up" style="animation-delay:0.2s">
+    <div class="events-label">Event Types</div>
 
-      document.getElementById('joinCard').classList.add('hidden');
-      document.getElementById('loadingCard').classList.remove('hidden');
+    <div class="event-type-card">
+      <div class="et-icon et-bridal">💍</div>
+      <div>
+        <div class="et-title">Bridal Shower</div>
+        <div class="et-desc">5 games tailored for the bride-to-be</div>
+      </div>
+    </div>
 
-      try {
-        const res = await fetch('/api/players/join', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ room_code: roomCode, player_name: playerName })
-        });
+    <div class="event-type-card">
+      <div class="et-icon et-baby">👶</div>
+      <div>
+        <div class="et-title">Baby Shower</div>
+        <div class="et-desc">5 games perfect for the mom-to-be</div>
+      </div>
+    </div>
 
-        const data = await res.json();
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-num">5</div>
+        <div class="stat-lbl">Live Games</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">50+</div>
+        <div class="stat-lbl">Players / Room</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">🏆</div>
+        <div class="stat-lbl">Live Leaderboard</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">📱</div>
+        <div class="stat-lbl">Mobile Ready</div>
+      </div>
+    </div>
+  </div>
+</main>
 
-        if (!data.success) {
-          throw new Error(data.message);
-        }
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner-lg"></div>
+  <div class="loading-text">Joining the game room... 🎮</div>
+</div>
 
-        // Save player info to session
-        sessionStorage.setItem('k4_player', JSON.stringify(data.data));
+<div class="toast-container" id="toastContainer"></div>
 
-        // Redirect to lobby
-        window.location.href = '/lobby.html';
+<script src="/js/app.js"></script>
+<script>
+  const roomInput = document.getElementById('roomCodeInput');
+  const nameInput = document.getElementById('playerNameInput');
 
-      } catch (err) {
-        document.getElementById('joinCard').classList.remove('hidden');
-        document.getElementById('loadingCard').classList.add('hidden');
-        showToast(err.message || 'Could not join. Check your room code.', 'error');
-      }
+  roomInput.addEventListener('input', e => {
+    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+  });
+  roomInput.addEventListener('keypress', e => { if(e.key==='Enter') nameInput.focus(); });
+  nameInput.addEventListener('keypress', e => { if(e.key==='Enter') joinGame(); });
+
+  async function joinGame() {
+    const roomCode = roomInput.value.trim();
+    const playerName = nameInput.value.trim();
+
+    if (!roomCode || roomCode.length < 6) {
+      K4App.toast('Please enter a 6-character room code', 'error');
+      roomInput.focus(); return;
+    }
+    if (!playerName) {
+      K4App.toast('Please enter your name', 'error');
+      nameInput.focus(); return;
     }
 
-    function showToast(message, type = 'info') {
-      const container = document.getElementById('toastContainer');
-      const toast = document.createElement('div');
-      const icons = { success: '✅', error: '❌', info: 'ℹ️' };
-      toast.className = `toast toast-${type}`;
-      toast.innerHTML = `<span>${icons[type]}</span><span>${message}</span>`;
-      container.appendChild(toast);
-      setTimeout(() => toast.remove(), 4000);
+    document.getElementById('loadingOverlay').classList.add('active');
+    document.getElementById('joinBtn').disabled = true;
+
+    try {
+      const res = await fetch('/api/players/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ room_code: roomCode, player_name: playerName })
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message);
+      sessionStorage.setItem('k4_player', JSON.stringify(data.data));
+      window.location.href = '/lobby.html';
+    } catch (err) {
+      document.getElementById('loadingOverlay').classList.remove('active');
+      document.getElementById('joinBtn').disabled = false;
+      K4App.toast(err.message || 'Could not join. Check your room code.', 'error');
     }
-  </script>
+  }
+</script>
 </body>
 </html>

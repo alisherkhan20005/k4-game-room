@@ -1,72 +1,148 @@
 /* ============================================
-   K4 GAME ROOM - ANIMATIONS
+   K4 GAME ROOM — ANIMATIONS
    ============================================ */
 
-/* Page Transitions */
-.fade-in-down {
-  animation: fadeInDown 0.5s ease forwards;
-}
-.fade-in-up {
-  animation: fadeInUp 0.5s ease forwards;
-}
+/* Page entrance */
+.fade-in      { animation: fadeIn 0.5s ease forwards; }
+.fade-in-up   { animation: fadeInUp 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+.fade-in-down { animation: fadeInDown 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+.slide-in-right { animation: slideInRight 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+.zoom-in      { animation: zoomIn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
 
-@keyframes fadeInDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+@keyframes fadeIn       { from{opacity:0} to{opacity:1} }
+@keyframes fadeInUp     { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeInDown   { from{opacity:0;transform:translateY(-30px)} to{opacity:1;transform:translateY(0)} }
+@keyframes slideInRight { from{opacity:0;transform:translateX(40px)} to{opacity:1;transform:translateX(0)} }
+@keyframes zoomIn       { from{opacity:0;transform:scale(0.8)} to{opacity:1;transform:scale(1)} }
 
-/* Stagger children */
-.fade-in-up:nth-child(1) { animation-delay: 0s; }
-.fade-in-up:nth-child(2) { animation-delay: 0.1s; }
-.fade-in-up:nth-child(3) { animation-delay: 0.2s; }
-.fade-in-up:nth-child(4) { animation-delay: 0.3s; }
+/* Stagger */
+.stagger > *:nth-child(1) { animation-delay:0.05s }
+.stagger > *:nth-child(2) { animation-delay:0.10s }
+.stagger > *:nth-child(3) { animation-delay:0.15s }
+.stagger > *:nth-child(4) { animation-delay:0.20s }
+.stagger > *:nth-child(5) { animation-delay:0.25s }
+.stagger > *:nth-child(6) { animation-delay:0.30s }
+.stagger > *:nth-child(7) { animation-delay:0.35s }
+.stagger > *:nth-child(8) { animation-delay:0.40s }
 
-/* Button tap feedback */
-.btn:active { transform: scale(0.97); }
+/* Pulse / Float */
+.pulse  { animation: pulse 2s ease infinite; }
+.float  { animation: float 3s ease-in-out infinite; }
+.glow   { animation: glow 2s ease-in-out infinite; }
 
-/* Pulse */
-@keyframes pulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,181,200,0.4); }
-  50%       { transform: scale(1.03); box-shadow: 0 0 0 12px rgba(255,181,200,0); }
-}
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+@keyframes glow  { 0%,100%{box-shadow:0 0 20px rgba(255,107,157,0.3)} 50%{box-shadow:0 0 40px rgba(255,107,157,0.6)} }
 
-/* Float */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-12px); }
-}
-
-/* Bounce */
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-18px); }
+/* Shake — wrong answer */
+.shake { animation: shake 0.4s cubic-bezier(0.36,0.07,0.19,0.97) both; }
+@keyframes shake {
+  10%,90% { transform:translateX(-3px) }
+  20%,80% { transform:translateX(5px) }
+  30%,50%,70% { transform:translateX(-6px) }
+  40%,60% { transform:translateX(6px) }
 }
 
-/* Score pop */
-@keyframes scorePop {
-  0%   { opacity: 1; transform: translateY(0) scale(1); }
-  60%  { opacity: 1; transform: translateY(-60px) scale(1.4); }
-  100% { opacity: 0; transform: translateY(-100px) scale(0.8); }
+/* Bounce — correct answer */
+.bounce-in { animation: bounceIn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+@keyframes bounceIn {
+  0%   { opacity:0; transform:scale(0.3) }
+  60%  { opacity:1; transform:scale(1.1) }
+  80%  { transform:scale(0.95) }
+  100% { transform:scale(1) }
 }
 
-/* Confetti */
-@keyframes confettiFall {
-  0%   { transform: translateY(-100px) rotate(0deg);   opacity: 1; }
-  100% { transform: translateY(110vh)  rotate(720deg); opacity: 0; }
+/* Correct glow */
+.correct-flash {
+  animation: correctFlash 0.6s ease forwards;
+}
+@keyframes correctFlash {
+  0%   { box-shadow:0 0 0 0 rgba(0,200,150,0.7) }
+  50%  { box-shadow:0 0 0 16px rgba(0,200,150,0) }
+  100% { box-shadow:0 0 0 0 rgba(0,200,150,0) }
 }
 
-/* Shining shimmer */
-@keyframes shimmer {
-  0%   { background-position: -400px 0; }
-  100% { background-position: 400px 0; }
+/* Wrong flash */
+.wrong-flash {
+  animation: wrongFlash 0.5s ease forwards;
+}
+@keyframes wrongFlash {
+  0%,100% { background:inherit }
+  30%,70% { background:rgba(255,71,87,0.15) }
 }
 
-.shimmer {
-  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
-  background-size: 400px 100%;
-  animation: shimmer 1.5s infinite;
+/* Question slide */
+.q-enter {
+  animation: qEnter 0.55s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+@keyframes qEnter {
+  from { opacity:0; transform:translateX(60px) scale(0.95) }
+  to   { opacity:1; transform:translateX(0) scale(1) }
+}
+
+/* Cell tick */
+@keyframes cellPop {
+  0%   { transform:scale(1) }
+  40%  { transform:scale(1.25) }
+  100% { transform:scale(1) }
+}
+
+/* Leaderboard items */
+@keyframes lbSlide {
+  from { opacity:0; transform:translateX(-20px) }
+  to   { opacity:1; transform:translateX(0) }
+}
+
+/* Podium rise */
+@keyframes podiumRise {
+  from { opacity:0; transform:translateY(50px) }
+  to   { opacity:1; transform:translateY(0) }
+}
+
+/* Winner crown */
+@keyframes crownDrop {
+  0%  { opacity:0; transform:translateY(-40px) rotate(-20deg) scale(0.5) }
+  60% { transform:translateY(5px) rotate(5deg) scale(1.2) }
+  100%{ opacity:1; transform:translateY(0) rotate(0) scale(1) }
+}
+
+/* Timer urgent */
+@keyframes timerUrgent {
+  0%,100% { color:inherit; transform:scale(1) }
+  50%     { color:#FF4757; transform:scale(1.15) }
+}
+
+/* Floating particles */
+@keyframes particleFloat {
+  0%   { opacity:0; transform:translateY(0) scale(0) rotate(0deg) }
+  10%  { opacity:1 }
+  90%  { opacity:0.8 }
+  100% { opacity:0; transform:translateY(-120px) scale(1) rotate(360deg) }
+}
+
+/* Letter drop for word scramble */
+@keyframes letterDrop {
+  from { opacity:0; transform:translateY(-25px) rotateX(-45deg) }
+  to   { opacity:1; transform:translateY(0) rotateX(0) }
+}
+
+/* Emoji entrance */
+@keyframes emojiPop {
+  0%   { opacity:0; transform:scale(0) rotate(-20deg) }
+  60%  { transform:scale(1.3) rotate(5deg) }
+  100% { opacity:1; transform:scale(1) rotate(0) }
+}
+
+/* Countdown */
+@keyframes countDown {
+  0%   { opacity:1; transform:scale(1.5) }
+  80%  { opacity:1; transform:scale(1) }
+  100% { opacity:0; transform:scale(0.8) }
+}
+
+/* Bingo win */
+@keyframes bingoWin {
+  0%,100% { transform:scale(1) }
+  25%,75% { transform:scale(1.05) }
+  50%     { transform:scale(1.08) }
 }

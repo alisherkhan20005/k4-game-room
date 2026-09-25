@@ -3,143 +3,153 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Event — K4 Admin</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>Create Event — K4 Game Room</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/animations.css">
   <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body class="admin-body">
+<div class="admin-layout">
   <aside class="admin-sidebar">
     <div class="sidebar-logo">
-      <div class="sidebar-icon">🎮</div>
-      <div class="sidebar-brand">K4 Admin</div>
+      <div class="sidebar-logo-icon">🎮</div>
+      <div class="sidebar-logo-text"><h3>K4 Game Room</h3><span>by Kreate 4</span></div>
     </div>
     <nav class="sidebar-nav">
-      <a href="/admin/dashboard.html" class="nav-link">📊 Dashboard</a>
-      <a href="/admin/create-event.html" class="nav-link active">➕ New Event</a>
-      <a href="/admin/events.html" class="nav-link">📋 All Events</a>
+      <div class="nav-section">Main</div>
+      <a href="/admin/dashboard.html" class="nav-item"><span class="nav-item-icon">📊</span> Dashboard</a>
+      <a href="/admin/create-event.html" class="nav-item active"><span class="nav-item-icon">✨</span> Create Event</a>
+      <a href="/admin/events.html" class="nav-item"><span class="nav-item-icon">📋</span> All Events</a>
+      <div class="nav-section">Account</div>
+      <button class="nav-item" onclick="K4App.clearAdmin();window.location.href='/admin/login.html'">
+        <span class="nav-item-icon">🚪</span> Logout
+      </button>
     </nav>
-    <div class="sidebar-footer">
-      <button class="btn btn-sm" onclick="logout()" style="width:100%;background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.2)">Logout</button>
-    </div>
   </aside>
 
   <main class="admin-main">
-    <div class="admin-header">
+    <div class="admin-topbar">
       <div>
-        <h1 class="admin-title">Create New Event</h1>
-        <p class="admin-sub">Set up a bridal shower or baby shower game room.</p>
+        <h1 class="admin-page-title">Create New Event</h1>
+        <p class="admin-page-sub">Set up a new Bridal or Baby Shower game room</p>
       </div>
     </div>
+    <div class="admin-content">
+      <div style="max-width:580px">
 
-    <div class="admin-card" style="max-width:560px">
-      <!-- Event Type Picker -->
-      <div class="form-group">
-        <label class="form-label">Event Type</label>
-        <div class="event-type-picker" id="typePicker">
-          <div class="type-option active" onclick="selectType('bridal')" id="opt-bridal">
-            <div class="type-icon">💍</div>
-            <div class="type-label">Bridal Shower</div>
+        <!-- Form Card -->
+        <div class="admin-card fade-in-up" id="formCard">
+          <div class="admin-card-title" style="margin-bottom:1.75rem">Event Details</div>
+
+          <!-- Event Type -->
+          <div class="dark-form-group">
+            <label class="dark-form-label">Event Type</label>
+            <div class="event-type-grid">
+              <div class="et-btn selected" id="bridalBtn" onclick="selectType('bridal')">
+                <span class="et-btn-icon">💍</span>
+                <div class="et-btn-label">Bridal Shower</div>
+                <div class="et-btn-sub">16 questions & more</div>
+              </div>
+              <div class="et-btn" id="babyBtn" onclick="selectType('baby')">
+                <span class="et-btn-icon">👶</span>
+                <div class="et-btn-label">Baby Shower</div>
+                <div class="et-btn-sub">15 questions & more</div>
+              </div>
+            </div>
+            <input type="hidden" id="eventType" value="bridal">
           </div>
-          <div class="type-option" onclick="selectType('baby')" id="opt-baby">
-            <div class="type-icon">👶</div>
-            <div class="type-label">Baby Shower</div>
+
+          <!-- Celebrant Name -->
+          <div class="dark-form-group">
+            <label class="dark-form-label">Celebrant's Name</label>
+            <input type="text" class="dark-form-input" id="celebrantInput"
+              placeholder="e.g. Sarah, Emma, Jessica" maxlength="50">
+            <small style="font-size:0.75rem;color:rgba(255,255,255,0.25);margin-top:0.3rem">
+              This name auto-fills in all game questions ✨
+            </small>
+          </div>
+
+          <!-- Host Password -->
+          <div class="dark-form-group">
+            <label class="dark-form-label">Event Host Password</label>
+            <input type="password" class="dark-form-input" id="hostPwInput"
+              placeholder="Set a password for this event" maxlength="50">
+            <small style="font-size:0.75rem;color:rgba(255,255,255,0.25);margin-top:0.3rem">
+              Only you need this — guests join with the room code
+            </small>
+          </div>
+
+          <button class="btn btn-primary btn-full btn-xl" id="createBtn" onclick="createK4Event()">
+            🎉 Create Event
+          </button>
+        </div>
+
+        <!-- Success Card -->
+        <div class="success-card hidden fade-in-up" id="successCard">
+          <div style="font-size:4rem;margin-bottom:1rem">🎉</div>
+          <h2 style="font-family:var(--font-display);font-size:2rem;margin-bottom:0.5rem">Event Created!</h2>
+          <p style="color:rgba(255,255,255,0.45);margin-bottom:2rem">Share this code with your guests</p>
+          <div class="room-code-display" style="margin-bottom:1.5rem">
+            <div class="rcd-label">Room Code</div>
+            <div class="rcd-code" id="newRoomCode">------</div>
+          </div>
+          <p style="font-size:0.82rem;color:rgba(255,255,255,0.3);margin-bottom:2rem">
+            Players go to your site URL and enter this code to join
+          </p>
+          <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap">
+            <button class="btn btn-success btn-lg" onclick="goControl()">🎛️ Start Hosting</button>
+            <button class="btn btn-ghost btn-lg" onclick="copyCode()">📋 Copy Code</button>
           </div>
         </div>
-        <input type="hidden" id="eventType" value="bridal">
-      </div>
 
-      <div class="form-group">
-        <label class="form-label" id="celebrantLabel">Bride's Name</label>
-        <input type="text" class="form-input" id="celebrantName" placeholder="e.g. Sarah Johnson" maxlength="100" autocomplete="off">
-        <small style="color:var(--gray);font-size:0.8rem;margin-top:0.25rem">This name auto-fills in all games</small>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Admin Password for This Event</label>
-        <input type="password" class="form-input" id="hostPassword" placeholder="Set a password for the host panel" maxlength="50" autocomplete="new-password">
-        <small style="color:var(--gray);font-size:0.8rem;margin-top:0.25rem">Share this with the event host to control games</small>
-      </div>
-
-      <button class="btn btn-primary btn-full btn-lg" id="createBtn" onclick="createK4Event()">
-        Create Event Room 🎉
-      </button>
-    </div>
-
-    <!-- Success modal -->
-    <div class="success-overlay" id="successOverlay" style="display:none">
-      <div class="success-modal">
-        <div class="success-icon">🎊</div>
-        <h2 style="font-family:var(--font-heading);font-size:1.8rem;margin-bottom:0.5rem">Event Created!</h2>
-        <p style="color:var(--gray);margin-bottom:1.5rem">Share the room code with your guests</p>
-        <div style="background:linear-gradient(135deg,rgba(255,181,200,0.15),rgba(168,206,222,0.15));border:2px dashed var(--baby-pink);border-radius:var(--radius-lg);padding:1.25rem;text-align:center;margin-bottom:1.5rem">
-          <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray);font-weight:600;margin-bottom:0.25rem">Room Code</div>
-          <div style="font-family:var(--font-heading);font-size:3rem;font-weight:700;letter-spacing:0.4em;color:var(--dark)" id="newRoomCode">------</div>
-        </div>
-        <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
-          <a id="controlLink" href="#" class="btn btn-primary" style="flex:1">Host Controls 🎮</a>
-          <a href="/admin/create-event.html" class="btn btn-outline" style="flex:1">New Event</a>
-        </div>
       </div>
     </div>
   </main>
+</div>
 
-  <div class="toast-container" id="toastContainer"></div>
+<div class="toast-container" id="toastContainer"></div>
+<script src="/js/app.js"></script>
+<script>
+  (async()=>{ if(!await K4App.requireAdmin()) return; })();
 
-  <script src="/js/app.js"></script>
-  <script>
-    const token = localStorage.getItem('k4_admin_token');
-    if (!token) window.location.href = '/admin/login.html';
+  let selectedType = 'bridal';
+  let createdEventId = null;
+  let createdRoomCode = null;
 
-    function selectType(type) {
-      document.getElementById('eventType').value = type;
-      document.querySelectorAll('.type-option').forEach(o => o.classList.remove('active'));
-      document.getElementById(`opt-${type}`).classList.add('active');
-      document.getElementById('celebrantLabel').textContent = type === 'bridal' ? "Bride's Name" : "Mum-to-be's Name";
+  function selectType(type) {
+    selectedType = type;
+    document.getElementById('eventType').value = type;
+    document.getElementById('bridalBtn').classList.toggle('selected', type==='bridal');
+    document.getElementById('babyBtn').classList.toggle('selected', type==='baby');
+  }
+
+  async function createK4Event() {
+    const celebrant = document.getElementById('celebrantInput').value.trim();
+    const hostPw    = document.getElementById('hostPwInput').value.trim();
+    const btn = document.getElementById('createBtn');
+    if(!celebrant) { K4App.toast("Enter the celebrant's name",'error'); return; }
+    if(!hostPw)    { K4App.toast('Set a host password','error'); return; }
+    btn.disabled=true; btn.textContent='Creating...';
+    try {
+      const data = await K4App.api('/events/create',{method:'POST',body:{
+        event_type:selectedType, celebrant_name:celebrant, host_password:hostPw
+      }});
+      createdEventId  = data.data.id;
+      createdRoomCode = data.data.room_code;
+      document.getElementById('newRoomCode').textContent = createdRoomCode;
+      document.getElementById('formCard').classList.add('hidden');
+      document.getElementById('successCard').classList.remove('hidden');
+    } catch(err) {
+      K4App.toast(err.message,'error');
+      btn.disabled=false; btn.textContent='🎉 Create Event';
     }
+  }
 
-    async function createK4Event() {
-      const event_type = document.getElementById('eventType').value;
-      const celebrant_name = document.getElementById('celebrantName').value.trim();
-      const host_password = document.getElementById('hostPassword').value;
-
-      if (!celebrant_name) { showToast('Please enter the celebrant name', 'error'); return; }
-      if (!host_password || host_password.length < 4) { showToast('Password must be at least 4 characters', 'error'); return; }
-
-      const btn = document.getElementById('createBtn');
-      btn.disabled = true; btn.textContent = 'Creating...';
-
-      try {
-        const res = await fetch('/api/events/create', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-          body: JSON.stringify({ event_type, celebrant_name, host_password })
-        });
-        const data = await res.json();
-        if (data.success) {
-          document.getElementById('newRoomCode').textContent = data.data.room_code;
-          document.getElementById('controlLink').href = `/admin/control.html?room=${data.data.room_code}`;
-          document.getElementById('successOverlay').style.display = 'flex';
-        } else {
-          showToast(data.message || 'Failed to create event', 'error');
-          btn.disabled = false; btn.textContent = 'Create Event Room 🎉';
-        }
-      } catch (e) {
-        showToast('Server error. Please try again.', 'error');
-        btn.disabled = false; btn.textContent = 'Create Event Room 🎉';
-      }
-    }
-
-    function showToast(msg, type) {
-      const c = document.getElementById('toastContainer');
-      const t = document.createElement('div');
-      t.className = `toast toast-${type}`;
-      t.innerHTML = `<span>${type==='error'?'❌':'✅'}</span><span>${msg}</span>`;
-      c.appendChild(t); setTimeout(() => t.remove(), 4000);
-    }
-    function logout() { localStorage.removeItem('k4_admin_token'); window.location.href = '/admin/login.html'; }
-  </script>
+  function goControl() { window.location.href=`/admin/control.html?event=${createdEventId}`; }
+  function copyCode()  {
+    navigator.clipboard.writeText(createdRoomCode).then(()=>K4App.toast('Room code copied!','success'));
+  }
+</script>
 </body>
 </html>

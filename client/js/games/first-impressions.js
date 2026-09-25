@@ -1,130 +1,84 @@
-/* ============================================
-   FIRST IMPRESSIONS - BINGO GAME
-   ============================================ */
-
+/* FIRST IMPRESSIONS — BINGO — Premium UI */
 const FirstImpressions = {
-  gameData: null,
-  ticked: new Set(),
-  hasWon: false,
+  gameData:null, ticked:new Set(), hasWon:false,
 
   init(gameData, player, socket) {
-    this.gameData = gameData;
-    this.player = player;
-    this.socket = socket;
-    this.ticked = new Set();
-    this.hasWon = false;
-    // Auto-tick the free space (index 12, centre)
-    this.ticked.add(12);
-    this.renderGrid();
+    this.gameData=gameData; this.player=player; this.socket=socket;
+    this.ticked=new Set(); this.hasWon=false;
+    this.ticked.add(12); // centre free space
+    document.getElementById('gameNameText').textContent = '🧊 First Impressions';
+    document.getElementById('progressFill').style.width = '0%';
+    this.render();
   },
 
-  renderGrid() {
+  render() {
     const game = this.gameData.game;
-    // Support both 'clues' and 'grid' key names
     const cells = game.clues || game.grid || [];
-    const content = document.getElementById('gameContent');
-
-    content.innerHTML = `
-      <div class="fade-in">
-        <div style="text-align:center;margin-bottom:1rem">
-          <h2 style="font-family:var(--font-heading);font-size:1.4rem;color:var(--dark)">${K4App.escapeHtml(game.title)}</h2>
-          <p style="color:var(--gray);font-size:0.85rem;margin-top:0.25rem">${K4App.escapeHtml(game.subtitle)}</p>
-        </div>
-        <div style="background:rgba(255,181,200,0.1);border-radius:var(--radius-md);padding:0.625rem 1rem;margin-bottom:1rem;font-size:0.82rem;color:var(--gray);text-align:center">
-          💡 Tap a square when you find someone who matches. Get 5 in a row and show the host!
-        </div>
-        <div class="bingo-grid" id="bingoGrid">
-          ${cells.map((cell, i) => {
-            const isFree = cell.is_free_space || cell.free || false;
-            const isTicked = this.ticked.has(i);
-            const displayText = isFree ? (cell.content || '⭐') + ' FREE' : K4App.escapeHtml(cell.text);
-            return `
-              <div
-                class="bingo-cell ${isFree ? 'bingo-cell--free' : ''} ${(isTicked && !isFree) ? 'bingo-cell--ticked' : ''} ${isFree && isTicked ? 'bingo-cell--free' : ''}"
-                id="cell-${i}"
-                data-index="${i}"
-                onclick="${isFree ? '' : `FirstImpressions.toggleCell(${i})`}"
-              >${displayText}</div>
-            `;
-          }).join('')}
-        </div>
-        <div id="winBanner"></div>
-        <div style="margin-top:0.75rem;text-align:center">
-          <span style="font-size:0.8rem;color:var(--gray)">
-            Ticked: <strong id="tickedCount">${this.ticked.size}</strong>/25
-          </span>
-        </div>
+    document.getElementById('gameContent').innerHTML = `
+      <div class="bingo-header fade-in">
+        <h2 class="bingo-title">${K4App.escapeHtml(game.title)}</h2>
+        <p class="bingo-sub">${K4App.escapeHtml(game.subtitle)}</p>
       </div>
-    `;
+      <div class="bingo-tip" style="width:100%">
+        💡 Tap a cell when you find someone who matches. Get 5 in a row to win!
+      </div>
+      <div class="bingo-grid" id="bingoGrid">
+        ${cells.map((cell,i) => {
+          const isFree = cell.is_free_space || cell.free || false;
+          const isTicked = this.ticked.has(i);
+          const txt = isFree ? `⭐<br>FREE` : K4App.escapeHtml(cell.text);
+          return `<div class="bingo-cell ${isFree?'free':''} ${(isTicked&&!isFree)?'ticked':''} ${isFree?'ticked':''}"
+            id="cell-${i}" onclick="${isFree?'':`FirstImpressions.toggle(${i})`}"
+          >${txt}</div>`;
+        }).join('')}
+      </div>
+      <div class="bingo-tally">Ticked: <strong id="tickedCount">${this.ticked.size}</strong> / 25</div>
+      <div id="bingoBanner" style="width:100%"></div>`;
   },
 
-  toggleCell(index) {
-    if (this.hasWon) return;
-    const cell = document.getElementById(`cell-${index}`);
-    if (!cell) return;
-
-    if (this.ticked.has(index)) {
-      this.ticked.delete(index);
-      cell.classList.remove('bingo-cell--ticked');
+  toggle(idx) {
+    if(this.hasWon) return;
+    const cell = document.getElementById(`cell-${idx}`);
+    if(!cell) return;
+    if(this.ticked.has(idx)) {
+      this.ticked.delete(idx);
+      cell.classList.remove('ticked');
     } else {
-      this.ticked.add(index);
-      cell.classList.add('bingo-cell--ticked');
-      K4Anim.bounce(cell);
+      this.ticked.add(idx);
+      cell.classList.add('ticked');
+      cell.style.animation = 'none';
+      setTimeout(() => cell.style.animation = 'cellPop 0.35s cubic-bezier(0.34,1.56,0.64,1)', 10);
     }
-
     document.getElementById('tickedCount').textContent = this.ticked.size;
     this.checkWin();
   },
 
-  // Check all rows, cols, diagonals in a flat 25-cell 5×5 grid
   checkWin() {
-    const SIZE = 5;
-    const winning = [];
-
-    // Rows
-    for (let r = 0; r < SIZE; r++) {
-      const row = [0,1,2,3,4].map(c => r * SIZE + c);
-      if (row.every(i => this.ticked.has(i))) { winning.push(...row); break; }
-    }
-    if (!winning.length) {
-      // Columns
-      for (let c = 0; c < SIZE; c++) {
-        const col = [0,1,2,3,4].map(r => r * SIZE + c);
-        if (col.every(i => this.ticked.has(i))) { winning.push(...col); break; }
-      }
-    }
-    if (!winning.length) {
-      // Diagonal TL→BR
-      const diag1 = [0,6,12,18,24];
-      if (diag1.every(i => this.ticked.has(i))) winning.push(...diag1);
-    }
-    if (!winning.length) {
-      // Diagonal TR→BL
-      const diag2 = [4,8,12,16,20];
-      if (diag2.every(i => this.ticked.has(i))) winning.push(...diag2);
-    }
-
-    if (winning.length) this.triggerWin(winning);
+    const S=5, win=[];
+    // rows
+    for(let r=0;r<S;r++){const row=[0,1,2,3,4].map(c=>r*S+c);if(row.every(i=>this.ticked.has(i))){win.push(...row);break;}}
+    // cols
+    if(!win.length)for(let c=0;c<S;c++){const col=[0,1,2,3,4].map(r=>r*S+c);if(col.every(i=>this.ticked.has(i))){win.push(...col);break;}}
+    // diags
+    if(!win.length){const d1=[0,6,12,18,24];if(d1.every(i=>this.ticked.has(i)))win.push(...d1);}
+    if(!win.length){const d2=[4,8,12,16,20];if(d2.every(i=>this.ticked.has(i)))win.push(...d2);}
+    if(win.length) this.triggerWin(win);
   },
 
-  triggerWin(winningCells) {
-    if (this.hasWon) return;
+  triggerWin(cells) {
+    if(this.hasWon) return;
     this.hasWon = true;
-
-    winningCells.forEach(i => {
-      const cell = document.getElementById(`cell-${i}`);
-      if (cell) cell.classList.add('bingo-cell--win');
+    cells.forEach(i => {
+      const c = document.getElementById(`cell-${i}`);
+      if(c) c.classList.add('win');
     });
-
-    const banner = document.getElementById('winBanner');
-    banner.innerHTML = `
-      <div class="bingo-win-banner" style="margin-top:1rem">
-        <div style="font-size:3rem;margin-bottom:0.5rem">🎉</div>
-        <h2>BINGO! You got 5 in a row!</h2>
-        <p style="margin-top:0.5rem;opacity:0.9;font-size:0.95rem">Show the host your screen to claim your win! 🏆</p>
-      </div>
-    `;
-    K4Anim.confetti(80);
+    document.getElementById('bingoBanner').innerHTML = `
+      <div class="bingo-win-banner">
+        <div style="font-size:3.5rem;margin-bottom:0.75rem">🎉</div>
+        <h2 style="font-family:var(--font-display);font-size:2rem;font-weight:900;margin-bottom:0.5rem">BINGO!</h2>
+        <p style="opacity:0.8">You got 5 in a row! Show the host your screen to claim your win! 🏆</p>
+      </div>`;
+    K4Anim.confetti(100);
   },
 
   destroy() {}

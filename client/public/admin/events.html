@@ -3,115 +3,98 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>All Events — K4 Admin</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>All Events — K4 Game Room</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/animations.css">
   <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body class="admin-body">
+<div class="admin-layout">
   <aside class="admin-sidebar">
     <div class="sidebar-logo">
-      <div class="sidebar-icon">🎮</div>
-      <div class="sidebar-brand">K4 Admin</div>
+      <div class="sidebar-logo-icon">🎮</div>
+      <div class="sidebar-logo-text"><h3>K4 Game Room</h3><span>by Kreate 4</span></div>
     </div>
     <nav class="sidebar-nav">
-      <a href="/admin/dashboard.html" class="nav-link">📊 Dashboard</a>
-      <a href="/admin/create-event.html" class="nav-link">➕ New Event</a>
-      <a href="/admin/events.html" class="nav-link active">📋 All Events</a>
+      <div class="nav-section">Main</div>
+      <a href="/admin/dashboard.html" class="nav-item"><span class="nav-item-icon">📊</span> Dashboard</a>
+      <a href="/admin/create-event.html" class="nav-item"><span class="nav-item-icon">✨</span> Create Event</a>
+      <a href="/admin/events.html" class="nav-item active"><span class="nav-item-icon">📋</span> All Events</a>
+      <div class="nav-section">Account</div>
+      <button class="nav-item" onclick="K4App.clearAdmin();window.location.href='/admin/login.html'">
+        <span class="nav-item-icon">🚪</span> Logout
+      </button>
     </nav>
-    <div class="sidebar-footer">
-      <button class="btn btn-sm" onclick="logout()" style="width:100%;background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.2)">Logout</button>
-    </div>
   </aside>
 
   <main class="admin-main">
-    <div class="admin-header">
+    <div class="admin-topbar">
       <div>
-        <h1 class="admin-title">All Events</h1>
-        <p class="admin-sub">Manage all your K4 Game Room events.</p>
+        <h1 class="admin-page-title">All Events</h1>
+        <p class="admin-page-sub">Manage all your game room sessions</p>
       </div>
-      <a href="/admin/create-event.html" class="btn btn-primary">➕ New Event</a>
+      <a href="/admin/create-event.html" class="btn btn-primary">✨ New Event</a>
     </div>
-
-    <div class="admin-card">
-      <div id="eventsContainer"><div class="loading-placeholder">Loading events...</div></div>
+    <div class="admin-content">
+      <div class="admin-card fade-in-up">
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Room Code</th>
+                <th>Celebrant</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="eventsBody">
+              <tr><td colspan="6" style="text-align:center;color:rgba(255,255,255,0.2);padding:3rem">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </main>
+</div>
 
-  <div class="toast-container" id="toastContainer"></div>
+<div class="toast-container" id="toastContainer"></div>
+<script src="/js/app.js"></script>
+<script>
+  function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 
-  <script>
-    const token = localStorage.getItem('k4_admin_token');
-    if (!token) window.location.href = '/admin/login.html';
+  (async()=>{
+    if(!await K4App.requireAdmin()) return;
+    try {
+      const data = await K4App.api('/events/all');
+      const events = data.data;
+      const tbody = document.getElementById('eventsBody');
+      if(!events.length){
+        tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;color:rgba(255,255,255,0.2);padding:3rem">No events yet. <a href="/admin/create-event.html" style="color:var(--pink)">Create one!</a></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = events.map(e=>`
+        <tr>
+          <td><span style="font-family:var(--font-display);font-weight:900;letter-spacing:0.15em;color:var(--pink)">${e.room_code}</span></td>
+          <td><span style="font-weight:600">${escHtml(e.celebrant_name)}</span></td>
+          <td><span class="badge ${e.event_type==='bridal'?'badge-pink':'badge-blue'}">${e.event_type==='bridal'?'💍 Bridal':'👶 Baby'}</span></td>
+          <td><span class="badge ${e.status==='active'?'badge-mint':e.status==='waiting'?'badge-yellow':'badge-purple'}">${e.status}</span></td>
+          <td style="color:rgba(255,255,255,0.35);font-size:0.82rem">${new Date(e.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</td>
+          <td style="display:flex;gap:0.5rem;flex-wrap:wrap">
+            <a href="/admin/control.html?event=${e.id}" class="btn btn-success btn-sm">🎛️ Control</a>
+            <button class="btn btn-sm" style="background:rgba(255,71,87,0.1);border:1px solid rgba(255,71,87,0.2);color:rgba(255,100,100,0.7)" onclick="del(${e.id})">Delete</button>
+          </td>
+        </tr>`).join('');
+    } catch(err){ K4App.toast(err.message,'error'); }
+  })();
 
-    async function loadEvents() {
-      try {
-        const res = await fetch('/api/events/all', { headers: { 'Authorization': `Bearer ${token}` } });
-        const data = await res.json();
-        if (!data.success) { logout(); return; }
-
-        const events = data.data;
-        const container = document.getElementById('eventsContainer');
-
-        if (events.length === 0) {
-          container.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--gray)">
-            <div style="font-size:3rem;margin-bottom:1rem">🎉</div>
-            <p>No events yet.</p>
-            <a href="/admin/create-event.html" class="btn btn-primary" style="margin-top:1rem;display:inline-flex">Create First Event</a>
-          </div>`;
-          return;
-        }
-
-        container.innerHTML = `<table class="admin-table">
-          <thead><tr>
-            <th>Celebrant</th><th>Type</th><th>Room Code</th><th>Status</th><th>Players</th><th>Created</th><th>Actions</th>
-          </tr></thead>
-          <tbody>
-          ${events.map(ev => `
-            <tr>
-              <td><strong>${escHtml(ev.celebrant_name)}</strong></td>
-              <td><span class="badge ${ev.event_type === 'bridal' ? 'badge-pink' : 'badge-blue'}">${ev.event_type}</span></td>
-              <td><code style="font-family:var(--font-heading);font-weight:700;letter-spacing:0.1em;font-size:1rem">${ev.room_code}</code></td>
-              <td><span class="badge ${ev.status === 'active' ? 'badge-green' : ev.status === 'finished' ? 'badge-yellow' : 'badge-blue'}">${ev.status}</span></td>
-              <td style="color:var(--gray)">—</td>
-              <td style="color:var(--gray);font-size:0.85rem">${new Date(ev.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'})}</td>
-              <td style="display:flex;gap:0.5rem;flex-wrap:wrap">
-                ${ev.status !== 'finished' ? `<a href="/admin/control.html?room=${ev.room_code}" class="btn btn-sm btn-primary">Host 🎮</a>` : ''}
-                <button class="btn btn-sm" onclick="deleteEvent(${ev.id}, '${ev.celebrant_name}')" style="background:rgba(255,107,107,0.1);color:#FF6B6B;border:1px solid rgba(255,107,107,0.2)">Delete</button>
-              </td>
-            </tr>
-          `).join('')}
-          </tbody>
-        </table>`;
-      } catch (e) { console.error(e); }
-    }
-
-    async function deleteEvent(id, name) {
-      if (!confirm(`Delete event for ${name}? This cannot be undone.`)) return;
-      try {
-        const res = await fetch(`/api/events/${id}`, {
-          method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await res.json();
-        if (data.success) { showToast('Event deleted', 'success'); loadEvents(); }
-        else showToast(data.message, 'error');
-      } catch (e) { showToast('Error deleting event', 'error'); }
-    }
-
-    function escHtml(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
-    function showToast(msg, type) {
-      const c = document.getElementById('toastContainer');
-      const t = document.createElement('div');
-      t.className = `toast toast-${type}`;
-      t.innerHTML = `<span>${type==='error'?'❌':'✅'}</span><span>${msg}</span>`;
-      c.appendChild(t); setTimeout(() => t.remove(), 4000);
-    }
-    function logout() { localStorage.removeItem('k4_admin_token'); window.location.href = '/admin/login.html'; }
-
-    loadEvents();
-  </script>
+  async function del(id) {
+    if(!confirm('Delete this event? Cannot be undone.')) return;
+    try { await K4App.api(`/events/${id}`,{method:'DELETE'}); K4App.toast('Deleted','success'); location.reload(); }
+    catch(err){ K4App.toast(err.message,'error'); }
+  }
+</script>
 </body>
 </html>

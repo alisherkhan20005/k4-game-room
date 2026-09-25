@@ -1,113 +1,81 @@
-/* ============================================
-   K4 GAME ROOM - LEADERBOARD
-   ============================================ */
-
+/* LEADERBOARD — Premium UI */
 const K4Leaderboard = {
 
-  // Render leaderboard list
-  render(players, containerId = 'leaderboardList', currentPlayerId = null) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    if (!players || players.length === 0) {
-      container.innerHTML = '<p style="text-align:center;color:var(--gray);padding:2rem">No scores yet</p>';
+  renderList(players, containerId, currentPlayerId=null) {
+    const el = document.getElementById(containerId);
+    if(!el) return;
+    if(!players || !players.length) {
+      el.innerHTML = `<p style="text-align:center;color:rgba(255,255,255,0.25);padding:2rem;font-size:0.9rem">No scores yet</p>`;
       return;
     }
-
-    container.innerHTML = players.map((p, i) => {
-      const rankClass = i === 0 ? 'leaderboard-rank--1' : i === 1 ? 'leaderboard-rank--2' : i === 2 ? 'leaderboard-rank--3' : 'leaderboard-rank--other';
-      const rankIcon = i === 0 ? '👑' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
+    el.innerHTML = players.map((p, i) => {
       const isMe = p.id === currentPlayerId;
-
+      const rankClass = i===0?'lb-rank-1':i===1?'lb-rank-2':i===2?'lb-rank-3':'lb-rank-n';
+      const rankIcon  = i===0?'👑':i===1?'🥈':i===2?'🥉':`${i+1}`;
       return `
-        <div class="leaderboard-item ${isMe ? 'leaderboard-item--me' : ''}"
-             style="${isMe ? 'border:2px solid var(--baby-pink);background:rgba(255,181,200,0.06)' : ''}">
-          <div class="leaderboard-rank ${rankClass}">${rankIcon}</div>
-          <div class="avatar" style="background:${p.avatar_color || '#FFB5C8'};width:38px;height:38px;font-size:0.9rem">
+        <div class="lb-item ${isMe?'me':''}" style="animation-delay:${i*60}ms">
+          <div class="lb-rank ${rankClass}">${rankIcon}</div>
+          <div class="avatar avatar-sm" style="background:${p.avatar_color||'var(--pink)'}">
             ${K4App.escapeHtml(p.name.charAt(0).toUpperCase())}
           </div>
-          <div class="leaderboard-name">
+          <div class="lb-name">
             ${K4App.escapeHtml(p.name)}
-            ${isMe ? ' <span style="color:var(--baby-pink);font-size:0.75rem">(you)</span>' : ''}
+            ${isMe?'<span style="color:var(--pink);font-size:0.72rem;font-weight:700;margin-left:0.4rem">(you)</span>':''}
           </div>
-          <div class="leaderboard-score">${p.total_score || 0} pts</div>
-        </div>
-      `;
+          <div class="lb-pts">${p.total_score||0} <span style="font-size:0.75rem;opacity:0.5">pts</span></div>
+        </div>`;
     }).join('');
-
-    // Stagger animation
-    const items = container.querySelectorAll('.leaderboard-item');
-    K4Anim.staggerFadeIn(Array.from(items), 80);
   },
 
-  // Render winner podium (top 3)
-  renderPodium(players, containerId = 'podiumContainer') {
-    const container = document.getElementById(containerId);
-    if (!container || players.length === 0) return;
+  renderPodium(players, containerId) {
+    const el = document.getElementById(containerId);
+    if(!el || !players.length) return;
+    const top3 = players.slice(0,3);
+    const order = [1,0,2]; // 2nd, 1st, 3rd
+    const heights = {0:140, 1:105, 2:76};
+    const classes = {0:'podium-1', 1:'podium-2', 2:'podium-3'};
+    const labels  = {0:'👑', 1:'2', 2:'3'};
+    const delays  = {0:'0.3s', 1:'0.5s', 2:'0.7s'};
 
-    const top3 = players.slice(0, 3);
-    const order = [1, 0, 2]; // 2nd, 1st, 3rd position order
-
-    container.innerHTML = order.map(idx => {
+    el.innerHTML = order.map(idx => {
       const p = top3[idx];
-      if (!p) return '<div class="podium-place"></div>';
-
-      const place = idx + 1;
-      const heights = { 1: 120, 2: 90, 3: 65 };
-      const labels = { 1: '👑', 2: '2', 3: '3' };
-
+      if(!p) return '<div style="flex:1"></div>';
       return `
-        <div class="podium-place podium-rise" style="--delay:${0.3 + idx * 0.15}s">
-          <div class="podium-avatar">
-            <div class="avatar avatar-lg" style="background:${p.avatar_color || '#FFB5C8'}">
+        <div class="podium-place" style="animation:podiumRise 0.7s ease ${delays[idx]} both">
+          <div class="podium-avatar-wrap">
+            ${idx===0?'<div class="podium-crown">👑</div>':''}
+            <div class="avatar avatar-lg" style="background:${p.avatar_color||'var(--pink)'}">
               ${K4App.escapeHtml(p.name.charAt(0).toUpperCase())}
             </div>
           </div>
           <div class="podium-name">${K4App.escapeHtml(p.name)}</div>
-          <div class="podium-score">${p.total_score} pts</div>
-          <div class="podium-block podium-block--${place}" style="height:${heights[place]}px">
-            ${labels[place]}
-          </div>
-        </div>
-      `;
+          <div class="podium-pts">${p.total_score||0} pts</div>
+          <div class="podium-block ${classes[idx]}">${labels[idx]}</div>
+        </div>`;
     }).join('');
   },
 
-  // Show leaderboard overlay
-  show(players, subtitle = 'After this round', currentPlayerId = null) {
-    const overlay = document.getElementById('leaderboardOverlay');
-    if (!overlay) return;
-
-    document.getElementById('lbSubtitle').textContent = subtitle;
-    this.render(players, 'leaderboardList', currentPlayerId);
-
-    overlay.classList.remove('hidden');
-    overlay.style.display = 'flex';
+  show(players, subtitle, currentPlayerId=null) {
+    const ov = document.getElementById('leaderboardOverlay');
+    if(!ov) return;
+    if(subtitle) document.getElementById('lbSubtitle').textContent = subtitle;
+    this.renderList(players, 'leaderboardList', currentPlayerId);
+    ov.classList.add('active');
   },
 
-  // Hide leaderboard overlay
   hide() {
-    const overlay = document.getElementById('leaderboardOverlay');
-    if (overlay) {
-      overlay.classList.add('hidden');
-      overlay.style.display = 'none';
-    }
+    const ov = document.getElementById('leaderboardOverlay');
+    if(ov) ov.classList.remove('active');
   },
 
-  // Show final results
-  showFinal(players, currentPlayerId = null) {
+  showFinal(players, currentPlayerId=null) {
     this.hide();
-    const final = document.getElementById('finalResults');
-    if (!final) return;
-
-    this.renderPodium(players);
-    this.render(players, 'finalLeaderboard', currentPlayerId);
-
-    final.classList.remove('hidden');
-    final.style.display = 'flex';
-
-    // Confetti!
-    setTimeout(() => K4Anim.confetti(100), 300);
-    setTimeout(() => K4Anim.confetti(50), 1500);
+    const fin = document.getElementById('finalResults');
+    if(!fin) return;
+    this.renderPodium(players, 'podiumContainer');
+    this.renderList(players, 'finalLeaderboard', currentPlayerId);
+    fin.classList.add('active');
+    setTimeout(() => K4Anim.confetti(120), 300);
+    setTimeout(() => K4Anim.confetti(60), 1800);
   }
 };

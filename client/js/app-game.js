@@ -1,108 +1,104 @@
-/* ============================================
-   K4 GAME ROOM - GAME ROUTER
-   ============================================ */
+/* K4 GAME ROOM — GAME SHELL CONTROLLER */
+(function() {
+  const playerData = JSON.parse(sessionStorage.getItem('k4_player') || '{}');
+  if(!playerData.player_id) { window.location.href='/'; return; }
 
-(async () => {
-  const player = K4App.requirePlayer();
-  if (!player) return;
-
-  const gameName = K4App.getParam('game');
-  const roomCode = K4App.getParam('room') || player.room_code;
-
-  // Set player avatar
-  const avatarEl = document.getElementById('playerAvatar');
-  if (avatarEl) {
-    avatarEl.textContent = player.player_name?.charAt(0).toUpperCase() || 'P';
-    avatarEl.style.background = player.avatar_color || 'var(--baby-pink)';
+  // Set avatar
+  const avatar = document.getElementById('playerAvatar');
+  if(avatar) {
+    avatar.textContent = (playerData.player_name||'P').charAt(0).toUpperCase();
+    avatar.style.background = playerData.avatar_color || 'var(--pink)';
   }
+  document.getElementById('currentScore').textContent = playerData.total_score || 0;
 
-  // Connect socket
+  // Socket
   const socket = io();
-  let currentGame = null;
+  let gameModule = null;
+  let localScore  = 0;
 
   socket.on('connect', () => {
     socket.emit('join_room', {
-      room_code: roomCode,
-      player_id: player.player_id,
-      player_name: player.player_name
+      room_code:   playerData.room_code,
+      player_id:   playerData.player_id,
+      player_name: playerData.player_name
     });
   });
 
-  // Load game data
-  try {
-    const data = await K4App.api(`/games/${roomCode}/${gameName}`);
-    const gameData = data.data;
-
-    // Set game name in header
-    const nameMap = {
-      who_knows_best: 'Who Knows Best ❓',
-      emojinary: 'Emoji-nary 😂',
-      price_check: 'Price Check 💰',
-      first_impressions: 'First Impressions 🧊',
-      word_scramble: 'Word Scramble 🔤'
-    };
-    document.getElementById('gameName').textContent = nameMap[gameName] || gameName;
-    document.title = `${nameMap[gameName] || 'Game'} — K4 Game Room`;
-
-    // Init correct game module
-    switch (gameName) {
-      case 'who_knows_best':
-        currentGame = WhoKnowsBest;
-        break;
-      case 'emojinary':
-        currentGame = Emojinary;
-        break;
-      case 'price_check':
-        currentGame = PriceCheck;
-        break;
-      case 'first_impressions':
-        currentGame = FirstImpressions;
-        break;
-      case 'word_scramble':
-        currentGame = WordScramble;
-        break;
-      default:
-        document.getElementById('gameContent').innerHTML = `
-          <div style="text-align:center;padding:3rem">
-            <div style="font-size:3rem">🎮</div>
-            <h2 style="font-family:var(--font-heading)">Game not found</h2>
-            <p style="color:var(--gray)">Please wait for the host to start a game</p>
-          </div>
-        `;
-        return;
+  socket.on('game_started', async ({ game_name }) => {
+    try {
+      const res = await fetch(`/api/games/${playerData.room_code}/${game_name}`, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+      if(!data.success) throw new Error(data.message);
+      initGame(game_name, data.data);
+    } catch(e) {
+      K4App.toast('Error loading game: '+e.message,'error');
     }
+  });
 
-    currentGame.init(gameData, player, socket);
+  // Close leaderboard when next game starts
+  socket.on('game_ended', ({ scores }) => {
+    updateScoreFromServer(scores);
+    K4Leaderboard.show(scores, 'Scores after this game', playerData.player_id);
+  });
 
-  } catch (err) {
-    console.error('Game load error:', err);
-    document.getElementById('gameContent').innerHTML = `
-      <div style="text-align:center;padding:3rem">
-        <div style="font-size:3rem">⚠️</div>
-        <h2 style="font-family:var(--font-heading)">Connection Error</h2>
-        <p style="color:var(--gray)">${K4App.escapeHtml(err.message)}</p>
-        <button class="btn btn-primary" style="margin-top:1.5rem" onclick="location.reload()">Try Again</button>
-      </div>
-    `;
+  socket.on('final_results', ({ scores }) => {
+    K4Leaderboard.showFinal(scores, playerData.player_id);
+  });
+
+  socket.on('score_update', ({ player_id, total_score }) => {
+    if(player_id === playerData.player_id) {
+      localScore = total_score;
+      document.getElementById('currentScore').textContent = total_score;
+    }
+  });
+
+  function updateScoreFromServer(scores) {
+    const me = scores.find(p => p.id === playerData.player_id);
+    if(me) document.getElementById('currentScore').textContent = me.total_score;
   }
 
-  // Socket global events
-  socket.on('game_started', ({ game_name }) => {
-    if (currentGame?.destroy) currentGame.destroy();
-    window.location.href = `/game.html?game=${game_name}&room=${roomCode}`;
-  });
+  function initGame(name, data) {
+    // Destroy old module
+    if(gameModule?.destroy) gameModule.destroy();
+    K4Leaderboard.hide();
 
-  socket.on('leaderboard_update', ({ players }) => {
-    document.getElementById('currentScore').textContent =
-      players.find(p => p.id === player.player_id)?.total_score || 0;
-  });
+    // Update topbar
+    const titles = {
+      who_knows_best:   '❓ Who Knows Best',
+      emojinary:        '😂 Emoji-nary',
+      price_check:      '💰 Price Check',
+      first_impressions:'🧊 First Impressions',
+      word_scramble:    '🔤 Word Scramble'
+    };
+    document.getElementById('gameNameText').textContent = titles[name] || name;
+    document.getElementById('progressFill').style.width = '0%';
 
-  socket.on('game_ended', ({ game_name, players }) => {
-    if (currentGame?.destroy) currentGame.destroy();
-    K4Leaderboard.show(players, `After ${game_name.replace(/_/g, ' ')}`, player.player_id);
-  });
+    // Init game module
+    const modules = {
+      who_knows_best:    WhoKnowsBest,
+      emojinary:         Emojinary,
+      price_check:       PriceCheck,
+      first_impressions: FirstImpressions,
+      word_scramble:     WordScramble
+    };
+    gameModule = modules[name];
+    if(gameModule) gameModule.init(data, playerData, socket);
+    else K4App.toast('Unknown game: '+name,'error');
+  }
 
-  socket.on('event_finished', ({ players }) => {
-    K4Leaderboard.showFinal(players, player.player_id);
-  });
+  // Check URL params for direct load (testing)
+  const urlGame = K4App.getParam('game');
+  const urlRoom = K4App.getParam('room');
+  if(urlGame && urlRoom) {
+    (async()=>{
+      try {
+        const res = await fetch(`/api/games/${urlRoom}/${urlGame}`);
+        const data = await res.json();
+        if(data.success) initGame(urlGame, data.data);
+      } catch(e) { console.log('Waiting for host to start game...'); }
+    })();
+  }
+
 })();

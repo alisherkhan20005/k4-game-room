@@ -1,153 +1,103 @@
-/* ============================================
-   PRICE CHECK - GAME LOGIC
-   ============================================ */
-
+/* PRICE CHECK — Premium UI */
 const PriceCheck = {
-  gameData: null,
-  currentIndex: 0,
-  score: 0,
-  answered: new Set(),
+  gameData:null, player:null, socket:null,
+  score:0, answered:new Set(),
 
   init(gameData, player, socket) {
-    this.gameData = gameData;
-    this.player = player;
-    this.socket = socket;
-    this.currentIndex = 0;
-    this.score = 0;
-    this.answered = new Set();
-    this.renderItem(0);
-    this.bindSocketEvents();
+    this.gameData=gameData; this.player=player; this.socket=socket;
+    this.score=0; this.answered=new Set();
+    document.getElementById('gameNameText').textContent = '💰 Price Check';
+    this.render(0);
+    socket.on('price_result', data => this.onResult(data));
+    socket.on('next_question', ({question_index}) => this.render(question_index));
   },
 
-  renderItem(index) {
+  render(idx) {
     const items = this.gameData.game.items;
-    const item = items[index];
-    if (!item) return;
-
+    const item = items[idx]; if(!item) return;
     const total = items.length;
-    const progress = (index / total) * 100;
-    const alreadyAnswered = this.answered.has(index);
+    const pct = Math.round((idx/total)*100);
+    document.getElementById('progressFill').style.width = pct+'%';
+    const already = this.answered.has(idx);
+    this._currentIdx = idx;
 
-    const content = document.getElementById('gameContent');
-    content.innerHTML = `
-      <div class="game-progress">
-        <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
-        <span class="progress-text">${index + 1}/${total}</span>
+    document.getElementById('gameContent').innerHTML = `
+      <div class="q-counter" style="background:rgba(255,217,61,0.1);border-color:rgba(255,217,61,0.2);color:rgba(255,217,61,0.8)">
+        Item ${idx+1} of ${total}
       </div>
-
-      <div class="price-item-card question-enter" id="priceCard">
+      <div class="price-card q-enter" id="priceCard">
         <span class="price-item-emoji">${item.emoji || '🛍️'}</span>
         <h2 class="price-item-name">${K4App.escapeHtml(item.name)}</h2>
-        <p style="color:var(--gray);font-size:0.9rem;margin-bottom:1.5rem">
-          How much do you think this costs?
-        </p>
-
-        ${alreadyAnswered ? `
-          <div style="padding:1rem;background:rgba(93,200,160,0.1);border-radius:var(--radius-md);color:var(--mint-green);font-weight:600">
-            ✅ Answer submitted!
-          </div>
-        ` : `
-          <div class="price-input-wrapper">
+        <p class="price-item-hint">How much do you think this costs? 🤔</p>
+        ${already ? `
+          <div style="padding:1rem;background:rgba(0,200,150,0.1);border-radius:var(--r-md);color:var(--mint);font-weight:700">
+            ✅ Your guess is locked in!
+          </div>` : `
+          <div class="price-input-wrap">
             <span class="price-currency">£</span>
-            <input
-              type="number"
-              class="price-input"
-              id="priceInput"
-              placeholder="0.00"
-              min="0"
-              step="0.01"
-              max="99999"
-            >
+            <input class="price-input" id="priceInput" type="number" placeholder="0.00" min="0" step="0.01" max="99999">
           </div>
-          <button class="btn btn-primary" style="margin-top:1rem;width:100%" onclick="PriceCheck.submitPrice(${index})">
-            Lock In My Price 🔒
-          </button>
-        `}
+          <button class="btn btn-full btn-lg" id="priceBtn"
+            style="background:linear-gradient(135deg,#FFD93D,#FF9B7B);color:#1A0A00;font-weight:800;margin-top:0.25rem"
+            onclick="PriceCheck.submit(${idx})">
+            🔒 Lock In My Price
+          </button>`}
       </div>
+      <div id="priceResultWrap"></div>`;
 
-      <div id="priceResult"></div>
-    `;
-
-    K4Anim.questionEnter(document.getElementById('priceCard'));
-
-    const input = document.getElementById('priceInput');
-    input?.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') this.submitPrice(index);
-    });
-    setTimeout(() => input?.focus(), 400);
+    const inp = document.getElementById('priceInput');
+    inp?.addEventListener('keypress', e => { if(e.key==='Enter') this.submit(idx); });
+    setTimeout(() => inp?.focus(), 500);
   },
 
-  submitPrice(index) {
-    const input = document.getElementById('priceInput');
-    const value = parseFloat(input?.value);
+  submit(idx) {
+    const inp = document.getElementById('priceInput');
+    const btn = document.getElementById('priceBtn');
+    const val = parseFloat(inp?.value);
+    if(!inp?.value || isNaN(val) || val < 0) { K4App.toast('Enter a valid price!','warning'); return; }
+    if(btn) { btn.disabled=true; btn.textContent='Locked In! 🔒'; }
+    this.answered.add(idx);
+    const item = this.gameData.game.items[idx];
 
-    if (!input?.value || isNaN(value) || value < 0) {
-      K4App.toast('Please enter a valid price!', 'warning');
-      K4Anim.shake(input);
-      return;
-    }
+    document.getElementById('priceResultWrap').innerHTML = `
+      <div style="text-align:center;color:rgba(255,255,255,0.3);font-size:0.85rem;padding:1rem">
+        <div class="spinner spinner-sm" style="margin:0 auto 0.5rem"></div>
+        Submitted £${val.toFixed(2)} — waiting for the reveal...
+      </div>`;
 
-    this.answered.add(index);
-    const item = this.gameData.game.items[index];
-
-    // Disable input
-    input.disabled = true;
-    document.querySelector(`[onclick="PriceCheck.submitPrice(${index})"]`).disabled = true;
-
-    // Send to server
     this.socket.emit('submit_price', {
-      player_id: this.player.player_id,
-      event_id: this.player.event_id,
-      item_index: index,
-      item_name: item.name,
-      guessed_price: value
+      player_id:this.player.player_id, event_id:this.player.event_id,
+      item_index:idx, item_name:item.name, guessed_price:val
     });
-
-    // Show pending
-    document.getElementById('priceResult').innerHTML = `
-      <div style="text-align:center;padding:1rem;color:var(--gray);font-size:0.9rem">
-        <div class="spinner" style="margin:0 auto 0.5rem;width:24px;height:24px;border-width:2px"></div>
-        Submitted £${value.toFixed(2)} — waiting for reveal...
-      </div>
-    `;
   },
 
-  onPriceResult({ score, difference, item_name }) {
+  onResult({ score, difference, item_name }) {
     this.score += score;
     document.getElementById('currentScore').textContent = this.score;
-
-    const resultEl = document.getElementById('priceResult');
-    const isClose = difference < 5;
     const isExact = difference === 0;
+    const isClose = difference < 5;
 
-    resultEl.innerHTML = `
-      <div class="price-reveal-card price-reveal" style="margin-top:1rem">
-        <div style="font-size:1rem;font-weight:600;margin-bottom:0.5rem">
-          ${isExact ? '🎯 Exact match!' : isClose ? '🔥 So close!' : '📊 Result'}
+    document.getElementById('priceResultWrap').innerHTML = `
+      <div class="price-result-card">
+        <div style="font-size:2rem;margin-bottom:0.5rem">${isExact?'🎯':isClose?'🔥':'📊'}</div>
+        <div style="font-size:0.9rem;font-weight:600;opacity:0.8;margin-bottom:0.25rem">
+          ${isExact?'Perfect match!':isClose?'So close!':'Result'}
         </div>
-        <div class="price-reveal-amount">+${score} pts</div>
-        <div style="font-size:0.9rem;opacity:0.8">
-          ${isExact ? 'Perfect price!' : `You were £${difference.toFixed(2)} away`}
+        <div class="price-result-score">+${score}</div>
+        <div class="price-result-diff">
+          ${isExact?'Exact price! Amazing!': difference != null?`You were £${parseFloat(difference).toFixed(2)} away`:'Good guess!'}
         </div>
-      </div>
-    `;
+      </div>`;
 
-    if (isExact || isClose) K4Anim.confetti(20);
+    if(isExact || isClose) K4Anim.confetti(20);
 
-    // Auto advance
-    const nextIndex = index + 1;
+    const idx = this._currentIdx;
     setTimeout(() => {
-      if (nextIndex < this.gameData.game.items.length) {
-        this.renderItem(nextIndex);
-      }
+      const next = idx + 1;
+      if(next < this.gameData.game.items.length) this.render(next);
+      else document.getElementById('priceResultWrap').innerHTML += `<div style="text-align:center;color:rgba(255,255,255,0.3);font-size:0.85rem;margin-top:1rem">🌸 All done! Waiting for host...</div>`;
     }, 3000);
   },
 
-  bindSocketEvents() {
-    this.socket.on('price_result', (data) => this.onPriceResult(data));
-  },
-
-  destroy() {
-    this.socket.off('price_result');
-  }
+  destroy() { this.socket.off('price_result'); this.socket.off('next_question'); }
 };
