@@ -1,0 +1,31 @@
+module.exports = {
+  title: "First Impressions",
+  subtitle: "Find guests in the room who match each clue. First to get 5 in a row wins!",
+  clues: [
+    { text: "Has three or more children", is_free_space: false },
+    { text: "Plays golf", is_free_space: false },
+    { text: "Is a grandparent", is_free_space: false },
+    { text: "Is bilingual", is_free_space: false },
+    { text: "Has been pregnant before", is_free_space: false },
+    { text: "Works with children", is_free_space: false },
+    { text: "Has twins in the family", is_free_space: false },
+    { text: "Is the eldest sibling", is_free_space: false },
+    { text: "Has a baby under 1 year old", is_free_space: false },
+    { text: "Loves to knit or sew", is_free_space: false },
+    { text: "Has a summer birthday", is_free_space: false },
+    { text: "Is a first-time parent", is_free_space: false },
+    { content: "👶", text: "FREE SPACE", is_free_space: true },
+    { text: "Has a family member also expecting", is_free_space: false },
+    { text: "Can change a nappy in under 2 minutes", is_free_space: false },
+    { text: "Has been to a baby shower before", is_free_space: false },
+    { text: "Is an aunt or uncle", is_free_space: false },
+    { text: "Has a pet", is_free_space: false },
+    { text: "Has a name picked out for their future child", is_free_space: false },
+    { text: "Was a nanny or babysitter", is_free_space: false },
+    { text: "Loves to bake baby-themed treats", is_free_space: false },
+    { text: "Knows what the baby's name is", is_free_space: false },
+    { text: "Has guessed the baby's gender correctly", is_free_space: false },
+    { text: "Already bought a baby gift", is_free_space: false },
+    { text: "Is expecting too!", is_free_space: false }
+  ]
+};
