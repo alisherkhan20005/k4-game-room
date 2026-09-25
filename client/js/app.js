@@ -1,64 +1,106 @@
-/* K4 Game Room — Shared utility functions */
+/* ============================================
+   K4 GAME ROOM - APP UTILITIES
+   ============================================ */
 
-function showToast(message, type = 'info') {
-  const container = document.getElementById('toastContainer');
-  if (!container) return;
-  const toast = document.createElement('div');
-  const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
-  toast.className = `toast toast-${type}`;
-  toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${message}</span>`;
-  container.appendChild(toast);
-  setTimeout(() => toast.remove(), 4000);
-}
+const K4App = {
+  toast(message, type = 'info', duration = 4000) {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${this.escapeHtml(message)}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), duration);
+  },
 
-function escHtml(str) {
-  const d = document.createElement('div');
-  d.textContent = str;
-  return d.innerHTML;
-}
+  escapeHtml(str) {
+    const d = document.createElement('div');
+    d.textContent = String(str);
+    return d.innerHTML;
+  },
 
-function spawnConfetti() {
-  const colors = ['#FFB5C8','#C4A8D4','#A8CEDE','#5DC8A0','#F5D06E','#FFAD99','#6ECFCF'];
-  for (let i = 0; i < 80; i++) {
-    setTimeout(() => {
-      const piece = document.createElement('div');
-      piece.className = 'confetti-piece';
-      piece.style.cssText = `
-        left: ${Math.random() * 100}vw;
-        background: ${colors[Math.floor(Math.random() * colors.length)]};
-        width: ${6 + Math.random() * 8}px;
-        height: ${6 + Math.random() * 8}px;
-        border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
-        animation-duration: ${2 + Math.random() * 2}s;
-        animation-delay: ${Math.random() * 0.6}s;
-        z-index: 9998;
-        position: fixed;
-        pointer-events: none;
-        animation-name: confettiFall;
-        animation-timing-function: linear;
-        animation-fill-mode: forwards;
-      `;
-      document.body.appendChild(piece);
-      setTimeout(() => piece.remove(), 5000);
-    }, i * 20);
+  getPlayer() {
+    try {
+      return JSON.parse(sessionStorage.getItem('k4_player') || '{}');
+    } catch { return {}; }
+  },
+
+  getAdminToken() {
+    return localStorage.getItem('k4_admin_token');
+  },
+
+  setAdminToken(token) {
+    localStorage.setItem('k4_admin_token', token);
+  },
+
+  clearAdmin() {
+    localStorage.removeItem('k4_admin_token');
+  },
+
+  async api(endpoint, options = {}) {
+    const token = this.getAdminToken();
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(`/api${endpoint}`, {
+      ...options,
+      headers: { ...headers, ...(options.headers || {}) },
+      body: options.body ? JSON.stringify(options.body) : undefined
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Request failed');
+    return data;
+  },
+
+  requirePlayer() {
+    const player = this.getPlayer();
+    if (!player.player_id) {
+      window.location.href = '/';
+      return null;
+    }
+    return player;
+  },
+
+  async requireAdmin() {
+    const token = this.getAdminToken();
+    if (!token) {
+      window.location.href = '/admin/login.html';
+      return false;
+    }
+    try {
+      await this.api('/admin/verify');
+      return true;
+    } catch {
+      this.clearAdmin();
+      window.location.href = '/admin/login.html';
+      return false;
+    }
+  },
+
+  getParam(name) {
+    return new URLSearchParams(window.location.search).get(name);
+  },
+
+  normalizeAnswer(str) {
+    return str.toLowerCase().trim().replace(/[^a-z0-9\s]/g, '');
+  },
+
+  answersMatch(a, b) {
+    const na = this.normalizeAnswer(a);
+    const nb = this.normalizeAnswer(b);
+    return na === nb || na.includes(nb) || nb.includes(na);
+  },
+
+  formatScore(score) {
+    return score > 0 ? `+${score}` : `${score}`;
   }
-}
+};
 
-function spawnScorePop(score, x, y) {
-  const el = document.createElement('div');
-  el.className = 'score-pop';
-  el.textContent = `+${score}`;
-  el.style.cssText = `left:${x || 45}%;top:${y || 50}%;`;
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 1600);
-}
-
-// Admin auth helper
-function getAdminToken() {
-  return localStorage.getItem('k4_admin_token');
-}
+// Global helpers
+window.showToast = (msg, type) => K4App.toast(msg, type);
+window.K4App = K4App;
 
 function logout() {
-  localStorage.removeItem('k4_admin_token');
+  K4App.clearAdmin();
   window.location.href = '/admin/login.html';
 }
