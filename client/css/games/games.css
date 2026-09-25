@@ -1,0 +1,65 @@
+/* ============================================
+   K4 GAME ROOM - GAME-SPECIFIC STYLES
+   ============================================ */
+
+/* Waiting dots (reusable) */
+.waiting-dots { display:flex; justify-content:center; gap:6px; }
+.waiting-dots span {
+  display:inline-block; width:8px; height:8px; border-radius:50%;
+  background:var(--baby-pink); animation:dotPulse 1.4s ease-in-out infinite;
+}
+.waiting-dots span:nth-child(2) { animation-delay:0.2s; background:var(--lavender); }
+.waiting-dots span:nth-child(3) { animation-delay:0.4s; background:var(--powder-blue); }
+@keyframes dotPulse { 0%,80%,100%{transform:scale(0.8);opacity:0.5} 40%{transform:scale(1.2);opacity:1} }
+
+/* Fade in animations */
+.fade-in-down { animation:fadeInDown 0.5s ease forwards; }
+.fade-in-up   { animation:fadeInUp 0.5s ease forwards; }
+@keyframes fadeInDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeInUp   { from{opacity:0;transform:translateY(20px)}  to{opacity:1;transform:translateY(0)} }
+
+/* Admin game control cards */
+.game-nav-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:1rem;
+}
+.game-nav-btn {
+  aspect-ratio:1; border-radius:var(--radius-lg); border:2px solid var(--border);
+  background:white; cursor:pointer; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:0.5rem; transition:var(--transition);
+  font-family:var(--font-body); font-weight:700; font-size:0.85rem; color:var(--dark);
+}
+.game-nav-btn:hover { border-color:var(--baby-pink); background:rgba(255,181,200,0.05); transform:translateY(-2px); }
+.game-nav-btn.active { border-color:var(--baby-pink); background:rgba(255,181,200,0.1); color:var(--baby-pink); }
+.game-nav-btn .g-icon { font-size:2rem; }
+
+/* Price check admin table */
+.price-table { width:100%; border-collapse:collapse; }
+.price-table th { text-align:left; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray); font-weight:600; padding:0.5rem 0.75rem; border-bottom:2px solid var(--border); }
+.price-table td { padding:0.5rem 0.75rem; border-bottom:1px solid var(--border); vertical-align:middle; font-size:0.9rem; }
+.price-table tr:last-child td { border-bottom:none; }
+.price-table input[type="number"] { width:110px; padding:0.4rem 0.75rem; border:2px solid var(--border); border-radius:var(--radius-sm); font-family:var(--font-body); font-size:0.9rem; outline:none; }
+.price-table input[type="number"]:focus { border-color:var(--baby-pink); }
+
+/* Quiz answer table */
+.quiz-table { width:100%; border-collapse:collapse; }
+.quiz-table td { padding:0.5rem 0.75rem; border-bottom:1px solid var(--border); vertical-align:middle; }
+.quiz-table tr:last-child td { border-bottom:none; }
+.quiz-table .q-label { font-size:0.85rem; color:var(--gray); font-weight:600; min-width:80px; }
+.quiz-table input[type="text"] { width:100%; padding:0.4rem 0.75rem; border:2px solid var(--border); border-radius:var(--radius-sm); font-family:var(--font-body); font-size:0.9rem; outline:none; }
+.quiz-table input[type="text"]:focus { border-color:var(--baby-pink); }
+
+/* Leaderboard big */
+.lb-big-row {
+  display:flex; align-items:center; gap:1rem; padding:0.75rem 1rem;
+  border-radius:var(--radius-md); margin-bottom:0.5rem; transition:var(--transition);
+}
+.lb-big-row:nth-child(1) { background:linear-gradient(135deg,rgba(245,166,35,0.15),rgba(245,166,35,0.05)); }
+.lb-big-row:nth-child(2) { background:linear-gradient(135deg,rgba(160,174,192,0.15),rgba(160,174,192,0.05)); }
+.lb-big-row:nth-child(3) { background:linear-gradient(135deg,rgba(192,124,74,0.15),rgba(192,124,74,0.05)); }
+.lb-big-rank { font-family:var(--font-heading); font-size:1.5rem; font-weight:900; width:44px; text-align:center; }
+.lb-big-name { flex:1; font-weight:700; font-size:1rem; }
+.lb-big-score { font-family:var(--font-heading); font-size:1.3rem; font-weight:700; color:var(--baby-pink); }
+
+@media (max-width:480px) {
+  .game-nav-grid { grid-template-columns:repeat(3,1fr); }
+}

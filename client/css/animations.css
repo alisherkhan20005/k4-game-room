@@ -1,0 +1,72 @@
+/* ============================================
+   K4 GAME ROOM - ANIMATIONS
+   ============================================ */
+
+/* Page Transitions */
+.fade-in-down {
+  animation: fadeInDown 0.5s ease forwards;
+}
+.fade-in-up {
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Stagger children */
+.fade-in-up:nth-child(1) { animation-delay: 0s; }
+.fade-in-up:nth-child(2) { animation-delay: 0.1s; }
+.fade-in-up:nth-child(3) { animation-delay: 0.2s; }
+.fade-in-up:nth-child(4) { animation-delay: 0.3s; }
+
+/* Button tap feedback */
+.btn:active { transform: scale(0.97); }
+
+/* Pulse */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,181,200,0.4); }
+  50%       { transform: scale(1.03); box-shadow: 0 0 0 12px rgba(255,181,200,0); }
+}
+
+/* Float */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-12px); }
+}
+
+/* Bounce */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-18px); }
+}
+
+/* Score pop */
+@keyframes scorePop {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  60%  { opacity: 1; transform: translateY(-60px) scale(1.4); }
+  100% { opacity: 0; transform: translateY(-100px) scale(0.8); }
+}
+
+/* Confetti */
+@keyframes confettiFall {
+  0%   { transform: translateY(-100px) rotate(0deg);   opacity: 1; }
+  100% { transform: translateY(110vh)  rotate(720deg); opacity: 0; }
+}
+
+/* Shining shimmer */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+  background-size: 400px 100%;
+  animation: shimmer 1.5s infinite;
+}

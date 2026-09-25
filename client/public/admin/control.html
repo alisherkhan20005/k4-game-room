@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Control — K4 Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/games/games.css">
+  <style>
+    .ctrl-topbar { position:sticky;top:0;z-index:100;background:rgba(26,26,46,0.95);backdrop-filter:blur(16px);padding:0.75rem 1.5rem;display:flex;align-items:center;gap:1rem;border-bottom:1px solid rgba(255,255,255,0.1); }
+    .ctrl-topbar .brand { font-family:var(--font-heading);font-size:1.1rem;color:var(--baby-pink); }
+    .ctrl-topbar .room { font-family:var(--font-heading);font-size:1.5rem;font-weight:700;color:white;letter-spacing:0.2em;flex:1;text-align:center; }
+    .ctrl-topbar .player-count { color:rgba(255,255,255,0.6);font-size:0.875rem;white-space:nowrap; }
+    .ctrl-body { background:#0f0f1a;min-height:calc(100vh - 56px);padding:1.5rem; }
+    .ctrl-grid { display:grid;grid-template-columns:1fr 320px;gap:1.5rem;max-width:1100px;margin:0 auto; }
+    @media(max-width:900px){.ctrl-grid{grid-template-columns:1fr}}
+    .ctrl-panel { background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-xl);padding:1.5rem;color:white; }
+    .ctrl-panel h2 { font-family:var(--font-heading);font-size:1.3rem;margin-bottom:1.25rem;color:white; }
+    /* game select tabs */
+    .game-tabs { display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.5rem; }
+    .game-tab { display:flex;align-items:center;gap:1rem;padding:0.875rem 1.25rem;border-radius:var(--radius-md);cursor:pointer;border:1px solid rgba(255,255,255,0.1);background:transparent;color:rgba(255,255,255,0.7);transition:var(--transition);font-family:var(--font-body);font-size:0.9rem;font-weight:600;text-align:left;width:100%; }
+    .game-tab:hover { background:rgba(255,181,200,0.1);border-color:var(--baby-pink);color:white; }
+    .game-tab.active { background:rgba(255,181,200,0.15);border-color:var(--baby-pink);color:white; }
+    .game-tab .g-emoji { font-size:1.5rem; }
+    .game-tab .g-status { margin-left:auto;font-size:0.75rem;padding:0.2rem 0.6rem;border-radius:var(--radius-full); }
+    .g-status.done { background:rgba(93,200,160,0.2);color:#5DC8A0; }
+    .g-status.active { background:rgba(255,181,200,0.2);color:var(--baby-pink); }
+    .g-status.pending { background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.4); }
+    /* Question controller */
+    .q-controller { }
+    .q-display { background:rgba(255,255,255,0.08);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1rem;text-align:center; }
+    .q-display .q-num-small { font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:0.5rem; }
+    .q-display .q-text-main { font-size:1.1rem;font-weight:600;color:white;line-height:1.4; }
+    .q-display .q-emoji-big { font-size:3rem;margin:0.75rem 0; }
+    .q-display .q-scramble-big { font-family:var(--font-heading);font-size:2.5rem;font-weight:900;color:var(--baby-pink);letter-spacing:0.15em; }
+    .q-nav { display:flex;gap:0.75rem; }
+    .q-nav button { flex:1; }
+    .q-counter { text-align:center;color:rgba(255,255,255,0.5);font-size:0.875rem;margin:0.75rem 0; }
+    /* Price check input table inside ctrl panel */
+    .price-ctrl-table { width:100%;border-collapse:collapse;margin-bottom:1rem; }
+    .price-ctrl-table td { padding:0.4rem 0.5rem;border-bottom:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.8);font-size:0.875rem;vertical-align:middle; }
+    .price-ctrl-table td:first-child { font-weight:600; }
+    .price-ctrl-table input[type="number"] { background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:white;border-radius:var(--radius-sm);padding:0.35rem 0.6rem;font-size:0.875rem;width:90px;font-family:var(--font-body);outline:none; }
+    .price-ctrl-table input[type="number"]:focus { border-color:var(--baby-pink); }
+    /* Answers input for who knows best */
+    .answer-ctrl-table { width:100%;border-collapse:collapse;margin-bottom:1rem; }
+    .answer-ctrl-table td { padding:0.4rem 0.5rem;border-bottom:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.8);font-size:0.85rem;vertical-align:middle; }
+    .answer-ctrl-table td:first-child { font-size:0.75rem;color:rgba(255,255,255,0.5);width:70px; }
+    .answer-ctrl-table input { background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:white;border-radius:var(--radius-sm);padding:0.35rem 0.6rem;font-size:0.85rem;width:100%;font-family:var(--font-body);outline:none; }
+    .answer-ctrl-table input:focus { border-color:var(--baby-pink); }
+    /* Players sidebar */
+    .player-list { display:flex;flex-direction:column;gap:0.5rem; }
+    .player-item { display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0.75rem;background:rgba(255,255,255,0.05);border-radius:var(--radius-md); }
+    .player-item .p-avatar { width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-weight:700;color:white;flex-shrink:0; }
+    .player-item .p-name { flex:1;color:rgba(255,255,255,0.9);font-size:0.9rem;font-weight:600; }
+    .player-item .p-score { font-family:var(--font-heading);font-weight:700;color:var(--baby-pink);font-size:0.9rem; }
+    /* End event */
+    .danger-zone { border-top:1px solid rgba(255,107,107,0.2);margin-top:1.5rem;padding-top:1.25rem; }
+  </style>
+</head>
+<body style="background:#0f0f1a">
+
+<!-- Top Bar -->
+<div class="ctrl-topbar">
+  <div class="brand">🎮 K4</div>
+  <div class="room" id="roomCodeBar">------</div>
+  <div class="player-count" id="playerCountBar">0 players</div>
+</div>
+
+<div class="ctrl-body">
+  <div class="ctrl-grid">
+
+    <!-- Left: Game Controls -->
+    <div>
+      <!-- Event info header -->
+      <div class="ctrl-panel" style="margin-bottom:1.25rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+        <div style="flex:1">
+          <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:0.2rem">Celebrating</div>
+          <div style="font-family:var(--font-heading);font-size:1.5rem;color:white" id="headerCelebrant">Loading...</div>
+        </div>
+        <span class="badge" id="headerEventType" style="font-size:0.875rem;padding:0.4rem 1rem">Bridal</span>
+      </div>
+
+      <!-- Game selection -->
+      <div class="ctrl-panel" style="margin-bottom:1.25rem">
+        <h2>🎮 Select Game</h2>
+        <div class="game-tabs" id="gameTabs">
+          <button class="game-tab" onclick="selectGame('who_knows_best')"><span class="g-emoji">🤔</span>Who Knows Best<span class="g-status pending" id="status-who_knows_best">Pending</span></button>
+          <button class="game-tab" onclick="selectGame('emojinary')"><span class="g-emoji">😀</span>Emoji-nary<span class="g-status pending" id="status-emojinary">Pending</span></button>
+          <button class="game-tab" onclick="selectGame('price_check')"><span class="g-emoji">💰</span>Price Check<span class="g-status pending" id="status-price_check">Pending</span></button>
+          <button class="game-tab" onclick="selectGame('first_impressions')"><span class="g-emoji">🎯</span>First Impressions<span class="g-status pending" id="status-first_impressions">Pending</span></button>
+          <button class="game-tab" onclick="selectGame('word_scramble')"><span class="g-emoji">🔤</span>Word Scramble<span class="g-status pending" id="status-word_scramble">Pending</span></button>
+        </div>
+      </div>
+
+      <!-- Active game controller -->
+      <div class="ctrl-panel" id="gameController" style="display:none">
+        <h2 id="activeGameTitle">🤔 Who Knows Best</h2>
+
+        <!-- Who Knows Best + Emojinary + Word Scramble: question navigation -->
+        <div id="questionCtrl" style="display:none">
+          <div style="margin-bottom:1rem">
+            <button class="btn btn-secondary btn-full" id="saveAnswersBtn" onclick="saveAnswers()" style="display:none;margin-bottom:0.75rem">💾 Save Correct Answers First</button>
+            <div id="answerInputs" style="display:none;max-height:300px;overflow-y:auto;margin-bottom:0.75rem">
+              <table class="answer-ctrl-table" id="answerCtrlTable"></table>
+            </div>
+          </div>
+          <div class="q-display" id="qDisplay">
+            <div class="q-num-small" id="qNumDisplay">Q1 / 16</div>
+            <div class="q-text-main" id="qTextDisplay">Select a game to start</div>
+            <div class="q-emoji-big" id="qEmojiDisplay" style="display:none"></div>
+            <div class="q-scramble-big" id="qScrambleDisplay" style="display:none"></div>
+          </div>
+          <div class="q-counter" id="qCounter"></div>
+          <div style="display:flex;gap:0.75rem;margin-bottom:0.75rem">
+            <button class="btn btn-outline btn-full" onclick="prevQuestion()" id="prevBtn" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.2);color:white">← Prev</button>
+            <button class="btn btn-primary btn-full" onclick="nextQuestion()" id="nextBtn">Next →</button>
+          </div>
+          <button class="btn btn-secondary btn-full" onclick="startCurrentGame()" id="launchBtn">▶️ Launch This Game</button>
+        </div>
+
+        <!-- Price check: enter prices -->
+        <div id="priceCtrl" style="display:none">
+          <p style="color:rgba(255,255,255,0.6);font-size:0.875rem;margin-bottom:1rem">Enter real prices before starting. Players will guess — closest wins!</p>
+          <table class="price-ctrl-table" id="priceCtrlTable"></table>
+          <button class="btn btn-secondary btn-full" onclick="savePrices()" style="margin-bottom:0.75rem">💾 Save Prices</button>
+          <button class="btn btn-primary btn-full" onclick="startCurrentGame()">▶️ Launch Price Check</button>
+        </div>
+
+        <!-- First Impressions: just launch -->
+        <div id="bingoCtrl" style="display:none">
+          <p style="color:rgba(255,255,255,0.6);font-size:0.875rem;margin-bottom:1.5rem">Players get a 5×5 bingo grid. First to get 5 in a row wins!</p>
+          <div style="background:rgba(255,255,255,0.05);border-radius:var(--radius-md);padding:1rem;margin-bottom:1rem">
+            <p style="color:rgba(255,255,255,0.5);font-size:0.8rem">How it works:</p>
+            <ul style="color:rgba(255,255,255,0.7);font-size:0.85rem;padding-left:1.25rem;margin-top:0.5rem;line-height:2">
+              <li>Players get unique bingo grids with guest clues</li>
+              <li>They find real people in the room who match the clues</li>
+              <li>First to get 5 in a row shows you their screen to win!</li>
+            </ul>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="startCurrentGame()">▶️ Launch Bingo</button>
+        </div>
+
+        <!-- End game -->
+        <div class="danger-zone">
+          <button class="btn btn-full" onclick="endCurrentGame()" style="background:rgba(255,107,107,0.15);border:1px solid rgba(255,107,107,0.3);color:#FF6B6B">🏁 End Game & Show Leaderboard</button>
+        </div>
+      </div>
+
+      <!-- End entire event -->
+      <div class="ctrl-panel" style="margin-top:1.25rem;border-color:rgba(255,107,107,0.2)">
+        <h2 style="color:rgba(255,107,107,0.8)">⚠️ End Event</h2>
+        <p style="color:rgba(255,255,255,0.5);font-size:0.875rem;margin-bottom:1rem">This will close the room and show the final leaderboard to all players.</p>
+        <button class="btn btn-full" onclick="endEvent()" style="background:rgba(255,107,107,0.15);border:1px solid rgba(255,107,107,0.4);color:#FF6B6B">
+          🎊 End Event & Final Leaderboard
+        </button>
+      </div>
+    </div>
+
+    <!-- Right: Live Players & Leaderboard -->
+    <div>
+      <div class="ctrl-panel" style="margin-bottom:1.25rem">
+        <h2>👥 Players (<span id="livePlayerCount">0</span>)</h2>
+        <div class="player-list" id="livePlayerList">
+          <p style="color:rgba(255,255,255,0.4);font-size:0.875rem;text-align:center;padding:1rem">Waiting for players to join...</p>
+        </div>
+      </div>
+
+      <div class="ctrl-panel">
+        <h2>🏆 Live Leaderboard</h2>
+        <div id="liveLeaderboard">
+          <p style="color:rgba(255,255,255,0.4);font-size:0.875rem;text-align:center;padding:1rem">Scores appear as games are played</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/socket.js"></script>
+<script>
+  const token = localStorage.getItem('k4_admin_token');
+  if (!token) window.location.href = '/admin/login.html';
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const roomCode = urlParams.get('room');
+  if (!roomCode) window.location.href = '/admin/events.html';
+
+  let eventData = null;
+  let gameData = null;
+  let currentGame = null;
+  let currentQIndex = 0;
+  let socket = null;
+
+  const GAME_TITLES = {
+    who_knows_best: '🤔 Who Knows Best',
+    emojinary: '😀 Emoji-nary',
+    price_check: '💰 Price Check',
+    first_impressions: '🎯 First Impressions',
+    word_scramble: '🔤 Word Scramble'
+  };
+
+  async function init() {
+    document.getElementById('roomCodeBar').textContent = roomCode;
+
+    try {
+      const res = await fetch(`/api/events/${roomCode}`);
+      const data = await res.json();
+      if (!data.success) { alert('Event not found'); return; }
+      eventData = data.data;
+
+      document.getElementById('headerCelebrant').textContent = eventData.celebrant_name;
+      const badge = document.getElementById('headerEventType');
+      if (eventData.event_type === 'baby') {
+        badge.textContent = '👶 Baby Shower';
+        badge.className = 'badge badge-blue';
+      } else {
+        badge.textContent = '💍 Bridal Shower';
+        badge.className = 'badge badge-pink';
+      }
+    } catch (e) { console.error(e); }
+
+    socket = initSocket(roomCode);
+    socket.emit('host_join', { room_code: roomCode });
+
+    socket.on('players_updated', ({ players }) => {
+      renderPlayers(players);
+    });
+
+    socket.on('leaderboard_update', ({ players }) => {
+      renderLeaderboard(players);
+    });
+  }
+
+  async function selectGame(name) {
+    currentGame = name;
+    currentQIndex = 0;
+
+    // Highlight tab
+    document.querySelectorAll('.game-tab').forEach(t => t.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+
+    // Load game data
+    try {
+      const res = await fetch(`/api/games/${roomCode}/${name}`);
+      const d = await res.json();
+      if (d.success) gameData = d.data.game;
+    } catch (e) { console.error(e); }
+
+    document.getElementById('gameController').style.display = 'block';
+    document.getElementById('activeGameTitle').textContent = GAME_TITLES[name];
+    document.getElementById('questionCtrl').style.display = 'none';
+    document.getElementById('priceCtrl').style.display = 'none';
+    document.getElementById('bingoCtrl').style.display = 'none';
+
+    if (name === 'price_check') {
+      document.getElementById('priceCtrl').style.display = 'block';
+      buildPriceTable();
+    } else if (name === 'first_impressions') {
+      document.getElementById('bingoCtrl').style.display = 'block';
+    } else {
+      document.getElementById('questionCtrl').style.display = 'block';
+      if (name === 'who_knows_best') {
+        document.getElementById('saveAnswersBtn').style.display = 'block';
+        document.getElementById('answerInputs').style.display = 'block';
+        buildAnswerTable();
+      } else {
+        document.getElementById('saveAnswersBtn').style.display = 'none';
+        document.getElementById('answerInputs').style.display = 'none';
+      }
+      updateQuestionDisplay();
+    }
+  }
+
+  function buildAnswerTable() {
+    if (!gameData || !gameData.questions) return;
+    const table = document.getElementById('answerCtrlTable');
+    table.innerHTML = gameData.questions.map((q, i) =>
+      `<tr>
+        <td>Q${i+1}</td>
+        <td style="color:rgba(255,255,255,0.9)">${q.text}</td>
+        <td><input type="text" id="ans-${i}" placeholder="Enter answer..."></td>
+      </tr>`
+    ).join('');
+  }
+
+  async function saveAnswers() {
+    if (!gameData || !gameData.questions) return;
+    const answers = gameData.questions.map((q, i) => ({
+      question_index: i,
+      question_text: q.text,
+      correct_answer: (document.getElementById(`ans-${i}`)?.value || '').trim()
+    })).filter(a => a.correct_answer);
+
+    try {
+      const res = await fetch(`/api/events/${eventData.id}/quiz-answers`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ answers })
+      });
+      const d = await res.json();
+      if (d.success) showToast('✅ Answers saved!', 'success');
+      else showToast('Failed to save answers', 'error');
+    } catch (e) { showToast('Error saving answers', 'error'); }
+  }
+
+  function buildPriceTable() {
+    if (!gameData || !gameData.items) return;
+    const table = document.getElementById('priceCtrlTable');
+    table.innerHTML = gameData.items.map((item, i) =>
+      `<tr>
+        <td>${item.emoji || '🛒'} ${item.name}</td>
+        <td><input type="number" id="price-${i}" placeholder="£0.00" min="0" step="0.01"></td>
+      </tr>`
+    ).join('');
+  }
+
+  async function savePrices() {
+    if (!gameData || !gameData.items) return;
+    const items = gameData.items.map((item, i) => ({
+      item_name: item.name,
+      item_emoji: item.emoji || '',
+      real_price: parseFloat(document.getElementById(`price-${i}`)?.value || 0),
+      display_order: i
+    }));
+
+    try {
+      const res = await fetch(`/api/events/${eventData.id}/prices`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ items })
+      });
+      const d = await res.json();
+      if (d.success) showToast('✅ Prices saved!', 'success');
+      else showToast('Failed to save prices', 'error');
+    } catch (e) { showToast('Error saving prices', 'error'); }
+  }
+
+  function updateQuestionDisplay() {
+    if (!gameData) return;
+    let items = [];
+    if (currentGame === 'who_knows_best') items = gameData.questions || [];
+    else if (currentGame === 'emojinary') items = gameData.items || [];
+    else if (currentGame === 'word_scramble') items = gameData.words || [];
+
+    const total = items.length;
+    const item = items[currentQIndex];
+
+    document.getElementById('qNumDisplay').textContent = `${currentQIndex + 1} / ${total}`;
+    document.getElementById('qCounter').textContent = `Question ${currentQIndex + 1} of ${total}`;
+
+    const qEmoji = document.getElementById('qEmojiDisplay');
+    const qScramble = document.getElementById('qScrambleDisplay');
+    qEmoji.style.display = 'none';
+    qScramble.style.display = 'none';
+
+    if (currentGame === 'who_knows_best') {
+      document.getElementById('qTextDisplay').textContent = item ? item.text : '';
+    } else if (currentGame === 'emojinary') {
+      document.getElementById('qTextDisplay').textContent = item ? item.answer : '';
+      qEmoji.textContent = item ? item.emojis : '';
+      qEmoji.style.display = 'block';
+    } else if (currentGame === 'word_scramble') {
+      document.getElementById('qTextDisplay').textContent = item ? `Answer: ${item.answer}` : '';
+      qScramble.textContent = item ? item.scrambled : '';
+      qScramble.style.display = 'block';
+    }
+
+    document.getElementById('prevBtn').disabled = currentQIndex === 0;
+    document.getElementById('nextBtn').disabled = currentQIndex >= total - 1;
+  }
+
+  function nextQuestion() {
+    let items = [];
+    if (currentGame === 'who_knows_best') items = gameData?.questions || [];
+    else if (currentGame === 'emojinary') items = gameData?.items || [];
+    else if (currentGame === 'word_scramble') items = gameData?.words || [];
+
+    if (currentQIndex < items.length - 1) {
+      currentQIndex++;
+      updateQuestionDisplay();
+      // Push question to players
+      socket.emit('next_question', {
+        room_code: roomCode,
+        question_index: currentQIndex,
+        question: items[currentQIndex]
+      });
+    }
+  }
+
+  function prevQuestion() {
+    let items = [];
+    if (currentGame === 'who_knows_best') items = gameData?.questions || [];
+    else if (currentGame === 'emojinary') items = gameData?.items || [];
+    else if (currentGame === 'word_scramble') items = gameData?.words || [];
+
+    if (currentQIndex > 0) {
+      currentQIndex--;
+      updateQuestionDisplay();
+      socket.emit('next_question', {
+        room_code: roomCode,
+        question_index: currentQIndex,
+        question: items[currentQIndex]
+      });
+    }
+  }
+
+  function startCurrentGame() {
+    if (!currentGame) return;
+    socket.emit('start_game', { room_code: roomCode, game_name: currentGame });
+    document.getElementById(`status-${currentGame}`).textContent = 'Active';
+    document.getElementById(`status-${currentGame}`).className = 'g-status active';
+
+    // For question-based games, push first question
+    if (currentGame !== 'first_impressions' && currentGame !== 'price_check') {
+      let items = [];
+      if (currentGame === 'who_knows_best') items = gameData?.questions || [];
+      else if (currentGame === 'emojinary') items = gameData?.items || [];
+      else if (currentGame === 'word_scramble') items = gameData?.words || [];
+      currentQIndex = 0;
+      updateQuestionDisplay();
+      if (items.length > 0) {
+        socket.emit('next_question', {
+          room_code: roomCode,
+          question_index: 0,
+          question: items[0]
+        });
+      }
+    }
+    showToast(`🎮 ${GAME_TITLES[currentGame]} launched!`, 'success');
+  }
+
+  function endCurrentGame() {
+    if (!currentGame) return;
+    socket.emit('end_game', { room_code: roomCode, game_name: currentGame });
+    document.getElementById(`status-${currentGame}`).textContent = 'Done';
+    document.getElementById(`status-${currentGame}`).className = 'g-status done';
+    showToast('🏁 Game ended. Leaderboard shown to players.', 'info');
+  }
+
+  function endEvent() {
+    if (!confirm('End the event and show final leaderboard to all players?')) return;
+    socket.emit('end_event', { room_code: roomCode });
+    showToast('🎊 Event ended! Final leaderboard sent.', 'success');
+    setTimeout(() => window.location.href = '/admin/dashboard.html', 3000);
+  }
+
+  function renderPlayers(players) {
+    const list = document.getElementById('livePlayerList');
+    const count = document.getElementById('livePlayerCount');
+    const barCount = document.getElementById('playerCountBar');
+    count.textContent = players.length;
+    barCount.textContent = `${players.length} players`;
+
+    if (players.length === 0) {
+      list.innerHTML = '<p style="color:rgba(255,255,255,0.4);font-size:0.875rem;text-align:center;padding:1rem">Waiting for players to join...</p>';
+      return;
+    }
+    list.innerHTML = players.map(p => `
+      <div class="player-item">
+        <div class="p-avatar" style="background:${p.avatar_color}">${p.name.charAt(0).toUpperCase()}</div>
+        <div class="p-name">${escHtml(p.name)}</div>
+        <div class="p-score">${p.total_score}</div>
+      </div>
+    `).join('');
+  }
+
+  function renderLeaderboard(players) {
+    const rankEmojis = ['🥇','🥈','🥉'];
+    const lb = document.getElementById('liveLeaderboard');
+    if (!players || players.length === 0) {
+      lb.innerHTML = '<p style="color:rgba(255,255,255,0.4);font-size:0.875rem;text-align:center;padding:1rem">No scores yet</p>';
+      return;
+    }
+    lb.innerHTML = players.map((p, i) => `
+      <div style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;border-bottom:1px solid rgba(255,255,255,0.07)">
+        <div style="font-family:var(--font-heading);font-size:1.1rem;width:28px;text-align:center;color:${i<3?'inherit':'rgba(255,255,255,0.4)'}">${i < 3 ? rankEmojis[i] : (i+1)}</div>
+        <div style="width:28px;height:28px;border-radius:50%;background:${p.avatar_color};display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:white;flex-shrink:0">${p.name.charAt(0).toUpperCase()}</div>
+        <div style="flex:1;color:rgba(255,255,255,0.9);font-size:0.875rem;font-weight:600">${escHtml(p.name)}</div>
+        <div style="font-family:var(--font-heading);font-weight:700;color:var(--baby-pink)">${p.total_score}</div>
+      </div>
+    `).join('');
+  }
+
+  function escHtml(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+
+  function showToast(msg, type = 'info') {
+    const c = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = `toast toast-${type}`;
+    const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+    t.innerHTML = `<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+    c.appendChild(t); setTimeout(() => t.remove(), 4000);
+  }
+
+  function logout() { localStorage.removeItem('k4_admin_token'); window.location.href = '/admin/login.html'; }
+
+  init();
+</script>
+</body>
+</html>

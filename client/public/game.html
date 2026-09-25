@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Playing — K4 Game Room</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/animations.css">
+  <link rel="stylesheet" href="/css/games/games.css">
+  <style>
+    .waiting-indicator { display:flex; align-items:center; justify-content:center; gap:0.5rem; color:var(--gray); font-size:0.9rem; }
+    .dot-bounce { width:8px; height:8px; border-radius:50%; background:var(--baby-pink); animation:dotBounce 1.2s ease infinite; }
+    @keyframes dotBounce { 0%,80%,100%{transform:scale(0.8);opacity:0.5} 40%{transform:scale(1.2);opacity:1} }
+  </style>
+</head>
+<body>
+  <!-- Game Header -->
+  <header class="game-header" id="gameHeader">
+    <div style="display:flex;align-items:center;gap:0.75rem">
+      <div class="avatar" id="playerAvatar" style="background:var(--baby-pink);width:36px;height:36px;font-size:0.9rem">P</div>
+      <span class="game-header-title" id="gameName">Loading...</span>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:0.7rem;color:var(--gray);font-weight:600;text-transform:uppercase;letter-spacing:0.05em">My Score</div>
+      <div style="font-family:var(--font-heading);font-weight:700;color:var(--baby-pink);font-size:1.2rem" id="currentScore">0</div>
+    </div>
+  </header>
+
+  <!-- Game Content -->
+  <main class="game-content" id="gameContent">
+    <div style="text-align:center;padding:4rem 2rem">
+      <div class="spinner" style="margin:0 auto 1rem"></div>
+      <p style="color:var(--gray)">Loading game...</p>
+    </div>
+  </main>
+
+  <!-- Interim Leaderboard Overlay -->
+  <div id="leaderboardOverlay" style="
+    position:fixed;inset:0;background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);
+    z-index:500;flex-direction:column;align-items:center;padding:2rem 1rem;overflow-y:auto;
+    display:none;
+  ">
+    <h2 style="font-family:var(--font-heading);font-size:2rem;margin-bottom:0.25rem">🏆 Leaderboard</h2>
+    <p style="color:var(--gray);margin-bottom:2rem" id="lbSubtitle">After this round</p>
+    <div id="leaderboardList" style="width:100%;max-width:500px"></div>
+    <div style="margin-top:2rem;text-align:center" id="waitingNextGame">
+      <div class="waiting-indicator">
+        <div class="dot-bounce"></div>
+        <div class="dot-bounce" style="animation-delay:0.2s"></div>
+        <div class="dot-bounce" style="animation-delay:0.4s"></div>
+        <span style="margin-left:0.25rem">Waiting for host to start next game...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Final Results Overlay -->
+  <div id="finalResults" style="
+    position:fixed;inset:0;
+    background:linear-gradient(135deg,#FFF0F5,#FFF8F0,#F0F8FF);
+    z-index:600;flex-direction:column;align-items:center;justify-content:center;
+    padding:2rem 1rem;text-align:center;overflow-y:auto;display:none;
+  ">
+    <div style="font-size:4rem;margin-bottom:1rem">🎉</div>
+    <h1 style="font-family:var(--font-heading);font-size:2.5rem;margin-bottom:0.5rem">Game Over!</h1>
+    <p style="color:var(--gray);margin-bottom:2rem">Thanks for playing K4 Game Room</p>
+    <div id="podiumContainer" class="podium-container"></div>
+    <div id="finalLeaderboard" style="width:100%;max-width:500px;margin-top:1.5rem"></div>
+    <p style="color:var(--gray);font-size:0.85rem;margin-top:2rem">Powered by Kreate 4 🌸</p>
+  </div>
+
+  <!-- Confetti layer -->
+  <div id="confettiContainer" style="position:fixed;inset:0;pointer-events:none;z-index:9998"></div>
+
+  <!-- Toast -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Scripts: order matters -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/socket.js"></script>
+  <script src="/js/animations.js"></script>
+  <script src="/js/leaderboard.js"></script>
+  <script src="/js/games/who-knows-best.js"></script>
+  <script src="/js/games/emojinary.js"></script>
+  <script src="/js/games/price-check.js"></script>
+  <script src="/js/games/first-impressions.js"></script>
+  <script src="/js/games/word-scramble.js"></script>
+  <script src="/js/app-game.js"></script>
+</body>
+</html>
