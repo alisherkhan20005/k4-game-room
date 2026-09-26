@@ -1,20 +1,26 @@
-/* K4 GAME ROOM — GAME SHELL CONTROLLER */
-(function() {
-  const playerData = JSON.parse(sessionStorage.getItem('k4_player') || '{}');
-  if(!playerData.player_id) { window.location.href='/'; return; }
-
-  // Set avatar
-  const avatar = document.getElementById('playerAvatar');
-  if(avatar) {
-    avatar.textContent = (playerData.player_name||'P').charAt(0).toUpperCase();
-    avatar.style.background = playerData.avatar_color || 'var(--pink)';
+/* K4 GAME ROOM — GAME SHELL CONTROLLER
+   Manages socket connection, game loading, leaderboard display
+*/
+(function () {
+  // Guard — must be logged in as player
+  const playerData = JSON.parse(sessionStorage.getItem('k4_player') || 'null');
+  if (!playerData || !playerData.player_id) {
+    window.location.href = '/';
+    return;
   }
-  document.getElementById('currentScore').textContent = playerData.total_score || 0;
 
-  // Socket
-  const socket = io();
-  let gameModule = null;
-  let localScore  = 0;
+  // Set topbar avatar
+  const avatarEl = document.getElementById('playerAvatar');
+  if (avatarEl) {
+    avatarEl.textContent  = (playerData.player_name || 'P').charAt(0).toUpperCase();
+    avatarEl.style.background = playerData.avatar_color || 'var(--pink)';
+  }
+  const scoreEl = document.getElementById('currentScore');
+  if (scoreEl) scoreEl.textContent = playerData.total_score || 0;
+
+  // Socket connection
+  const socket = io({ transports: ['websocket', 'polling'] });
+  let activeGame = null;
 
   socket.on('connect', () => {
     socket.emit('join_room', {
@@ -24,58 +30,75 @@
     });
   });
 
+  socket.on('connect_error', () => {
+    K4App.toast('Connection error — reconnecting...', 'error');
+  });
+
+  // Host launched a game
   socket.on('game_started', async ({ game_name }) => {
-    try {
-      const res = await fetch(`/api/games/${playerData.room_code}/${game_name}`, {
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const data = await res.json();
-      if(!data.success) throw new Error(data.message);
-      initGame(game_name, data.data);
-    } catch(e) {
-      K4App.toast('Error loading game: '+e.message,'error');
-    }
+    // Close leaderboard if open
+    K4Leaderboard.hide();
+    await _loadAndStartGame(game_name);
   });
 
-  // Close leaderboard when next game starts
+  // Host ended a game — show interim leaderboard
   socket.on('game_ended', ({ scores }) => {
-    updateScoreFromServer(scores);
-    K4Leaderboard.show(scores, 'Scores after this game', playerData.player_id);
+    if (activeGame?.destroy) activeGame.destroy();
+    _updateMyScore(scores);
+    K4Leaderboard.show(scores, 'After this game', playerData.player_id);
   });
 
+  // Host ended entire event — show final results
   socket.on('final_results', ({ scores }) => {
+    if (activeGame?.destroy) activeGame.destroy();
+    _updateMyScore(scores);
     K4Leaderboard.showFinal(scores, playerData.player_id);
   });
 
+  // Real-time score update from server
   socket.on('score_update', ({ player_id, total_score }) => {
-    if(player_id === playerData.player_id) {
-      localScore = total_score;
-      document.getElementById('currentScore').textContent = total_score;
+    if (String(player_id) === String(playerData.player_id)) {
+      if (scoreEl) scoreEl.textContent = total_score;
     }
   });
 
-  function updateScoreFromServer(scores) {
-    const me = scores.find(p => p.id === playerData.player_id);
-    if(me) document.getElementById('currentScore').textContent = me.total_score;
+  // Load game data from API then init game module
+  async function _loadAndStartGame(game_name) {
+    const content = document.getElementById('gameContent');
+    if (content) content.innerHTML = `
+      <div class="waiting-screen">
+        <div class="waiting-title">Loading game...</div>
+        <div class="waiting-dots"><span></span><span></span><span></span></div>
+      </div>`;
+
+    try {
+      const res  = await fetch(`/api/games/${playerData.room_code}/${game_name}`);
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message);
+      _initGame(game_name, data.data);
+    } catch (err) {
+      K4App.toast('Error loading game: ' + err.message, 'error');
+    }
   }
 
-  function initGame(name, data) {
-    // Destroy old module
-    if(gameModule?.destroy) gameModule.destroy();
-    K4Leaderboard.hide();
+  function _initGame(name, data) {
+    if (activeGame?.destroy) activeGame.destroy();
 
     // Update topbar
-    const titles = {
-      who_knows_best:   '❓ Who Knows Best',
-      emojinary:        '😂 Emoji-nary',
-      price_check:      '💰 Price Check',
-      first_impressions:'🧊 First Impressions',
-      word_scramble:    '🔤 Word Scramble'
+    const labels = {
+      who_knows_best:    'Who Knows Best',
+      emojinary:         'Emoji-nary',
+      price_check:       'Price Check',
+      first_impressions: 'First Impressions',
+      word_scramble:     'Word Scramble'
     };
-    document.getElementById('gameNameText').textContent = titles[name] || name;
-    document.getElementById('progressFill').style.width = '0%';
+    const nameEl = document.getElementById('gameNameText');
+    if (nameEl) nameEl.textContent = labels[name] || name;
 
-    // Init game module
+    // Reset progress
+    const pb = document.getElementById('progressFill');
+    if (pb) pb.style.width = '0%';
+
     const modules = {
       who_knows_best:    WhoKnowsBest,
       emojinary:         Emojinary,
@@ -83,22 +106,22 @@
       first_impressions: FirstImpressions,
       word_scramble:     WordScramble
     };
-    gameModule = modules[name];
-    if(gameModule) gameModule.init(data, playerData, socket);
-    else K4App.toast('Unknown game: '+name,'error');
+
+    activeGame = modules[name];
+    if (!activeGame) { K4App.toast('Unknown game: ' + name, 'error'); return; }
+    activeGame.init(data, playerData, socket);
   }
 
-  // Check URL params for direct load (testing)
+  function _updateMyScore(scores) {
+    const me = scores.find(p => String(p.id) === String(playerData.player_id));
+    if (me && scoreEl) scoreEl.textContent = me.total_score || 0;
+  }
+
+  // Support direct URL load for testing: /game.html?game=emojinary&room=ABC123
   const urlGame = K4App.getParam('game');
   const urlRoom = K4App.getParam('room');
-  if(urlGame && urlRoom) {
-    (async()=>{
-      try {
-        const res = await fetch(`/api/games/${urlRoom}/${urlGame}`);
-        const data = await res.json();
-        if(data.success) initGame(urlGame, data.data);
-      } catch(e) { console.log('Waiting for host to start game...'); }
-    })();
+  if (urlGame && urlRoom && urlRoom === playerData.room_code) {
+    _loadAndStartGame(urlGame);
   }
 
 })();

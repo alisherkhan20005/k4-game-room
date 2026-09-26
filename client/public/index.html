@@ -6,461 +6,173 @@
   <title>K4 Game Room — Kreate 4 Events</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="stylesheet" href="/css/animations.css">
   <style>
-    body { background: var(--dark); overflow: hidden; height: 100vh; }
-
-    /* ── Animated mesh background ── */
-    .bg-mesh {
-      position: fixed; inset: 0; z-index: 0;
-      background: linear-gradient(135deg, #0D0D1A 0%, #1A0A2E 40%, #0F1A3A 100%);
-    }
-    .bg-orb {
-      position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none;
-    }
-    .orb-1 { width:500px; height:500px; background:rgba(255,107,157,0.18); top:-150px; right:-100px; animation:orbFloat1 8s ease-in-out infinite; }
-    .orb-2 { width:400px; height:400px; background:rgba(107,158,255,0.15); bottom:-100px; left:-100px; animation:orbFloat2 10s ease-in-out infinite; }
-    .orb-3 { width:300px; height:300px; background:rgba(0,200,150,0.12); top:40%; left:30%; animation:orbFloat3 12s ease-in-out infinite; }
-    @keyframes orbFloat1 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-30px,20px) scale(1.1)} }
-    @keyframes orbFloat2 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(20px,-30px) scale(1.05)} }
-    @keyframes orbFloat3 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-20px,15px) scale(1.08)} }
-
-    /* ── Floating particles ── */
-    .particle {
-      position: absolute; border-radius: 50%; pointer-events: none;
-      animation: particleFloat var(--dur,6s) ease-in-out infinite;
-      animation-delay: var(--delay,0s);
-    }
-
-    /* ── Main layout ── */
-    .home-wrap {
-      position: relative; z-index: 1;
-      min-height: 100vh;
-      display: grid;
-      grid-template-columns: 1fr 480px 1fr;
-      grid-template-rows: 1fr;
-      align-items: center;
-      padding: 2rem;
-      gap: 3rem;
-    }
-
-    /* ── Left side — branding ── */
-    .brand-side {
-      grid-column: 1;
-      text-align: right;
-      color: var(--white);
-      padding-right: 2rem;
-    }
-    .brand-logo {
-      display: inline-flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-    .logo-icon-wrap {
-      width: 64px; height: 64px;
-      background: var(--grad-primary);
-      border-radius: 18px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.8rem;
-      box-shadow: var(--shadow-pink);
-    }
-    .brand-name {
-      font-family: var(--font-display);
-      font-size: 1.4rem;
-      font-weight: 900;
-      line-height: 1;
-    }
-    .brand-sub {
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      opacity: 0.55;
-      margin-top: 0.2rem;
-    }
-    .brand-tagline {
-      font-family: var(--font-display);
-      font-size: clamp(2rem, 4vw, 3.2rem);
-      font-weight: 900;
-      line-height: 1.1;
-      margin-bottom: 1rem;
-      color: var(--white);
-    }
-    .brand-tagline em {
-      font-style: italic;
-      background: var(--grad-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .brand-desc {
-      font-size: 0.95rem;
-      color: rgba(255,255,255,0.55);
-      line-height: 1.7;
-      max-width: 360px;
-      margin-left: auto;
-    }
-    .game-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 1.5rem;
-      justify-content: flex-end;
-    }
-    .game-pill {
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: var(--r-full);
-      padding: 0.35rem 0.9rem;
-      font-size: 0.78rem;
-      color: rgba(255,255,255,0.7);
-      font-weight: 500;
-    }
-
-    /* ── Join Card ── */
-    .join-wrap { grid-column: 2; }
-    .join-card {
-      background: rgba(255,255,255,0.06);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 28px;
-      padding: 2.75rem 2.25rem;
-      box-shadow: 0 32px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
-    }
-    .join-header {
-      text-align: center;
-      margin-bottom: 2.25rem;
-    }
-    .join-emoji {
-      font-size: 3rem;
-      display: block;
-      margin-bottom: 0.75rem;
-      animation: float 3s ease-in-out infinite;
-    }
-    .join-title {
-      font-family: var(--font-display);
-      font-size: 1.9rem;
-      font-weight: 900;
-      color: var(--white);
-      margin-bottom: 0.4rem;
-    }
-    .join-sub { font-size: 0.88rem; color: rgba(255,255,255,0.45); }
-
-    .dark-label {
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: rgba(255,255,255,0.45);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 0.5rem;
-      display: block;
-    }
-    .dark-input {
-      width: 100%;
-      padding: 0.9rem 1.25rem;
-      background: rgba(255,255,255,0.06);
-      border: 1.5px solid rgba(255,255,255,0.12);
-      border-radius: var(--r-md);
-      color: var(--white);
-      font-family: var(--font-body);
-      font-size: 0.95rem;
-      outline: none;
-      transition: all var(--t-base);
-    }
-    .dark-input:focus {
-      border-color: var(--pink);
-      background: rgba(255,107,157,0.08);
-      box-shadow: 0 0 0 4px rgba(255,107,157,0.15);
-    }
-    .dark-input::placeholder { color: rgba(255,255,255,0.25); }
-    .dark-input.code-input {
-      text-align: center;
-      letter-spacing: 0.4em;
-      font-size: 2rem;
-      font-weight: 800;
-      font-family: var(--font-display);
-      text-transform: uppercase;
-    }
-
-    .divider-line {
-      display: flex; align-items: center; gap: 1rem;
-      margin: 1.5rem 0;
-      color: rgba(255,255,255,0.2);
-      font-size: 0.78rem;
-    }
-    .divider-line::before, .divider-line::after {
-      content: ''; flex: 1; height: 1px;
-      background: rgba(255,255,255,0.1);
-    }
-
-    /* ── Right side — event types ── */
-    .events-side {
-      grid-column: 3;
-      padding-left: 2rem;
-    }
-    .events-label {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: rgba(255,255,255,0.35);
-      font-weight: 600;
-      margin-bottom: 1rem;
-    }
-    .event-type-card {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: var(--r-lg);
-      padding: 1.25rem;
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      color: var(--white);
-      transition: all var(--t-base);
-    }
-    .event-type-card:hover {
-      background: rgba(255,255,255,0.1);
-      border-color: rgba(255,255,255,0.2);
-      transform: translateX(4px);
-    }
-    .et-icon {
-      width: 50px; height: 50px; border-radius: var(--r-md);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem; flex-shrink: 0;
-    }
-    .et-bridal { background: linear-gradient(135deg, rgba(255,107,157,0.3), rgba(255,107,157,0.1)); }
-    .et-baby   { background: linear-gradient(135deg, rgba(107,158,255,0.3), rgba(107,158,255,0.1)); }
-    .et-title  { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.1rem; }
-    .et-desc   { font-size: 0.78rem; color: rgba(255,255,255,0.4); }
-
-    .stats-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-      margin-top: 1.5rem;
-    }
-    .stat-box {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: var(--r-md);
-      padding: 1rem;
-      text-align: center;
-      color: var(--white);
-    }
-    .stat-num {
-      font-family: var(--font-display);
-      font-size: 1.8rem;
-      font-weight: 900;
-      background: var(--grad-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      line-height: 1;
-    }
-    .stat-lbl { font-size: 0.72rem; color: rgba(255,255,255,0.35); margin-top: 0.25rem; }
-
-    /* ── Loading overlay ── */
-    .loading-overlay {
-      position: fixed; inset: 0;
-      background: rgba(13,13,26,0.9);
-      backdrop-filter: blur(10px);
-      z-index: 1000;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 1.5rem;
-    }
-    .loading-overlay.active { display: flex; }
-    .loading-spinner-lg {
-      width: 60px; height: 60px;
-      border: 4px solid rgba(255,255,255,0.1);
-      border-top-color: var(--pink);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    .loading-text { color: var(--white); font-weight: 600; font-size: 1rem; }
-
-    /* ── Responsive ── */
-    @media (max-width: 1100px) {
-      .home-wrap { grid-template-columns: 1fr; grid-template-rows: auto; padding: 2rem 1rem; gap: 2rem; }
-      .brand-side, .events-side { display: none; }
-      .join-wrap { grid-column: 1; }
-      body { overflow: auto; height: auto; }
-    }
+    body { background:#0D0D1A; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem 1rem; position:relative; overflow:hidden; }
+    .orb { position:fixed; border-radius:50%; filter:blur(70px); pointer-events:none; }
+    .o1 { width:350px;height:350px;background:rgba(255,107,157,0.15);top:-100px;right:-80px; }
+    .o2 { width:280px;height:280px;background:rgba(107,158,255,0.12);bottom:-80px;left:-60px; }
+    .o3 { width:200px;height:200px;background:rgba(0,200,150,0.08);top:45%;left:38%; }
+    /* Type badges */
+    .type-badges { position:relative;z-index:2;display:flex;gap:0.5rem;margin-bottom:1rem; }
+    .type-badge { padding:0.28rem 0.875rem;border-radius:var(--r-full);font-size:0.72rem;font-weight:600;letter-spacing:0.04em; }
+    .badge-bridal { background:rgba(255,107,157,0.1);border:1px solid rgba(255,107,157,0.25);color:rgba(255,181,200,0.9); }
+    .badge-baby   { background:rgba(107,158,255,0.1);border:1px solid rgba(107,158,255,0.25);color:rgba(180,210,255,0.9); }
+    /* Headline */
+    .headline { position:relative;z-index:2;text-align:center;margin-bottom:1rem; }
+    .headline h1 { font-family:'Playfair Display',serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:900;color:#fff;margin-bottom:0.3rem; }
+    .headline h1 em { font-style:italic;color:var(--pink); }
+    .headline p { font-size:0.82rem;color:rgba(255,255,255,0.38); }
+    /* Live count */
+    .live-count { position:relative;z-index:2;margin-bottom:1rem;background:rgba(0,200,150,0.08);border:1px solid rgba(0,200,150,0.2);border-radius:var(--r-full);padding:0.3rem 0.875rem;display:flex;align-items:center;gap:0.4rem; }
+    .live-dot { width:7px;height:7px;border-radius:50%;background:#00C896;animation:livePulse 1.8s ease-in-out infinite; }
+    @keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.5)} }
+    .live-count span { font-size:0.75rem;color:rgba(0,200,150,0.9);font-weight:600; }
+    /* Card */
+    .join-card { position:relative;z-index:2;width:100%;max-width:340px;background:rgba(255,255,255,0.055);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:2rem 1.75rem;box-shadow:0 24px 60px rgba(0,0,0,0.4); }
+    .card-brand { text-align:center;margin-bottom:1.5rem; }
+    .brand-icon { width:52px;height:52px;background:var(--grad-primary);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 0.6rem;box-shadow:var(--shadow-pink); }
+    .brand-name { font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900;color:#fff; }
+    .brand-by   { font-size:0.62rem;color:rgba(255,255,255,0.28);text-transform:uppercase;letter-spacing:0.12em;margin-top:0.15rem; }
+    .field-label { display:block;font-size:0.67rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.32);margin-bottom:0.4rem; }
+    .field-input { width:100%;padding:0.82rem 1rem;background:rgba(0,0,0,0.3);border:1.5px solid rgba(255,255,255,0.08);border-radius:10px;color:#fff;font-size:0.88rem;font-weight:500;font-family:'Poppins',sans-serif;outline:none;margin-bottom:0.95rem;display:block;transition:border-color 0.2s; }
+    .field-input:focus { border-color:var(--pink);background:rgba(255,107,157,0.06);box-shadow:0 0 0 3px rgba(255,107,157,0.1); }
+    .field-input::placeholder { color:rgba(255,255,255,0.22); }
+    .play-btn { width:100%;padding:0.9rem;border:none;border-radius:var(--r-full);background:var(--pink);color:#fff;font-size:0.95rem;font-weight:700;font-family:'Poppins',sans-serif;cursor:pointer;box-shadow:var(--shadow-pink);transition:all 0.2s;margin-bottom:0.75rem;display:block; }
+    .play-btn:hover { background:#ff5488;transform:translateY(-2px);box-shadow:0 10px 28px rgba(255,107,157,0.5); }
+    .play-btn:disabled { opacity:0.55;cursor:not-allowed;transform:none; }
+    .or-line { display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem; }
+    .or-line::before,.or-line::after { content:'';flex:1;height:1px;background:rgba(255,255,255,0.07); }
+    .or-line span { font-size:0.7rem;color:rgba(255,255,255,0.18); }
+    .host-btn { width:100%;padding:0.82rem;border:1.5px solid rgba(155,127,212,0.35);border-radius:var(--r-full);background:rgba(155,127,212,0.1);color:rgba(210,185,255,0.88);font-size:0.85rem;font-weight:600;font-family:'Poppins',sans-serif;cursor:pointer;transition:all 0.2s;display:block; }
+    .host-btn:hover { background:rgba(155,127,212,0.2);border-color:rgba(155,127,212,0.55);color:#fff; }
+    /* How it works */
+    .steps { position:relative;z-index:2;display:flex;align-items:center;margin-top:1.25rem;max-width:340px;width:100%; }
+    .step { flex:1;text-align:center; }
+    .step-num { width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:800;margin:0 auto 0.3rem; }
+    .s1 { background:rgba(255,107,157,0.15);border:1px solid rgba(255,107,157,0.3);color:var(--pink); }
+    .s2 { background:rgba(155,127,212,0.15);border:1px solid rgba(155,127,212,0.3);color:var(--lavender); }
+    .s3 { background:rgba(0,200,150,0.15);border:1px solid rgba(0,200,150,0.3);color:var(--mint); }
+    .step-label { font-size:0.66rem;color:rgba(255,255,255,0.38);font-weight:500; }
+    .step-line { width:28px;height:1px;background:rgba(255,255,255,0.08); }
+    /* Game pills */
+    .game-pills { position:relative;z-index:2;display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:1rem;justify-content:center;max-width:360px; }
+    .game-pill { padding:0.26rem 0.7rem;border-radius:var(--r-full);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.42);font-size:0.68rem;font-weight:500; }
+    /* Footer */
+    .footer { position:relative;z-index:2;margin-top:1.25rem;font-size:0.67rem;color:rgba(255,255,255,0.14);letter-spacing:0.06em; }
+    .footer span { color:rgba(255,107,157,0.38);font-weight:700; }
+    /* Loading */
+    .loading-overlay { position:fixed;inset:0;background:rgba(13,13,26,0.9);backdrop-filter:blur(10px);z-index:1000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:1.25rem; }
+    .loading-overlay.active { display:flex; }
+    .loading-spinner { width:48px;height:48px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--pink);border-radius:50%;animation:spin 0.8s linear infinite; }
+    .loading-text { color:#fff;font-size:0.9rem;font-weight:600; }
+    @keyframes spin { to{transform:rotate(360deg)} }
   </style>
 </head>
 <body>
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+  <div class="orb o3"></div>
 
-<!-- Background -->
-<div class="bg-mesh">
-  <div class="bg-orb orb-1"></div>
-  <div class="bg-orb orb-2"></div>
-  <div class="bg-orb orb-3"></div>
-  <!-- Particles -->
-  <div class="particle" style="width:4px;height:4px;background:rgba(255,107,157,0.6);top:20%;left:15%;--dur:7s;--delay:0s"></div>
-  <div class="particle" style="width:6px;height:6px;background:rgba(0,200,150,0.5);top:60%;left:25%;--dur:9s;--delay:1s"></div>
-  <div class="particle" style="width:3px;height:3px;background:rgba(107,158,255,0.7);top:30%;left:70%;--dur:6s;--delay:2s"></div>
-  <div class="particle" style="width:5px;height:5px;background:rgba(255,217,61,0.5);top:75%;left:60%;--dur:8s;--delay:0.5s"></div>
-  <div class="particle" style="width:4px;height:4px;background:rgba(255,107,157,0.5);top:50%;left:85%;--dur:10s;--delay:3s"></div>
-  <div class="particle" style="width:6px;height:6px;background:rgba(0,200,150,0.4);top:10%;left:55%;--dur:11s;--delay:1.5s"></div>
-</div>
-
-<main class="home-wrap">
-  <!-- LEFT: Branding -->
-  <div class="brand-side fade-in-up">
-    <div class="brand-logo" style="justify-content:flex-end">
-      <div style="text-align:right">
-        <div class="brand-name">K4 Game Room</div>
-        <div class="brand-sub">by Kreate 4</div>
-      </div>
-      <div class="logo-icon-wrap">🎮</div>
-    </div>
-    <h1 class="brand-tagline">
-      Make Every<br>Event <em>Unforgettable</em>
-    </h1>
-    <p class="brand-desc">
-      Live multiplayer games designed for Bridal & Baby Showers.
-      Real-time scoring, live leaderboards & instant celebrations.
-    </p>
-    <div class="game-pills">
-      <span class="game-pill">🧊 Ice Breaker Bingo</span>
-      <span class="game-pill">💰 Price Check</span>
-      <span class="game-pill">❓ Who Knows Best</span>
-      <span class="game-pill">😂 Emoji-nary</span>
-      <span class="game-pill">🔤 Word Scramble</span>
-    </div>
+  <div class="type-badges">
+    <span class="type-badge badge-bridal">Bridal Shower</span>
+    <span class="type-badge badge-baby">Baby Shower</span>
   </div>
 
-  <!-- CENTER: Join Card -->
-  <div class="join-wrap">
-    <div class="join-card fade-in-up" id="joinCard">
-      <div class="join-header">
-        <span class="join-emoji">🎉</span>
-        <h2 class="join-title">Join the Game!</h2>
-        <p class="join-sub">Enter your room code to start playing</p>
-      </div>
-
-      <div class="form-group" style="margin-bottom:1.25rem">
-        <label class="dark-label">Room Code</label>
-        <input type="text" class="dark-input code-input" id="roomCodeInput"
-          placeholder="ABC123" maxlength="6"
-          autocomplete="off" autocorrect="off" autocapitalize="characters">
-      </div>
-
-      <div class="form-group" style="margin-bottom:1.75rem">
-        <label class="dark-label">Your Name</label>
-        <input type="text" class="dark-input" id="playerNameInput"
-          placeholder="Enter your name ✨" maxlength="30" autocomplete="off">
-      </div>
-
-      <button class="btn btn-primary btn-full btn-xl" id="joinBtn" onclick="joinGame()">
-        🎊 Let's Play!
-      </button>
-
-      <div class="divider-line">or</div>
-
-      <a href="/admin/login.html" class="btn btn-ghost btn-full">
-        🎛️ I'm the Host
-      </a>
-    </div>
+  <div class="headline">
+    <h1>Make Every Event <em>Unforgettable</em></h1>
+    <p>Enter your room code and join the fun with everyone</p>
   </div>
 
-  <!-- RIGHT: Event info -->
-  <div class="events-side fade-in-up" style="animation-delay:0.2s">
-    <div class="events-label">Event Types</div>
-
-    <div class="event-type-card">
-      <div class="et-icon et-bridal">💍</div>
-      <div>
-        <div class="et-title">Bridal Shower</div>
-        <div class="et-desc">5 games tailored for the bride-to-be</div>
-      </div>
-    </div>
-
-    <div class="event-type-card">
-      <div class="et-icon et-baby">👶</div>
-      <div>
-        <div class="et-title">Baby Shower</div>
-        <div class="et-desc">5 games perfect for the mom-to-be</div>
-      </div>
-    </div>
-
-    <div class="stats-row">
-      <div class="stat-box">
-        <div class="stat-num">5</div>
-        <div class="stat-lbl">Live Games</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num">50+</div>
-        <div class="stat-lbl">Players / Room</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num">🏆</div>
-        <div class="stat-lbl">Live Leaderboard</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num">📱</div>
-        <div class="stat-lbl">Mobile Ready</div>
-      </div>
-    </div>
+  <div class="live-count">
+    <div class="live-dot"></div>
+    <span id="liveCount">Join players online right now</span>
   </div>
-</main>
 
-<!-- Loading Overlay -->
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="loading-spinner-lg"></div>
-  <div class="loading-text">Joining the game room... 🎮</div>
-</div>
+  <div class="join-card">
+    <div class="card-brand">
+      <div class="brand-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+        </svg>
+      </div>
+      <div class="brand-name">K4 Game Room</div>
+      <div class="brand-by">by Kreate 4</div>
+    </div>
 
-<div class="toast-container" id="toastContainer"></div>
+    <label class="field-label">Room Code</label>
+    <input class="field-input" id="roomCodeInput"
+      type="text" placeholder="Enter the code"
+      maxlength="6" autocomplete="off" autocorrect="off" autocapitalize="characters">
 
-<script src="/js/app.js"></script>
-<script>
-  const roomInput = document.getElementById('roomCodeInput');
-  const nameInput = document.getElementById('playerNameInput');
+    <label class="field-label">Your Name</label>
+    <input class="field-input" id="playerNameInput"
+      type="text" placeholder="Enter your name"
+      maxlength="30" autocomplete="off">
 
-  roomInput.addEventListener('input', e => {
-    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
-  });
-  roomInput.addEventListener('keypress', e => { if(e.key==='Enter') nameInput.focus(); });
-  nameInput.addEventListener('keypress', e => { if(e.key==='Enter') joinGame(); });
+    <button class="play-btn" id="playBtn" onclick="joinGame()">Let's Play!</button>
+    <div class="or-line"><span>or</span></div>
+    <a href="/admin/login.html"><button class="host-btn">I'm the Host</button></a>
+  </div>
 
-  async function joinGame() {
-    const roomCode = roomInput.value.trim();
-    const playerName = nameInput.value.trim();
+  <div class="steps">
+    <div class="step"><div class="step-num s1">1</div><div class="step-label">Enter Code</div></div>
+    <div class="step-line"></div>
+    <div class="step"><div class="step-num s2">2</div><div class="step-label">Type Name</div></div>
+    <div class="step-line"></div>
+    <div class="step"><div class="step-num s3">3</div><div class="step-label">Play Games</div></div>
+  </div>
 
-    if (!roomCode || roomCode.length < 6) {
-      K4App.toast('Please enter a 6-character room code', 'error');
-      roomInput.focus(); return;
+  <div class="game-pills">
+    <span class="game-pill">Who Knows Best</span>
+    <span class="game-pill">Emoji-nary</span>
+    <span class="game-pill">Price Check</span>
+    <span class="game-pill">First Impressions</span>
+    <span class="game-pill">Word Scramble</span>
+  </div>
+
+  <div class="footer">Powered by <span>Kreate 4</span></div>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Joining the game room...</div>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    const roomInput = document.getElementById('roomCodeInput');
+    const nameInput = document.getElementById('playerNameInput');
+
+    roomInput.addEventListener('input', e => {
+      e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+    });
+    roomInput.addEventListener('keypress', e => { if(e.key==='Enter') nameInput.focus(); });
+    nameInput.addEventListener('keypress', e => { if(e.key==='Enter') joinGame(); });
+
+    async function joinGame() {
+      const roomCode   = roomInput.value.trim();
+      const playerName = nameInput.value.trim();
+      if (!roomCode || roomCode.length !== 6) { K4App.toast('Enter a 6-character room code','error'); roomInput.focus(); return; }
+      if (!playerName)  { K4App.toast('Enter your name','error'); nameInput.focus(); return; }
+
+      const btn = document.getElementById('playBtn');
+      btn.disabled = true;
+      document.getElementById('loadingOverlay').classList.add('active');
+
+      try {
+        const data = await K4App.api('/players/join', {
+          method: 'POST',
+          body: { room_code: roomCode, player_name: playerName }
+        });
+        sessionStorage.setItem('k4_player', JSON.stringify(data.data));
+        window.location.href = '/lobby.html';
+      } catch(err) {
+        document.getElementById('loadingOverlay').classList.remove('active');
+        btn.disabled = false;
+        K4App.toast(err.message || 'Could not join — check your room code','error');
+      }
     }
-    if (!playerName) {
-      K4App.toast('Please enter your name', 'error');
-      nameInput.focus(); return;
-    }
-
-    document.getElementById('loadingOverlay').classList.add('active');
-    document.getElementById('joinBtn').disabled = true;
-
-    try {
-      const res = await fetch('/api/players/join', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ room_code: roomCode, player_name: playerName })
-      });
-      const data = await res.json();
-      if (!data.success) throw new Error(data.message);
-      sessionStorage.setItem('k4_player', JSON.stringify(data.data));
-      window.location.href = '/lobby.html';
-    } catch (err) {
-      document.getElementById('loadingOverlay').classList.remove('active');
-      document.getElementById('joinBtn').disabled = false;
-      K4App.toast(err.message || 'Could not join. Check your room code.', 'error');
-    }
-  }
-</script>
+  </script>
 </body>
 </html>

@@ -4,290 +4,234 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Waiting Room — K4 Game Room</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="stylesheet" href="/css/animations.css">
   <style>
-    body {
-      background: linear-gradient(160deg, #0D0D1A 0%, #1A0A2E 50%, #0A1A2E 100%);
-      min-height: 100vh;
-      color: var(--white);
-    }
-    .bg-orb {
-      position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0;
-    }
-    .orb-1 { width:400px;height:400px;background:rgba(255,107,157,0.12);top:-100px;right:-100px; }
-    .orb-2 { width:350px;height:350px;background:rgba(107,158,255,0.10);bottom:-100px;left:-100px; }
-
-    .lobby-wrap {
-      position: relative; z-index: 1;
-      max-width: 680px; margin: 0 auto;
-      padding: 2rem 1rem;
-    }
-
-    /* Top nav */
-    .lobby-nav {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 2.5rem;
-    }
-    .lobby-brand {
-      display: flex; align-items: center; gap: 0.75rem;
-      font-family: var(--font-display); font-size: 1.1rem; font-weight: 700;
-    }
-    .brand-dot {
-      width: 36px; height: 36px;
-      background: var(--grad-primary); border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1rem;
-    }
-
-    /* Hero area */
-    .lobby-hero {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    .lobby-event-badge {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      background: rgba(255,107,157,0.12);
-      border: 1px solid rgba(255,107,157,0.2);
-      border-radius: var(--r-full);
-      padding: 0.35rem 1rem;
-      font-size: 0.78rem; font-weight: 700;
-      color: var(--pink-l);
-      text-transform: uppercase; letter-spacing: 0.08em;
-      margin-bottom: 1.25rem;
-    }
-    .lobby-title {
-      font-family: var(--font-display);
-      font-size: clamp(1.8rem,5vw,2.8rem);
-      font-weight: 900; line-height: 1.1;
-      margin-bottom: 0.5rem;
-    }
-    .lobby-celebrant { color: rgba(255,255,255,0.5); font-size: 0.95rem; }
-    .lobby-celebrant strong { color: var(--pink); font-weight: 700; }
-
+    body { background:var(--grad-dark);min-height:100vh;color:#fff; }
+    .orb { position:fixed;border-radius:50%;filter:blur(70px);pointer-events:none; }
+    .o1 { width:300px;height:300px;background:rgba(255,107,157,0.12);top:-80px;right:-60px; }
+    .o2 { width:250px;height:250px;background:rgba(107,158,255,0.10);bottom:-60px;left:-60px; }
+    .wrap { position:relative;z-index:1;max-width:540px;margin:0 auto;padding:1.75rem 1rem; }
+    /* Nav */
+    .nav { display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem; }
+    .nav-brand { display:flex;align-items:center;gap:0.6rem; }
+    .nav-logo  { width:34px;height:34px;background:var(--grad-primary);border-radius:10px;display:flex;align-items:center;justify-content:center; }
+    .nav-name  { font-family:'Playfair Display',serif;font-size:1rem;font-weight:900;color:#fff; }
+    .nav-badge { padding:0.25rem 0.8rem;border-radius:var(--r-full);background:rgba(255,107,157,0.1);border:1px solid rgba(255,107,157,0.22);color:rgba(255,181,200,0.9);font-size:0.7rem;font-weight:600; }
+    /* Header */
+    .header { text-align:center;margin-bottom:1.5rem; }
+    .header h1 { font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;margin-bottom:0.3rem; }
+    .header p  { font-size:0.85rem;color:rgba(255,255,255,0.38); }
+    .header p strong { color:var(--pink);font-weight:700; }
     /* Room code card */
-    .room-code-card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: var(--r-xl);
-      padding: 1.75rem;
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-    .rc-label {
-      font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em;
-      color: rgba(255,255,255,0.3); font-weight: 600; margin-bottom: 0.75rem;
-    }
-    .rc-value {
-      font-family: var(--font-display);
-      font-size: clamp(2.5rem,7vw,4rem);
-      font-weight: 900; letter-spacing: 0.35em;
-      background: var(--grad-primary);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 0.875rem;
-    }
-    .rc-waiting {
-      display: flex; align-items: center; justify-content: center; gap: 0.75rem;
-      color: rgba(255,255,255,0.35); font-size: 0.82rem;
-    }
-    .waiting-dots-wrap { display: flex; gap: 5px; }
-    .w-dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--pink);
-      animation: dotPulse 1.4s ease-in-out infinite;
-    }
-    .w-dot:nth-child(2) { animation-delay:0.2s; background:var(--lavender); }
-    .w-dot:nth-child(3) { animation-delay:0.4s; background:var(--mint); }
-    @keyframes dotPulse { 0%,80%,100%{transform:scale(0.7);opacity:0.4} 40%{transform:scale(1.2);opacity:1} }
-
-    /* Players section */
-    .players-section {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: var(--r-xl);
-      padding: 1.5rem;
-    }
-    .players-head {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 1.25rem;
-    }
-    .players-head-title {
-      font-family: var(--font-display); font-size: 1.1rem; font-weight: 700;
-    }
-    .player-count-badge {
-      background: rgba(255,107,157,0.12);
-      border: 1px solid rgba(255,107,157,0.2);
-      border-radius: var(--r-full);
-      padding: 0.25rem 0.75rem;
-      font-size: 0.75rem; font-weight: 700;
-      color: var(--pink-l);
-    }
-    .players-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-      gap: 0.75rem;
-    }
-    .player-chip {
-      display: flex; flex-direction: column; align-items: center;
-      gap: 0.5rem; padding: 1rem 0.5rem;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: var(--r-md);
-      text-align: center;
-      animation: bounceIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
-      transition: all var(--t-base);
-    }
-    .player-chip:hover { background: rgba(255,255,255,0.07); }
-    .player-chip.me {
-      border-color: rgba(255,107,157,0.3);
-      background: rgba(255,107,157,0.08);
-    }
-    .chip-name {
-      font-size: 0.78rem; font-weight: 600;
-      max-width: 100%; overflow: hidden;
-      text-overflow: ellipsis; white-space: nowrap;
-      color: rgba(255,255,255,0.8);
-    }
-    .chip-you {
-      font-size: 0.62rem; color: var(--pink);
-      font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
-    }
-    .chip-pts {
-      font-size: 0.7rem; color: rgba(255,255,255,0.3);
-    }
-
+    .rc-card { background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:1.5rem;text-align:center;margin-bottom:1rem; }
+    .rc-label { font-size:0.62rem;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.25);font-weight:700;margin-bottom:0.5rem; }
+    .rc-value { font-family:'Playfair Display',serif;font-size:clamp(2.2rem,7vw,3.5rem);font-weight:900;letter-spacing:0.35em;background:var(--grad-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem; }
+    .rc-share { display:flex;gap:0.6rem;justify-content:center;margin-bottom:0.875rem; }
+    .rc-btn { padding:0.38rem 1.1rem;border-radius:var(--r-full);font-size:0.75rem;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;transition:all 0.2s;border:1px solid; }
+    .rc-btn-pink   { background:rgba(255,107,157,0.12);border-color:rgba(255,107,157,0.3);color:rgba(255,181,200,0.9); }
+    .rc-btn-pink:hover { background:rgba(255,107,157,0.2); }
+    .rc-btn-purple { background:rgba(155,127,212,0.12);border-color:rgba(155,127,212,0.3);color:rgba(210,185,255,0.9); }
+    .rc-btn-purple:hover { background:rgba(155,127,212,0.2); }
+    .rc-waiting { display:flex;align-items:center;justify-content:center;gap:0.5rem;color:rgba(255,255,255,0.3);font-size:0.78rem; }
+    .w-dot { width:6px;height:6px;border-radius:50%;display:inline-block;animation:dotPulse 1.4s ease-in-out infinite; }
+    /* Players card */
+    .players-card { background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:1.25rem;margin-bottom:1rem; }
+    .players-head { display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem; }
+    .players-title { font-family:'Playfair Display',serif;font-size:1rem;font-weight:700; }
+    .players-badge { background:rgba(0,200,150,0.1);border:1px solid rgba(0,200,150,0.2);border-radius:var(--r-full);padding:0.2rem 0.7rem;font-size:0.7rem;color:rgba(168,240,220,0.9);font-weight:600;display:flex;align-items:center;gap:0.35rem; }
+    .live-dot-g { width:6px;height:6px;border-radius:50%;background:#00C896;animation:livePulse 1.8s ease-in-out infinite; }
+    @keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.5)} }
+    .players-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:0.6rem; }
+    .player-chip { display:flex;flex-direction:column;align-items:center;gap:0.35rem;padding:0.75rem 0.4rem;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);text-align:center;transition:all 0.2s; }
+    .player-chip.me { border-color:rgba(255,107,157,0.3);background:rgba(255,107,157,0.08); }
+    .chip-avatar { width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:800;color:#fff; }
+    .chip-name { font-size:0.68rem;font-weight:600;color:rgba(255,255,255,0.8);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:88px; }
+    .chip-you  { font-size:0.58rem;color:var(--pink);font-weight:700;text-transform:uppercase;letter-spacing:0.04em; }
+    .chip-ready { font-size:0.58rem;color:rgba(0,200,150,0.8);font-weight:600; }
+    /* Games strip */
+    .games-strip { background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:1rem 1.25rem;margin-bottom:1rem; }
+    .games-strip-label { font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.22);margin-bottom:0.75rem; }
+    .games-row { display:flex;gap:0.5rem;overflow-x:auto;padding-bottom:4px; }
+    .game-tag { padding:0.3rem 0.75rem;border-radius:var(--r-full);font-size:0.67rem;font-weight:600;white-space:nowrap;border:1px solid; }
+    .g1 { background:rgba(255,107,157,0.08);border-color:rgba(255,107,157,0.15);color:rgba(255,181,200,0.8); }
+    .g2 { background:rgba(155,127,212,0.08);border-color:rgba(155,127,212,0.15);color:rgba(210,185,255,0.8); }
+    .g3 { background:rgba(255,217,61,0.08);border-color:rgba(255,217,61,0.15);color:rgba(255,233,130,0.8); }
+    .g4 { background:rgba(107,158,255,0.08);border-color:rgba(107,158,255,0.15);color:rgba(180,210,255,0.8); }
+    .g5 { background:rgba(0,200,150,0.08);border-color:rgba(0,200,150,0.15);color:rgba(168,240,220,0.8); }
+    /* Tips ticker */
+    .ticker-wrap { background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:0.7rem 1.1rem;margin-bottom:1.25rem;min-height:40px;display:flex;align-items:center;justify-content:center;overflow:hidden; }
+    .ticker-text { font-size:0.75rem;color:rgba(255,255,255,0.42);text-align:center;font-weight:500;animation:tickerFade 4s ease infinite; }
+    @keyframes tickerFade { 0%{opacity:0;transform:translateY(6px)} 12%{opacity:1;transform:translateY(0)} 88%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(-6px)} }
     /* Game starting overlay */
-    .game-starting {
-      position: fixed; inset: 0;
-      background: rgba(13,13,26,0.95);
-      backdrop-filter: blur(20px);
-      z-index: 1000;
-      display: none;
-      flex-direction: column; align-items: center; justify-content: center;
-      gap: 1.5rem; text-align: center;
-    }
-    .game-starting.active { display: flex; animation: fadeIn 0.3s ease; }
-    .gs-icon { font-size: 5rem; animation: bounceIn 0.6s cubic-bezier(0.34,1.56,0.64,1); }
-    .gs-title { font-family: var(--font-display); font-size: 2.5rem; font-weight: 900; }
-    .gs-sub   { color: rgba(255,255,255,0.45); }
+    .gs-overlay { position:fixed;inset:0;background:rgba(13,13,26,0.95);backdrop-filter:blur(20px);z-index:1000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;text-align:center; }
+    .gs-overlay.active { display:flex;animation:gsIn 0.3s ease; }
+    @keyframes gsIn { from{opacity:0} to{opacity:1} }
+    .gs-icon  { font-size:5rem; }
+    .gs-title { font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:900; }
+    .gs-sub   { color:rgba(255,255,255,0.45); }
+    .gs-spin  { width:40px;height:40px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--pink);border-radius:50%;animation:spin 0.8s linear infinite; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .footer { text-align:center;font-size:0.67rem;color:rgba(255,255,255,0.14);letter-spacing:0.06em; }
+    .footer span { color:rgba(255,107,157,0.35);font-weight:700; }
   </style>
 </head>
 <body>
-<div class="bg-orb orb-1"></div>
-<div class="bg-orb orb-2"></div>
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
 
-<div class="lobby-wrap">
-  <!-- Nav -->
-  <nav class="lobby-nav fade-in">
-    <div class="lobby-brand">
-      <div class="brand-dot">🎮</div>
-      K4 Game Room
-    </div>
-    <div id="eventBadge" class="lobby-event-badge">💍 Bridal Shower</div>
-  </nav>
-
-  <!-- Hero -->
-  <div class="lobby-hero fade-in-up">
-    <h1 class="lobby-title">You're in! 🎉</h1>
-    <p class="lobby-celebrant">Get ready to play for <strong id="celebrantName">the celebrant</strong></p>
-  </div>
-
-  <!-- Room Code -->
-  <div class="room-code-card fade-in-up" style="animation-delay:0.1s">
-    <div class="rc-label">Your Room Code</div>
-    <div class="rc-value" id="roomCodeDisplay">------</div>
-    <div class="rc-waiting">
-      <div class="waiting-dots-wrap">
-        <div class="w-dot"></div>
-        <div class="w-dot"></div>
-        <div class="w-dot"></div>
+  <div class="wrap">
+    <nav class="nav">
+      <div class="nav-brand">
+        <div class="nav-logo">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        </div>
+        <div class="nav-name">K4 Game Room</div>
       </div>
-      Waiting for host to start a game...
-    </div>
-  </div>
+      <div class="nav-badge" id="eventBadge">Bridal Shower</div>
+    </nav>
 
-  <!-- Players -->
-  <div class="players-section fade-in-up" style="animation-delay:0.2s">
-    <div class="players-head">
-      <div class="players-head-title">Players Joined 🎮</div>
-      <div class="player-count-badge" id="playerCount">0 online</div>
+    <div class="header">
+      <h1>You're In!</h1>
+      <p>Get ready to play for <strong id="celebrantName">the celebrant</strong></p>
     </div>
-    <div class="players-grid" id="playersGrid">
-      <div style="grid-column:1/-1;text-align:center;color:rgba(255,255,255,0.25);padding:1.5rem;font-size:0.85rem">
-        Waiting for players to join...
+
+    <div class="rc-card">
+      <div class="rc-label">Your Room Code</div>
+      <div class="rc-value" id="roomCodeDisplay">------</div>
+      <div class="rc-share">
+        <button class="rc-btn rc-btn-pink" id="copyBtn" onclick="copyCode()">Copy Code</button>
+        <button class="rc-btn rc-btn-purple" onclick="shareCode()">Share Link</button>
+      </div>
+      <div class="rc-waiting">
+        <div style="display:flex;gap:4px">
+          <span class="w-dot" style="background:var(--pink)"></span>
+          <span class="w-dot" style="background:var(--lavender);animation-delay:0.2s"></span>
+          <span class="w-dot" style="background:var(--mint);animation-delay:0.4s"></span>
+        </div>
+        Waiting for host to start the game...
       </div>
     </div>
+
+    <div class="players-card">
+      <div class="players-head">
+        <div class="players-title">Players Joined</div>
+        <div class="players-badge">
+          <div class="live-dot-g"></div>
+          <span id="playerCountBadge">0 online</span>
+        </div>
+      </div>
+      <div class="players-grid" id="playersGrid">
+        <div style="grid-column:1/-1;text-align:center;color:rgba(255,255,255,0.2);padding:1.5rem;font-size:0.82rem">Waiting for players...</div>
+      </div>
+    </div>
+
+    <div class="games-strip">
+      <div class="games-strip-label">Coming Up</div>
+      <div class="games-row">
+        <span class="game-tag g1">Who Knows Best</span>
+        <span class="game-tag g2">Emoji-nary</span>
+        <span class="game-tag g3">Price Check</span>
+        <span class="game-tag g4">First Impressions</span>
+        <span class="game-tag g5">Word Scramble</span>
+      </div>
+    </div>
+
+    <div class="ticker-wrap">
+      <div class="ticker-text" id="tickerText">Tip: First to answer gets bonus points!</div>
+    </div>
+
+    <div class="footer">Powered by <span>Kreate 4</span></div>
   </div>
-</div>
 
-<!-- Game Starting Overlay -->
-<div class="game-starting" id="gameStarting">
-  <div class="gs-icon">🚀</div>
-  <h2 class="gs-title">Game Starting!</h2>
-  <p class="gs-sub">Get ready... Loading in 2 seconds</p>
-  <div class="spinner"></div>
-</div>
+  <!-- Game starting overlay -->
+  <div class="gs-overlay" id="gsOverlay">
+    <div class="gs-icon">🚀</div>
+    <div class="gs-title">Game Starting!</div>
+    <div class="gs-sub">Get ready...</div>
+    <div class="gs-spin"></div>
+  </div>
 
-<div class="toast-container" id="toastContainer"></div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/app.js"></script>
+  <script>
+    const playerData = JSON.parse(sessionStorage.getItem('k4_player') || 'null');
+    if (!playerData?.player_id) window.location.href = '/';
 
-<script src="/socket.io/socket.io.js"></script>
-<script src="/js/app.js"></script>
-<script>
-  const playerData = JSON.parse(sessionStorage.getItem('k4_player') || '{}');
-  if (!playerData.player_id) window.location.href = '/';
+    // Set UI from session
+    document.getElementById('roomCodeDisplay').textContent  = playerData.room_code || '------';
+    document.getElementById('celebrantName').textContent    = playerData.celebrant_name || 'the celebrant';
+    document.getElementById('eventBadge').textContent       = playerData.event_type==='baby' ? 'Baby Shower' : 'Bridal Shower';
 
-  // Set UI
-  document.getElementById('roomCodeDisplay').textContent = playerData.room_code || '------';
-  document.getElementById('celebrantName').textContent = playerData.celebrant_name || 'the celebrant';
-  const badge = document.getElementById('eventBadge');
-  badge.textContent = playerData.event_type === 'baby' ? '👶 Baby Shower' : '💍 Bridal Shower';
+    // Tips ticker
+    const tips = [
+      'Tip: First to answer gets bonus points!',
+      'Tip: Closer price guess = more points in Price Check!',
+      'Tip: Spell it correctly in Word Scramble for full marks!',
+      'Tip: You can still win even if you join late!',
+      'Tip: Every correct answer updates the live leaderboard!',
+      'Tip: Get 5 in a row in Bingo to win!'
+    ];
+    let tipIdx = 0;
+    function showTip() {
+      const el = document.getElementById('tickerText');
+      el.style.animation = 'none';
+      el.textContent = tips[tipIdx++ % tips.length];
+      void el.offsetWidth;
+      el.style.animation = 'tickerFade 4s ease infinite';
+    }
+    showTip();
+    setInterval(showTip, 4000);
 
-  // Socket
-  const socket = io();
-  socket.on('connect', () => {
-    socket.emit('join_room', {
-      room_code: playerData.room_code,
-      player_id: playerData.player_id,
-      player_name: playerData.player_name
-    });
-  });
-
-  socket.on('players_updated', ({ players }) => {
-    const grid = document.getElementById('playersGrid');
-    const badge = document.getElementById('playerCount');
-    badge.textContent = `${players.length} online`;
-
-    if (players.length === 0) {
-      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:rgba(255,255,255,0.25);padding:1.5rem;font-size:0.85rem">Waiting for players...</div>`;
-      return;
+    // Copy / Share
+    function copyCode() {
+      navigator.clipboard?.writeText(playerData.room_code);
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy Code', 2000);
+    }
+    function shareCode() {
+      const url = `${window.location.origin}?code=${playerData.room_code}`;
+      navigator.share ? navigator.share({ title:'K4 Game Room', text:`Join with code ${playerData.room_code}`, url }) : navigator.clipboard?.writeText(url);
     }
 
-    grid.innerHTML = players.map(p => {
-      const isMe = p.id === playerData.player_id;
-      const initials = p.name.charAt(0).toUpperCase();
-      return `
-        <div class="player-chip ${isMe ? 'me' : ''}">
-          <div class="avatar avatar-md" style="background:${p.avatar_color}">${initials}</div>
-          <span class="chip-name">${escHtml(p.name)}</span>
-          ${isMe ? '<span class="chip-you">You</span>' : '<span class="chip-pts">Ready ✓</span>'}
-        </div>
-      `;
-    }).join('');
-  });
+    // Socket
+    const socket = io({ transports: ['websocket','polling'] });
+    socket.on('connect', () => {
+      socket.emit('join_room', {
+        room_code:   playerData.room_code,
+        player_id:   playerData.player_id,
+        player_name: playerData.player_name
+      });
+    });
 
-  socket.on('game_started', ({ game_name }) => {
-    document.getElementById('gameStarting').classList.add('active');
-    setTimeout(() => {
-      window.location.href = `/game.html?game=${game_name}&room=${playerData.room_code}`;
-    }, 2000);
-  });
+    socket.on('players_updated', ({ players }) => {
+      const grid  = document.getElementById('playersGrid');
+      const badge = document.getElementById('playerCountBadge');
+      badge.textContent = `${players.length} online`;
+      if (!players.length) {
+        grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:rgba(255,255,255,0.2);padding:1.5rem;font-size:0.82rem">Waiting for players...</div>`;
+        return;
+      }
+      grid.innerHTML = players.map(p => {
+        const isMe = String(p.id) === String(playerData.player_id);
+        return `
+          <div class="player-chip ${isMe?'me':''}">
+            <div class="chip-avatar" style="background:${p.avatar_color||'#FF6B9D'}">
+              ${K4App.escapeHtml((p.name||'?').charAt(0).toUpperCase())}
+            </div>
+            <span class="chip-name">${K4App.escapeHtml(p.name||'Player')}</span>
+            ${isMe ? '<span class="chip-you">You</span>' : '<span class="chip-ready">Ready</span>'}
+          </div>`;
+      }).join('');
+    });
 
-  function escHtml(str) {
-    const d = document.createElement('div');
-    d.textContent = str; return d.innerHTML;
-  }
-</script>
+    socket.on('game_started', ({ game_name }) => {
+      document.getElementById('gsOverlay').classList.add('active');
+      setTimeout(() => {
+        window.location.href = `/game.html?game=${game_name}&room=${playerData.room_code}`;
+      }, 2000);
+    });
+  </script>
 </body>
 </html>

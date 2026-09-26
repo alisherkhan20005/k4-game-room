@@ -1,105 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create Event — K4 Game Room</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="stylesheet" href="/css/animations.css">
   <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body class="admin-body">
 <div class="admin-layout">
   <aside class="admin-sidebar">
-    <div class="sidebar-logo">
-      <div class="sidebar-logo-icon">🎮</div>
-      <div class="sidebar-logo-text"><h3>K4 Game Room</h3><span>by Kreate 4</span></div>
-    </div>
-    <nav class="sidebar-nav">
-      <div class="nav-section">Main</div>
-      <a href="/admin/dashboard.html" class="nav-item"><span class="nav-item-icon">📊</span> Dashboard</a>
-      <a href="/admin/create-event.html" class="nav-item active"><span class="nav-item-icon">✨</span> Create Event</a>
-      <a href="/admin/events.html" class="nav-item"><span class="nav-item-icon">📋</span> All Events</a>
-      <div class="nav-section">Account</div>
-      <button class="nav-item" onclick="K4App.clearAdmin();window.location.href='/admin/login.html'">
-        <span class="nav-item-icon">🚪</span> Logout
-      </button>
+    <div class="sb-logo"><div class="sb-logo-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div><div><div class="sb-logo-name">K4 Game Room</div><div class="sb-logo-sub">by Kreate 4</div></div></div>
+    <nav class="sb-nav">
+      <div class="sb-section">Main</div>
+      <a href="/admin/dashboard.html" class="sb-item"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
+      <a href="/admin/create-event.html" class="sb-item active"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Create Event</a>
+      <a href="/admin/events.html" class="sb-item"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>All Events</a>
+      <div class="sb-section">Account</div>
+      <button class="sb-item" onclick="K4App.clearAdmin();window.location.href='/admin/login.html'"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</button>
     </nav>
   </aside>
 
   <main class="admin-main">
     <div class="admin-topbar">
-      <div>
-        <h1 class="admin-page-title">Create New Event</h1>
-        <p class="admin-page-sub">Set up a new Bridal or Baby Shower game room</p>
-      </div>
+      <div><div class="admin-page-title">Create New Event</div><div class="admin-page-sub">Set up a new Bridal or Baby Shower game room</div></div>
     </div>
     <div class="admin-content">
-      <div style="max-width:580px">
+      <div style="display:grid;grid-template-columns:1fr 260px;gap:1.5rem;align-items:start">
 
-        <!-- Form Card -->
-        <div class="admin-card fade-in-up" id="formCard">
-          <div class="admin-card-title" style="margin-bottom:1.75rem">Event Details</div>
+        <!-- Form -->
+        <div id="formArea">
+          <!-- Steps -->
+          <div class="steps-row" style="margin-bottom:1.5rem">
+            <div class="step-item"><div class="step-num done" id="s1n">1</div><div class="step-lbl active" id="s1l">Event Type</div></div>
+            <div class="step-line"></div>
+            <div class="step-item"><div class="step-num" id="s2n">2</div><div class="step-lbl" id="s2l">Details</div></div>
+            <div class="step-line"></div>
+            <div class="step-item"><div class="step-num" id="s3n">3</div><div class="step-lbl" id="s3l">Launch</div></div>
+          </div>
 
-          <!-- Event Type -->
-          <div class="dark-form-group">
-            <label class="dark-form-label">Event Type</label>
-            <div class="event-type-grid">
-              <div class="et-btn selected" id="bridalBtn" onclick="selectType('bridal')">
-                <span class="et-btn-icon">💍</span>
-                <div class="et-btn-label">Bridal Shower</div>
-                <div class="et-btn-sub">16 questions & more</div>
+          <div class="admin-card">
+            <!-- Step 1 -->
+            <div id="step1">
+              <div class="af-label" style="margin-bottom:0.875rem">Select Event Type</div>
+              <div class="et-grid">
+                <div class="et-card selected" id="bridalCard" onclick="selectType('bridal')">
+                  <div class="et-icon et-i-pink"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF6B9D" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+                  <div class="et-name">Bridal Shower</div>
+                  <div class="et-sub">16 questions · 5 games</div>
+                </div>
+                <div class="et-card" id="babyCard" onclick="selectType('baby')">
+                  <div class="et-icon et-i-blue"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6B9EFF" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                  <div class="et-name">Baby Shower</div>
+                  <div class="et-sub">15 questions · 5 games</div>
+                </div>
               </div>
-              <div class="et-btn" id="babyBtn" onclick="selectType('baby')">
-                <span class="et-btn-icon">👶</span>
-                <div class="et-btn-label">Baby Shower</div>
-                <div class="et-btn-sub">15 questions & more</div>
+              <button class="btn btn-primary btn-full" onclick="goStep2()">Continue</button>
+            </div>
+            <!-- Step 2 -->
+            <div id="step2" style="display:none">
+              <div class="af-group">
+                <label class="af-label">Celebrant's Name</label>
+                <input class="af-input" id="celebrantInp" placeholder="e.g. Sarah, Emma, Jessica" maxlength="50">
+                <div class="af-hint">This name auto-fills in all game questions</div>
+              </div>
+              <div class="af-group">
+                <label class="af-label">Event Date (optional)</label>
+                <input class="af-input" type="date" id="dateInp">
+              </div>
+              <div class="af-group">
+                <label class="af-label">Host Password</label>
+                <input class="af-input" type="password" id="pwInp" placeholder="Set a password for this event">
+                <div class="af-hint">Only you need this — guests join with the room code</div>
+              </div>
+              <div style="display:flex;gap:0.75rem">
+                <button class="btn btn-full" style="background:#F0F2F5;border:1px solid #E4E6EA;color:#6B7280;flex:1" onclick="goStep1()">Back</button>
+                <button class="btn btn-primary" style="flex:2" id="createBtn" onclick="createEvent()">Create Event</button>
               </div>
             </div>
-            <input type="hidden" id="eventType" value="bridal">
+            <!-- Step 3: Success -->
+            <div id="step3" style="display:none;text-align:center">
+              <div class="sc-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="sc-title">Event Created!</div>
+              <div class="sc-sub">Share this code with your guests</div>
+              <div class="sc-code-box">
+                <div class="sc-code-label">Room Code</div>
+                <div class="sc-code-val" id="newCode">------</div>
+                <div class="sc-code-sub">For <span id="newCelebrant" style="color:var(--pink);font-weight:700">Sarah</span></div>
+              </div>
+              <div style="display:flex;gap:0.75rem;margin-bottom:0.875rem">
+                <button class="btn btn-success" style="flex:2" onclick="goControl()">Start Hosting</button>
+                <button class="btn btn-full" id="copyBtn" style="background:#F0F2F5;border:1px solid #E4E6EA;color:#374151;flex:1" onclick="copyCode()">Copy Code</button>
+              </div>
+              <button class="btn btn-full" style="background:transparent;border:1.5px solid #E4E6EA;color:#9EA3AC" onclick="resetForm()">Create Another Event</button>
+            </div>
           </div>
-
-          <!-- Celebrant Name -->
-          <div class="dark-form-group">
-            <label class="dark-form-label">Celebrant's Name</label>
-            <input type="text" class="dark-form-input" id="celebrantInput"
-              placeholder="e.g. Sarah, Emma, Jessica" maxlength="50">
-            <small style="font-size:0.75rem;color:rgba(255,255,255,0.25);margin-top:0.3rem">
-              This name auto-fills in all game questions ✨
-            </small>
-          </div>
-
-          <!-- Host Password -->
-          <div class="dark-form-group">
-            <label class="dark-form-label">Event Host Password</label>
-            <input type="password" class="dark-form-input" id="hostPwInput"
-              placeholder="Set a password for this event" maxlength="50">
-            <small style="font-size:0.75rem;color:rgba(255,255,255,0.25);margin-top:0.3rem">
-              Only you need this — guests join with the room code
-            </small>
-          </div>
-
-          <button class="btn btn-primary btn-full btn-xl" id="createBtn" onclick="createK4Event()">
-            🎉 Create Event
-          </button>
         </div>
 
-        <!-- Success Card -->
-        <div class="success-card hidden fade-in-up" id="successCard">
-          <div style="font-size:4rem;margin-bottom:1rem">🎉</div>
-          <h2 style="font-family:var(--font-display);font-size:2rem;margin-bottom:0.5rem">Event Created!</h2>
-          <p style="color:rgba(255,255,255,0.45);margin-bottom:2rem">Share this code with your guests</p>
-          <div class="room-code-display" style="margin-bottom:1.5rem">
-            <div class="rcd-label">Room Code</div>
-            <div class="rcd-code" id="newRoomCode">------</div>
+        <!-- Info panel -->
+        <div>
+          <div class="wi-card">
+            <div class="wi-title">What's Included</div>
+            <div class="wi-item"><div class="wi-icon si-pink"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF6B9D" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div><div class="wi-name">Who Knows Best</div><div class="wi-count">16 trivia questions</div></div></div>
+            <div class="wi-item"><div class="wi-icon si-purple"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9B7FD4" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div><div class="wi-name">Emoji-nary</div><div class="wi-count">16 emoji puzzles</div></div></div>
+            <div class="wi-item"><div class="wi-icon si-yellow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div><div class="wi-name">Price Check</div><div class="wi-count">9 price guesses</div></div></div>
+            <div class="wi-item"><div class="wi-icon si-blue"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B9EFF" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div><div><div class="wi-name">First Impressions</div><div class="wi-count">5x5 bingo card</div></div></div>
+            <div class="wi-item"><div class="wi-icon si-green"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="2" stroke-linecap="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg></div><div><div class="wi-name">Word Scramble</div><div class="wi-count">12 scrambled words</div></div></div>
           </div>
-          <p style="font-size:0.82rem;color:rgba(255,255,255,0.3);margin-bottom:2rem">
-            Players go to your site URL and enter this code to join
-          </p>
-          <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap">
-            <button class="btn btn-success btn-lg" onclick="goControl()">🎛️ Start Hosting</button>
-            <button class="btn btn-ghost btn-lg" onclick="copyCode()">📋 Copy Code</button>
+          <div class="tips-card">
+            <div class="tips-label">Host Tips</div>
+            <div class="tip-item">Share room code before the event starts</div>
+            <div class="tip-item">Set prices in Price Check before launching</div>
+            <div class="tip-item">Wait for all players to join first</div>
+            <div class="tip-item">You control the pace — launch each game when ready</div>
           </div>
         </div>
 
@@ -108,47 +121,80 @@
   </main>
 </div>
 
-<div class="toast-container" id="toastContainer"></div>
 <script src="/js/app.js"></script>
 <script>
-  (async()=>{ if(!await K4App.requireAdmin()) return; })();
-
   let selectedType = 'bridal';
   let createdEventId = null;
   let createdRoomCode = null;
 
-  function selectType(type) {
-    selectedType = type;
-    document.getElementById('eventType').value = type;
-    document.getElementById('bridalBtn').classList.toggle('selected', type==='bridal');
-    document.getElementById('babyBtn').classList.toggle('selected', type==='baby');
+  (async () => { if (!await K4App.requireAdmin()) return; })();
+
+  function selectType(t) {
+    selectedType = t;
+    document.getElementById('bridalCard').className = 'et-card' + (t==='bridal'?' selected':'');
+    document.getElementById('babyCard').className   = 'et-card' + (t==='baby'?' selected-baby':'');
   }
 
-  async function createK4Event() {
-    const celebrant = document.getElementById('celebrantInput').value.trim();
-    const hostPw    = document.getElementById('hostPwInput').value.trim();
-    const btn = document.getElementById('createBtn');
-    if(!celebrant) { K4App.toast("Enter the celebrant's name",'error'); return; }
-    if(!hostPw)    { K4App.toast('Set a host password','error'); return; }
+  function goStep1() {
+    document.getElementById('step1').style.display='block';
+    document.getElementById('step2').style.display='none';
+    setStep(1);
+  }
+  function goStep2() {
+    document.getElementById('step1').style.display='none';
+    document.getElementById('step2').style.display='block';
+    setStep(2);
+    setTimeout(() => document.getElementById('celebrantInp')?.focus(), 100);
+  }
+
+  function setStep(n) {
+    [1,2,3].forEach(i => {
+      const num = document.getElementById(`s${i}n`);
+      const lbl = document.getElementById(`s${i}l`);
+      num.className = 'step-num' + (i<=n?' done':'');
+      lbl.className = 'step-lbl' + (i===n?' active':'');
+    });
+  }
+
+  async function createEvent() {
+    const celebrant = document.getElementById('celebrantInp').value.trim();
+    const pw        = document.getElementById('pwInp').value.trim();
+    const btn       = document.getElementById('createBtn');
+    if (!celebrant) { K4App.toast("Enter the celebrant's name",'error'); return; }
+    if (!pw)        { K4App.toast('Set a host password','error'); return; }
     btn.disabled=true; btn.textContent='Creating...';
     try {
-      const data = await K4App.api('/events/create',{method:'POST',body:{
-        event_type:selectedType, celebrant_name:celebrant, host_password:hostPw
-      }});
+      const data = await K4App.api('/events/create',{method:'POST',body:{event_type:selectedType,celebrant_name:celebrant,host_password:pw}});
       createdEventId  = data.data.id;
       createdRoomCode = data.data.room_code;
-      document.getElementById('newRoomCode').textContent = createdRoomCode;
-      document.getElementById('formCard').classList.add('hidden');
-      document.getElementById('successCard').classList.remove('hidden');
+      document.getElementById('newCode').textContent      = createdRoomCode;
+      document.getElementById('newCelebrant').textContent = celebrant;
+      document.getElementById('step2').style.display='none';
+      document.getElementById('step3').style.display='block';
+      setStep(3);
+      document.getElementById('s3n').className='step-num done-green';
+      document.getElementById('s3l').className='step-lbl done-green';
     } catch(err) {
       K4App.toast(err.message,'error');
-      btn.disabled=false; btn.textContent='🎉 Create Event';
+      btn.disabled=false; btn.textContent='Create Event';
     }
   }
 
   function goControl() { window.location.href=`/admin/control.html?event=${createdEventId}`; }
   function copyCode()  {
-    navigator.clipboard.writeText(createdRoomCode).then(()=>K4App.toast('Room code copied!','success'));
+    navigator.clipboard?.writeText(createdRoomCode);
+    const btn=document.getElementById('copyBtn');
+    btn.textContent='Copied!'; btn.style.background='#E8FFF8'; btn.style.borderColor='#A8F0DC'; btn.style.color='#00A876';
+    setTimeout(()=>{btn.textContent='Copy Code';btn.style.background='#F0F2F5';btn.style.borderColor='#E4E6EA';btn.style.color='#374151';},2500);
+  }
+  function resetForm() {
+    createdEventId=null; createdRoomCode=null;
+    document.getElementById('step3').style.display='none';
+    document.getElementById('step1').style.display='block';
+    document.getElementById('celebrantInp').value='';
+    document.getElementById('pwInp').value='';
+    setStep(1);
+    selectType('bridal');
   }
 </script>
 </body>

@@ -1,293 +1,362 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Game Control — K4 Game Room</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/main.css">
-  <link rel="stylesheet" href="/css/animations.css">
-  <link rel="stylesheet" href="/css/admin.css">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control Panel — K4 Game Room</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css"><link rel="stylesheet" href="/css/admin.css">
 </head>
 <body class="admin-body">
 <div class="admin-layout">
+  <!-- Sidebar -->
   <aside class="admin-sidebar">
-    <div class="sidebar-logo">
-      <div class="sidebar-logo-icon">🎮</div>
-      <div class="sidebar-logo-text"><h3>K4 Game Room</h3><span>by Kreate 4</span></div>
-    </div>
-    <nav class="sidebar-nav">
-      <div class="nav-section">Main</div>
-      <a href="/admin/dashboard.html" class="nav-item"><span class="nav-item-icon">📊</span> Dashboard</a>
-      <a href="/admin/create-event.html" class="nav-item"><span class="nav-item-icon">✨</span> Create Event</a>
-      <div class="nav-section">Live Event</div>
-      <div class="nav-item" style="cursor:default">
-        <span class="nav-item-icon">🏷️</span>
-        <span>Room: <strong id="sidebarCode" style="color:var(--pink)">---</strong></span>
-      </div>
-      <div class="nav-item" style="cursor:default">
-        <span class="nav-item-icon">👥</span>
-        <span id="sidebarPlayerCount">0 players</span>
-      </div>
-      <div class="nav-section">Account</div>
-      <button class="nav-item" onclick="K4App.clearAdmin();window.location.href='/admin/login.html'">
-        <span class="nav-item-icon">🚪</span> Logout
-      </button>
+    <div class="sb-logo"><div class="sb-logo-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div><div><div class="sb-logo-name">K4 Game Room</div><div class="sb-logo-sub">by Kreate 4</div></div></div>
+    <nav class="sb-nav">
+      <div class="sb-section">Main</div>
+      <a href="/admin/dashboard.html" class="sb-item"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
+      <a href="/admin/create-event.html" class="sb-item"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Create Event</a>
+      <a href="/admin/events.html" class="sb-item"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>All Events</a>
+      <div class="sb-section">Account</div>
+      <button class="sb-item" onclick="K4App.clearAdmin();window.location.href='/admin/login.html'"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</button>
     </nav>
   </aside>
 
+  <!-- Main -->
   <main class="admin-main">
     <div class="admin-topbar">
       <div>
-        <h1 class="admin-page-title">🎛️ Game Control</h1>
-        <p class="admin-page-sub" id="eventInfoText">Loading event...</p>
+        <div class="admin-page-title" id="pageTitleEl">Control Panel</div>
+        <div class="admin-page-sub" id="pageSubEl">Loading event...</div>
       </div>
-      <div class="room-code-display" style="margin:0;min-width:180px">
-        <div class="rcd-label">Room Code</div>
-        <div class="rcd-code" style="font-size:1.5rem;letter-spacing:0.2em" id="topbarCode">---</div>
+      <div style="display:flex;align-items:center;gap:0.875rem">
+        <!-- Notification Bell -->
+        <div class="notif-bell" onclick="toggleBell()">
+          <div class="notif-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </div>
+          <div class="notif-count" id="notifCount">3</div>
+        </div>
+        <div class="notif-dropdown" id="notifDropdown">
+          <div class="nd-head">Notifications</div>
+          <div class="nd-item"><div class="nd-dot" style="background:#00C896"></div><div><div class="nd-text">Player joined the room</div><div class="nd-time">Just now</div></div></div>
+          <div class="nd-item"><div class="nd-dot" style="background:#FFD93D"></div><div><div class="nd-text">5 players waiting in lobby</div><div class="nd-time">2 min ago</div></div></div>
+          <div class="nd-item"><div class="nd-dot" style="background:#6B9EFF"></div><div><div class="nd-text">Price Check prices not set</div><div class="nd-time">Reminder</div></div></div>
+        </div>
+        <div class="rcd"><div class="rcd-label">Room Code</div><div class="rcd-code" id="topRoomCode">------</div></div>
       </div>
     </div>
-
     <div class="admin-content">
-      <div class="control-grid">
 
-        <!-- Main panel -->
+      <!-- Quick Stats -->
+      <div class="qs-grid">
+        <div class="qs-card"><div class="qs-icon si-green"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div><div class="qs-val" id="qsPlayers">0</div><div class="qs-lbl">Players Online</div></div></div>
+        <div class="qs-card"><div class="qs-icon si-pink"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF6B9D" stroke-width="2" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div><div class="qs-val qs-val-sm" id="qsGame">None</div><div class="qs-lbl">Current Game</div></div></div>
+        <div class="qs-card"><div class="qs-icon si-purple"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9B7FD4" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div><div class="qs-val" id="qsQSent">0</div><div class="qs-lbl">Questions Sent</div></div></div>
+        <div class="qs-card"><div class="qs-icon si-yellow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div><div class="qs-val" id="qsTop">0</div><div class="qs-lbl">Top Score</div></div></div>
+      </div>
+
+      <div class="ctrl-grid">
+        <!-- Left: Game Controls -->
         <div>
           <!-- Game Selector -->
-          <div class="admin-card" style="margin-bottom:1.5rem">
-            <div class="admin-card-title" style="margin-bottom:1.25rem">🎮 Select & Launch Game</div>
-            <div class="game-grid" id="gameSelector">
-              <button class="game-btn-admin" data-game="who_knows_best" onclick="selectGame('who_knows_best')">
-                <span class="game-btn-icon">❓</span>Who Knows Best
-              </button>
-              <button class="game-btn-admin" data-game="emojinary" onclick="selectGame('emojinary')">
-                <span class="game-btn-icon">😂</span>Emoji-nary
-              </button>
-              <button class="game-btn-admin" data-game="price_check" onclick="selectGame('price_check')">
-                <span class="game-btn-icon">💰</span>Price Check
-              </button>
-              <button class="game-btn-admin" data-game="first_impressions" onclick="selectGame('first_impressions')">
-                <span class="game-btn-icon">🧊</span>First Impressions
-              </button>
-              <button class="game-btn-admin" data-game="word_scramble" onclick="selectGame('word_scramble')">
-                <span class="game-btn-icon">🔤</span>Word Scramble
-              </button>
-            </div>
-
-            <!-- Game specific controls -->
-            <div id="gameSpecific" style="display:none">
-              <div style="height:1px;background:rgba(255,255,255,0.06);margin:1rem 0"></div>
-              <div id="gameSpecificContent"></div>
-              <div style="display:flex;gap:0.875rem;margin-top:1.25rem;flex-wrap:wrap">
-                <button class="btn btn-success btn-lg" id="launchBtn" onclick="launchGame()" style="flex:2;min-width:180px">
-                  ▶️ Launch Game
-                </button>
-                <button class="btn btn-outline btn-ghost btn-lg" id="endBtn" onclick="endGame()" style="display:none;flex:1">
-                  ⏹ End Game
-                </button>
+          <div class="admin-card">
+            <div class="admin-card-head"><div class="admin-card-title">Select Game</div></div>
+            <div class="game-grid-admin" id="gameGrid">
+              <div class="game-btn-admin" data-game="who_knows_best" onclick="selectGame('who_knows_best')">
+                <div class="gba-letter">W</div>Who Knows Best
+              </div>
+              <div class="game-btn-admin" data-game="emojinary" onclick="selectGame('emojinary')">
+                <div class="gba-letter">E</div>Emoji-nary
+              </div>
+              <div class="game-btn-admin" data-game="price_check" onclick="selectGame('price_check')">
+                <div class="gba-letter">P</div>Price Check
+              </div>
+              <div class="game-btn-admin" data-game="first_impressions" onclick="selectGame('first_impressions')">
+                <div class="gba-letter">F</div>First Impressions
+              </div>
+              <div class="game-btn-admin" data-game="word_scramble" onclick="selectGame('word_scramble')">
+                <div class="gba-letter">S</div>Word Scramble
               </div>
             </div>
+            <div style="display:flex;gap:0.75rem;margin-top:0.875rem">
+              <button class="btn btn-primary" style="flex:2" id="launchBtn" onclick="launchGame()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Launch Game
+              </button>
+              <button class="btn" style="flex:1;background:#FFF0F0;border:1px solid #FFD0D0;color:#E05555" id="endGameBtn" onclick="endGame()">
+                End Game
+              </button>
+            </div>
           </div>
 
-          <!-- Who Knows Best — Question controls (hidden until selected) -->
-          <div class="admin-card hidden" id="wkbControls" style="margin-bottom:1.5rem">
-            <div class="admin-card-title" style="margin-bottom:0.5rem">❓ Send Questions</div>
-            <p style="font-size:0.82rem;color:rgba(255,255,255,0.35);margin-bottom:1.25rem">Click Send to push each question to players one at a time</p>
-            <div id="questionsList"></div>
+          <!-- Who Knows Best Questions -->
+          <div class="admin-card" id="wkbPanel" style="display:none">
+            <div class="admin-card-head">
+              <div class="admin-card-title">Send Questions</div>
+              <div class="admin-card-link" id="qSentCount">0 sent</div>
+            </div>
+            <div id="questionList" style="max-height:340px;overflow-y:auto;display:flex;flex-direction:column;gap:0.6rem"></div>
           </div>
 
-          <!-- Price Check — Price editor -->
-          <div class="admin-card hidden" id="priceControls" style="margin-bottom:1.5rem">
-            <div class="admin-card-title" style="margin-bottom:0.5rem">💰 Set Real Prices</div>
-            <p style="font-size:0.82rem;color:rgba(255,255,255,0.35);margin-bottom:1.25rem">Enter actual prices before launching. Players won't see these.</p>
-            <div id="priceList"></div>
-            <button class="btn btn-success btn-full" style="margin-top:1.25rem" onclick="savePrices()">
-              💾 Save Prices
-            </button>
+          <!-- Price Check -->
+          <div class="admin-card" id="pricePanel" style="display:none">
+            <div class="admin-card-head">
+              <div class="admin-card-title">Set Real Prices</div>
+              <div class="admin-card-link">Set before launching</div>
+            </div>
+            <div id="priceList" style="display:flex;flex-direction:column;gap:0.6rem"></div>
+            <button class="btn btn-success btn-full" style="margin-top:1rem" onclick="savePrices()">Save Prices</button>
           </div>
 
-          <!-- End Event -->
-          <div class="admin-card" style="border-color:rgba(255,71,87,0.15)">
-            <div class="admin-card-title" style="margin-bottom:0.5rem;color:rgba(255,255,255,0.5)">🏁 End Event</div>
-            <p style="font-size:0.82rem;color:rgba(255,255,255,0.3);margin-bottom:1.25rem">Shows the final leaderboard and podium to all players</p>
-            <button class="btn btn-full" style="background:rgba(255,71,87,0.12);border:1px solid rgba(255,71,87,0.2);color:rgba(255,100,100,0.8)" onclick="endEvent()">
-              🏁 End Event & Show Final Leaderboard
-            </button>
+          <!-- Danger Zone -->
+          <div class="danger-card">
+            <div class="danger-title">Danger Zone</div>
+            <div class="danger-sub">End the entire event and show final leaderboard to all players</div>
+            <button class="act-btn act-btn-red" onclick="endEvent()" style="padding:0.5rem 1.25rem">End Entire Event</button>
           </div>
+
         </div>
 
-        <!-- Sidebar -->
+        <!-- Right: Live players -->
         <div>
-          <!-- Live Players -->
-          <div class="live-panel">
-            <div class="live-panel-title">
-              Live Players
-              <span class="badge badge-mint" id="liveCount">0 online</span>
-            </div>
-            <div id="livePlayersList">
-              <p style="color:rgba(255,255,255,0.2);font-size:0.82rem;text-align:center;padding:1rem">Waiting for players...</p>
+          <!-- Search -->
+          <div class="admin-card" style="padding:0.875rem;margin-bottom:0.875rem">
+            <div class="search-input-wrap" style="width:100%">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9EA3AC" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input class="search-input" style="width:100%" placeholder="Search players..." oninput="searchPlayers(this.value)" id="playerSearch">
             </div>
           </div>
-
-          <!-- Live Leaderboard -->
+          <!-- Player list -->
           <div class="live-panel">
-            <div class="live-panel-title">
-              Live Leaderboard 🏆
+            <div class="lp-title">
+              <span>Live Players</span>
+              <span class="abadge ab-green" id="playerCountBadge">0 online</span>
             </div>
-            <div id="adminLeaderboard">
-              <p style="color:rgba(255,255,255,0.2);font-size:0.82rem;text-align:center;padding:1rem">No scores yet</p>
-            </div>
+            <div id="livePlayerList"><div style="text-align:center;color:#9EA3AC;font-size:0.72rem;padding:1rem">No players yet</div></div>
           </div>
+          <!-- Top 3 -->
+          <div class="live-panel">
+            <div class="lp-title"><span>Top 3</span></div>
+            <div id="top3List"><div style="text-align:center;color:#9EA3AC;font-size:0.72rem;padding:0.5rem">Waiting...</div></div>
+          </div>
+          <!-- Print -->
+          <button class="btn btn-full" style="background:#F0F2F5;border:1px solid #E4E6EA;color:#374151;font-size:0.82rem" onclick="printLeaderboard()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Print Leaderboard
+          </button>
         </div>
       </div>
     </div>
   </main>
 </div>
 
-<div class="toast-container" id="toastContainer"></div>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/app.js"></script>
 <script>
-  let eventData=null, selectedGame=null, gameDataCache=null, socket=null;
-  const eventId = K4App.getParam('event');
-  if(!eventId) window.location.href='/admin/dashboard.html';
-
-  function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+  let eventId   = null, roomCode = null, eventType = null;
+  let gameData  = {};
+  let activeGame = null, qSentCount = 0;
+  let allPlayers = [];
 
   (async()=>{
-    if(!await K4App.requireAdmin()) return;
-    // Load event
-    const data = await K4App.api('/events/all');
-    eventData = data.data.find(e=>e.id==eventId);
-    if(!eventData){K4App.toast('Event not found','error');return;}
-
-    document.getElementById('sidebarCode').textContent = eventData.room_code;
-    document.getElementById('topbarCode').textContent  = eventData.room_code;
-    document.getElementById('eventInfoText').textContent =
-      `${eventData.event_type==='bridal'?'💍 Bridal Shower':'👶 Baby Shower'} · For ${eventData.celebrant_name}`;
-
-    // Socket
-    socket = io();
-    socket.on('connect', ()=>{
-      socket.emit('host_join',{room_code:eventData.room_code});
-    });
-
-    socket.on('players_updated',({players})=>{
-      const cnt = players.length;
-      document.getElementById('liveCount').textContent = `${cnt} online`;
-      document.getElementById('sidebarPlayerCount').textContent = `${cnt} players`;
-
-      const list = document.getElementById('livePlayersList');
-      list.innerHTML = players.length ? players.map(p=>`
-        <div class="live-player-row">
-          <div class="avatar avatar-sm" style="background:${p.avatar_color}">${escHtml(p.name.charAt(0))}</div>
-          <span style="flex:1">${escHtml(p.name)}</span>
-          <span class="live-score">${p.total_score||0}</span>
-        </div>`).join('')
-        : `<p style="color:rgba(255,255,255,0.2);font-size:0.82rem;text-align:center;padding:1rem">No players yet</p>`;
-
-      // Update leaderboard
-      const sorted = [...players].sort((a,b)=>b.total_score-a.total_score);
-      const lb = document.getElementById('adminLeaderboard');
-      lb.innerHTML = sorted.length ? sorted.map((p,i)=>{
-        const icons=['👑','🥈','🥉'];
-        return `<div class="live-player-row">
-          <span style="font-size:${i<3?'1rem':'0.8rem'}">${icons[i]||i+1}</span>
-          <div class="avatar avatar-sm" style="background:${p.avatar_color}">${escHtml(p.name.charAt(0))}</div>
-          <span style="flex:1;font-size:0.85rem">${escHtml(p.name)}</span>
-          <span class="live-score">${p.total_score||0}</span>
-        </div>`;
-      }).join('')
-      : `<p style="color:rgba(255,255,255,0.2);font-size:0.82rem;text-align:center;padding:1rem">No scores yet</p>`;
-    });
+    if (!await K4App.requireAdmin()) return;
+    eventId = K4App.getParam('event');
+    if (!eventId) { K4App.toast('No event selected','error'); window.location.href='/admin/dashboard.html'; return; }
+    try {
+      const data   = await K4App.api('/events/all');
+      const event  = data.data.find(e=>String(e.id)===String(eventId));
+      if (!event)  { K4App.toast('Event not found','error'); return; }
+      roomCode  = event.room_code;
+      eventType = event.event_type;
+      document.getElementById('pageTitleEl').textContent = `Control — ${K4App.escapeHtml(event.celebrant_name)}'s Event`;
+      document.getElementById('pageSubEl').textContent   = `${event.event_type==='bridal'?'Bridal':'Baby'} Shower · Room: ${event.room_code}`;
+      document.getElementById('topRoomCode').textContent = event.room_code;
+      if (event.current_game) {
+        selectGame(event.current_game, false);
+        document.getElementById('qsGame').textContent = event.current_game.replace(/_/g,' ');
+      }
+      initSocket();
+      loadPriceCheckData();
+      loadWKBQuestions();
+    } catch(err) { K4App.toast(err.message,'error'); }
   })();
 
-  async function selectGame(name) {
-    selectedGame = name;
-    document.querySelectorAll('.game-btn-admin').forEach(b=>b.classList.toggle('active',b.dataset.game===name));
-    document.getElementById('gameSpecific').style.display='block';
-    document.getElementById('launchBtn').style.display='inline-flex';
-    document.getElementById('endBtn').style.display='none';
-    document.getElementById('wkbControls').classList.add('hidden');
-    document.getElementById('priceControls').classList.add('hidden');
+  function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 
-    try {
-      const data = await K4App.api(`/games/${eventData.room_code}/${name}`);
-      gameDataCache = data.data;
-
-      if(name==='who_knows_best') {
-        document.getElementById('wkbControls').classList.remove('hidden');
-        const qs = gameDataCache.game.questions;
-        document.getElementById('questionsList').innerHTML = qs.map((q,i)=>`
-          <div style="display:flex;align-items:center;gap:0.75rem;padding:0.625rem 0;border-bottom:1px solid rgba(255,255,255,0.05)" id="qrow${i}">
-            <span style="font-size:0.75rem;color:rgba(255,255,255,0.3);min-width:20px">${i+1}.</span>
-            <span style="flex:1;font-size:0.82rem;color:rgba(255,255,255,0.7)">${escHtml(q.text)}</span>
-            <button class="btn btn-purple btn-sm" id="qbtn${i}" onclick="sendQ(${i})" ${i>0?'disabled':''}>Send</button>
-          </div>`).join('');
-      }
-      if(name==='price_check') {
-        document.getElementById('priceControls').classList.remove('hidden');
-        const items = gameDataCache.game.items;
-        document.getElementById('priceList').innerHTML = items.map((it,i)=>`
-          <div class="price-row">
-            <span class="price-row-name">${it.emoji||'🛍️'} ${escHtml(it.name)}</span>
-            <div style="display:flex;align-items:center;gap:0.3rem">
-              <span style="color:rgba(255,255,255,0.3);font-weight:700">£</span>
-              <input class="price-row-input" id="p${i}" type="number" placeholder="0.00" min="0" step="0.01" value="${it.real_price||''}">
-            </div>
-          </div>`).join('');
-      }
-      document.getElementById('gameSpecificContent').innerHTML = `
-        <p style="font-size:0.82rem;color:rgba(255,255,255,0.35)">
-          Ready to launch <strong style="color:var(--white)">${name.replace(/_/g,' ')}</strong> for all players
-        </p>`;
-    } catch(err){ K4App.toast('Error: '+err.message,'error'); }
+  // Socket — host joins room
+  let socket;
+  function initSocket() {
+    socket = io({transports:['websocket','polling']});
+    socket.on('connect', () => {
+      socket.emit('host_join', { room_code: roomCode });
+    });
+    socket.on('players_updated', ({ players }) => {
+      allPlayers = players;
+      renderPlayers(players);
+      document.getElementById('qsPlayers').textContent = players.length;
+      document.getElementById('playerCountBadge').textContent = `${players.length} online`;
+      if (players.length) document.getElementById('qsTop').textContent = players[0].total_score || 0;
+    });
   }
 
-  function sendQ(idx) {
-    const q = gameDataCache.game.questions[idx];
-    socket.emit('next_question',{room_code:eventData.room_code, question_index:idx+1, question:q});
-    const btn=document.getElementById(`qbtn${idx}`);
-    btn.textContent='✓ Sent'; btn.disabled=true;
-    document.getElementById(`qrow${idx}`).style.opacity='0.4';
-    const next=document.getElementById(`qbtn${idx+1}`);
-    if(next) next.disabled=false;
-    K4App.toast(`Question ${idx+1} sent!`,'success');
+  function renderPlayers(players) {
+    const list  = document.getElementById('livePlayerList');
+    const top3  = document.getElementById('top3List');
+    const ranks = ['🥇','🥈','🥉'];
+    if (!players.length) {
+      list.innerHTML=`<div style="text-align:center;color:#9EA3AC;font-size:0.72rem;padding:1rem">No players joined yet</div>`;
+      top3.innerHTML=`<div style="text-align:center;color:#9EA3AC;font-size:0.72rem;padding:0.5rem">Waiting...</div>`;
+      return;
+    }
+    list.innerHTML = players.map(p=>`
+      <div class="lp-row" data-name="${esc(p.name.toLowerCase())}">
+        <div class="lp-av" style="background:${p.avatar_color||'#FF6B9D'}">${esc((p.name||'?').charAt(0).toUpperCase())}</div>
+        <span class="lp-name">${esc(p.name||'Player')}</span>
+        <span class="lp-score">${p.total_score||0}</span>
+      </div>`).join('');
+    top3.innerHTML = players.slice(0,3).map((p,i)=>`
+      <div class="lp-row">
+        <span style="font-size:1rem">${ranks[i]}</span>
+        <span class="lp-name" style="font-weight:700">${esc(p.name||'Player')}</span>
+        <span class="lp-score">${p.total_score||0}</span>
+      </div>`).join('');
+  }
+
+  function searchPlayers(q) {
+    document.querySelectorAll('#livePlayerList .lp-row').forEach(row=>{
+      row.style.display = row.dataset.name?.includes(q.toLowerCase()) ? '' : 'none';
+    });
+  }
+
+  // Game selection
+  function selectGame(name, loadPanel=true) {
+    activeGame = name;
+    document.querySelectorAll('.game-btn-admin').forEach(b=>b.classList.toggle('active', b.dataset.game===name));
+    document.getElementById('wkbPanel').style.display   = name==='who_knows_best' ? 'block' : 'none';
+    document.getElementById('pricePanel').style.display = name==='price_check'    ? 'block' : 'none';
+  }
+
+  // Launch game
+  function launchGame() {
+    if (!activeGame) { K4App.toast('Select a game first','warning'); return; }
+    if (!socket)     { K4App.toast('Not connected','error'); return; }
+    qSentCount = 0;
+    document.getElementById('qSentCount').textContent = '0 sent';
+    socket.emit('start_game', { room_code: roomCode, game_name: activeGame });
+    document.getElementById('qsGame').textContent = activeGame.replace(/_/g,' ');
+    K4App.toast(`${activeGame.replace(/_/g,' ')} launched!`,'success');
+    // Reset question buttons
+    document.querySelectorAll('.q-send-btn').forEach(b=>{ b.disabled=false; b.textContent='Send'; b.style.background=''; });
+  }
+
+  // End game
+  function endGame() {
+    if (!socket) return;
+    socket.emit('end_game', { room_code: roomCode, game_name: activeGame });
+    K4App.toast('Game ended — interim leaderboard shown to players','info');
+  }
+
+  // End event
+  function endEvent() {
+    if (!confirm('End the entire event? All players will see the final leaderboard.')) return;
+    socket.emit('end_event', { room_code: roomCode });
+    K4App.toast('Event ended — final results shown to all players','success');
+  }
+
+  // Who Knows Best questions
+  function loadWKBQuestions() {
+    if (!eventType) return;
+    // We load the data from the API the same way game.html does
+    fetch(`/api/games/${roomCode}/who_knows_best`)
+      .then(r=>r.json()).then(data=>{
+        if (!data.success) return;
+        const questions = data.data.game.questions || [];
+        const list = document.getElementById('questionList');
+        list.innerHTML = questions.map((q,i)=>`
+          <div style="display:flex;align-items:center;gap:0.65rem;padding:0.5rem 0;border-bottom:1px solid #F4F6FB">
+            <span style="font-size:0.7rem;color:#9EA3AC;min-width:20px;font-weight:700">${i+1}</span>
+            <span style="flex:1;font-size:0.75rem;color:#374151">${esc(q.text)}</span>
+            <button class="act-btn q-send-btn" onclick="sendQuestion(${i},this)" style="flex-shrink:0">Send</button>
+          </div>`).join('');
+      }).catch(()=>{});
+  }
+
+  function sendQuestion(idx, btn) {
+    if (!socket) { K4App.toast('Not connected','error'); return; }
+    const allQuestions = document.querySelectorAll('#questionList > div');
+    const qText = allQuestions[idx]?.querySelector('span:nth-child(2)')?.textContent;
+    socket.emit('next_question', {
+      room_code:      roomCode,
+      question_index: idx + 1,  // 1-based index
+      question:       { text: qText, index: idx + 1 }
+    });
+    btn.disabled = true; btn.textContent = '✓ Sent'; btn.style.background = '#E8FFF8'; btn.style.color = '#00A876'; btn.style.borderColor='#A8F0DC';
+    qSentCount++;
+    document.getElementById('qSentCount').textContent = `${qSentCount} sent`;
+    document.getElementById('qsQSent').textContent = qSentCount;
+  }
+
+  // Price check data
+  function loadPriceCheckData() {
+    if (!roomCode) return;
+    fetch(`/api/games/${roomCode}/price_check`)
+      .then(r=>r.json()).then(data=>{
+        if (!data.success) return;
+        const items = data.data.game.items || [];
+        const list  = document.getElementById('priceList');
+        list.innerHTML = items.map((item,i)=>`
+          <div style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;border-bottom:1px solid #F4F6FB">
+            <span style="font-size:1.2rem">${item.emoji||'🛍️'}</span>
+            <span style="flex:1;font-size:0.78rem;color:#374151;font-weight:600">${esc(item.name)}</span>
+            <div style="display:flex;align-items:center;gap:0.3rem">
+              <span style="font-size:0.8rem;color:#9EA3AC;font-weight:700">£</span>
+              <input type="number" class="af-input price-real-input" data-index="${i}"
+                style="width:90px;padding:0.4rem 0.6rem;font-size:0.82rem;text-align:center"
+                placeholder="0.00" min="0" step="0.01"
+                value="${item.real_price && item.real_price>0 ? item.real_price : ''}">
+            </div>
+          </div>`).join('');
+      }).catch(()=>{});
   }
 
   async function savePrices() {
-    const items = gameDataCache.game.items.map((it,i)=>({
-      item_name:it.name, item_emoji:it.emoji,
-      real_price:parseFloat(document.getElementById(`p${i}`)?.value||0),
-      display_order:i
-    }));
+    const inputs = document.querySelectorAll('.price-real-input');
+    const items  = [];
+    let hasPrice = false;
+    inputs.forEach((inp, i) => {
+      const price = parseFloat(inp.value);
+      if (price > 0) hasPrice = true;
+      items.push({ display_order: i, real_price: price > 0 ? price : 0, item_name: '', item_emoji: '' });
+    });
+    if (!hasPrice) { K4App.toast('Enter at least one price','warning'); return; }
     try {
       await K4App.api(`/events/${eventId}/prices`,{method:'POST',body:{items}});
-      K4App.toast('Prices saved! ✅','success');
-    } catch(err){ K4App.toast('Error: '+err.message,'error'); }
+      K4App.toast('Prices saved!','success');
+    } catch(err) { K4App.toast(err.message,'error'); }
   }
 
-  function launchGame() {
-    if(!selectedGame){K4App.toast('Select a game first','warning');return;}
-    socket.emit('start_game',{room_code:eventData.room_code, game_name:selectedGame});
-    document.getElementById('launchBtn').style.display='none';
-    document.getElementById('endBtn').style.display='inline-flex';
-    K4App.toast(`${selectedGame.replace(/_/g,' ')} launched! 🚀`,'success');
+  function toggleBell() {
+    document.getElementById('notifDropdown').classList.toggle('show');
+    document.getElementById('notifCount').style.display='none';
   }
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.notif-bell')) document.getElementById('notifDropdown').classList.remove('show');
+  });
 
-  function endGame() {
-    socket.emit('end_game',{room_code:eventData.room_code, game_name:selectedGame});
-    document.getElementById('endBtn').style.display='none';
-    document.getElementById('launchBtn').style.display='inline-flex';
-    document.getElementById('launchBtn').textContent='▶️ Launch Next Game';
-    K4App.toast('Game ended — scores shown to players!','success');
-  }
-
-  function endEvent() {
-    if(!confirm('End the entire event and show the final leaderboard?')) return;
-    socket.emit('end_event',{room_code:eventData.room_code});
-    K4App.api(`/events/${eventId}/status`,{method:'PUT',body:{status:'finished'}});
-    K4App.toast('Event ended! Final leaderboard shown 🎉','success');
+  function printLeaderboard() {
+    if (!allPlayers.length) { K4App.toast('No players yet','warning'); return; }
+    const w = window.open('','_blank');
+    w.document.write(`<html><head><title>Leaderboard — K4 Game Room</title>
+    <style>body{font-family:sans-serif;padding:2rem;max-width:500px}
+    h1{font-size:1.5rem;margin-bottom:1rem} table{width:100%;border-collapse:collapse}
+    th{background:#f0f0f0;padding:0.5rem;text-align:left;font-size:0.75rem}
+    td{padding:0.6rem 0.5rem;border-bottom:1px solid #eee;font-size:0.85rem}
+    .gold{font-weight:800;color:#B8860B}</style></head>
+    <body><h1>Final Leaderboard</h1>
+    <table><thead><tr><th>Rank</th><th>Name</th><th>Score</th></tr></thead><tbody>
+    ${allPlayers.map((p,i)=>`<tr><td class="${i<3?'gold':''}">${['🥇','🥈','🥉'][i]||i+1}</td><td>${K4App.escapeHtml(p.name)}</td><td style="font-weight:700">${p.total_score||0} pts</td></tr>`).join('')}
+    </tbody></table></body></html>`);
+    w.print();
   }
 </script>
 </body>

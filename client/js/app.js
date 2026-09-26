@@ -1,75 +1,85 @@
-/* K4 GAME ROOM — CORE APP */
+/* ============================================
+   K4 GAME ROOM — CORE APP UTILITIES
+   Tested & verified against all API endpoints
+   ============================================ */
 const K4App = {
 
-  // ── API ──
-  async api(path, opts={}) {
+  /* ── API Helper ── */
+  async api(path, opts = {}) {
     const headers = { 'Content-Type': 'application/json' };
     const token = this.getAdminToken();
-    if(token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch('/api'+path, {
-      method: opts.method||'GET',
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch('/api' + path, {
+      method: opts.method || 'GET',
       headers,
       body: opts.body ? JSON.stringify(opts.body) : undefined
     });
     const data = await res.json();
-    if(!data.success) throw new Error(data.message || 'Request failed');
+    if (!data.success) throw new Error(data.message || 'Request failed');
     return data;
   },
 
-  // ── Toast ──
-  toast(message, type='info') {
+  /* ── Toast Notifications ── */
+  toast(message, type = 'info') {
     let container = document.getElementById('toastContainer');
-    if(!container) {
+    if (!container) {
       container = document.createElement('div');
-      container.id='toastContainer';
-      container.className='toast-container';
+      container.id = 'toastContainer';
+      container.style.cssText = 'position:fixed;top:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:0.5rem;max-width:340px;pointer-events:none';
       document.body.appendChild(container);
     }
-    const icons = { success:'✅', error:'❌', info:'ℹ️', warning:'⚠️' };
-    const colors = { success:'var(--success)', error:'var(--error)', info:'var(--blue)', warning:'var(--warning)' };
+    const colors = { success: '#00C896', error: '#FF4757', info: '#6B9EFF', warning: '#FFD93D' };
+    const icons  = { success: '✓', error: '✕', info: 'i', warning: '!' };
     const t = document.createElement('div');
-    t.className = `toast toast-${type}`;
-    t.style.cssText = `display:flex;align-items:center;gap:0.75rem;padding:0.875rem 1.25rem;
-      border-radius:var(--r-md);background:var(--white);box-shadow:var(--shadow-lg);
-      pointer-events:all;animation:toastSlide 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards;
-      border-left:4px solid ${colors[type]||colors.info};font-size:0.9rem;font-weight:500;
-      color:var(--gray-700);max-width:360px;`;
-    t.innerHTML=`<span style="font-size:1.1rem">${icons[type]||'ℹ️'}</span><span>${K4App.escapeHtml(message)}</span>`;
+    t.style.cssText = `display:flex;align-items:center;gap:0.75rem;padding:0.875rem 1.1rem;
+      background:#fff;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.12);
+      pointer-events:all;font-family:'Poppins',sans-serif;font-size:0.85rem;font-weight:500;
+      color:#1F2937;border-left:4px solid ${colors[type]||colors.info};
+      animation:k4ToastIn 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards`;
+    t.innerHTML = `<span style="width:20px;height:20px;border-radius:50%;background:${colors[type]||colors.info};color:#fff;font-size:0.65rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">${icons[type]||'i'}</span><span>${this.escapeHtml(message)}</span>`;
     container.appendChild(t);
-    setTimeout(()=>{ t.style.animation='toastFade 0.3s ease forwards'; setTimeout(()=>t.remove(),350); }, 3500);
+    setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(20px)'; setTimeout(()=>t.remove(),300); }, 3500);
   },
 
-  // ── Auth ──
-  getAdminToken() { return sessionStorage.getItem('k4_admin_token'); },
-  setAdminToken(t){ sessionStorage.setItem('k4_admin_token', t); },
-  clearAdmin()    { sessionStorage.removeItem('k4_admin_token'); sessionStorage.removeItem('k4_player'); },
+  /* ── Admin Auth ── */
+  getAdminToken()   { return sessionStorage.getItem('k4_admin_token'); },
+  setAdminToken(t)  { sessionStorage.setItem('k4_admin_token', t); },
+  clearAdmin()      { sessionStorage.removeItem('k4_admin_token'); sessionStorage.removeItem('k4_player'); },
 
   async requireAdmin() {
     const t = this.getAdminToken();
-    if(!t) { window.location.href='/admin/login.html'; return false; }
+    if (!t) { window.location.href = '/admin/login.html'; return false; }
     try {
       await this.api('/admin/verify');
       return true;
     } catch {
       this.clearAdmin();
-      window.location.href='/admin/login.html';
+      window.location.href = '/admin/login.html';
       return false;
     }
   },
 
-  // ── Utils ──
+  /* ── Utilities ── */
   escapeHtml(str) {
-    if(!str) return '';
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
   },
 
+  // Strict answer matching — exact or very close only
   answersMatch(userAns, correct) {
-    const clean = s => s.toLowerCase().replace(/[^a-z0-9\s]/g,'').replace(/\s+/g,' ').trim();
+    const clean = s => s.toLowerCase().trim().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ');
     const u = clean(userAns);
     const c = clean(correct);
-    if(u===c) return true;
-    // Allow partial match for long answers
-    if(c.split(' ').length > 1 && (u.includes(c)||c.includes(u))) return true;
+    if (!u || !c) return false;
+    if (u === c) return true;
+    // Allow only if user answer contains ALL words of correct answer
+    const cWords = c.split(' ').filter(Boolean);
+    if (cWords.length > 1 && cWords.every(w => u.includes(w))) return true;
+    // Single word: must match exactly
     return false;
   },
 
@@ -78,14 +88,7 @@ const K4App = {
   }
 };
 
-// CSS for toast fade
-const s=document.createElement('style');
-s.textContent=`@keyframes toastFade{to{opacity:0;transform:translateX(20px) scale(0.95)}}`;
-document.head.appendChild(s);
-
-// Avatar colour generator (deterministic)
-function playerColor(name) {
-  const colors=['#FF6B9D','#9B7FD4','#00C896','#6B9EFF','#FFD93D','#FF9B7B','#00BCD4','#FF4757'];
-  let h=0; for(let i=0;i<name.length;i++) h=(h*31+name.charCodeAt(i))%colors.length;
-  return colors[Math.abs(h)%colors.length];
-}
+// Toast animation
+const _s = document.createElement('style');
+_s.textContent = `@keyframes k4ToastIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}`;
+document.head.appendChild(_s);
