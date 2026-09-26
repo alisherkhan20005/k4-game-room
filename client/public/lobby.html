@@ -226,6 +226,12 @@
       }).join('');
     });
 
+    socket.on('final_results', ({ scores }) => {
+      document.getElementById('gsOverlay').innerHTML = `<div class="gs-icon">🏆</div><div class="gs-title">Event Ended!</div><div class="gs-sub">Showing final results...</div>`;
+      document.getElementById('gsOverlay').classList.add('active');
+      setTimeout(() => window.location.href = '/game.html', 1500);
+    });
+
     socket.on('game_started', ({ game_name }) => {
       document.getElementById('gsOverlay').classList.add('active');
       setTimeout(() => {

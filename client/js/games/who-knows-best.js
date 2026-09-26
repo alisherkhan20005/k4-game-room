@@ -1,6 +1,8 @@
-/* WHO KNOWS BEST
-   Server handles answer checking via QuizAnswer table.
-   We send the raw answer — server returns correct:bool, score:int
+/* WHO KNOWS BEST — AUTO FLOW
+   - Questions broadcast by server one at a time
+   - Player answers → server checks via QuizAnswer table → result shown
+   - After result shown (3s), player waits for next question automatically
+   - Host controls pace from admin — or auto-advance after all players answered
 */
 const WhoKnowsBest = {
   gameData: null, player: null, socket: null,
@@ -8,23 +10,28 @@ const WhoKnowsBest = {
   timerInterval: null,
 
   init(gameData, player, socket) {
-    this.gameData = gameData;
-    this.player   = player;
-    this.socket   = socket;
-    this.answered = new Set();
+    this.gameData   = gameData;
+    this.player     = player;
+    this.socket     = socket;
+    this.answered   = new Set();
     this.totalScore = parseInt(document.getElementById('currentScore')?.textContent || 0);
 
     document.getElementById('gameNameText').textContent = 'Who Knows Best';
     this._renderWaiting();
 
-    // Server pushes question to all players
+    // Server pushes next question to all players
     socket.on('question_show', ({ question_index, question }) => {
       this._renderQuestion(question_index, question);
     });
 
-    // Server sends back result after submit_answer
-    socket.on('answer_received', ({ correct, score, question_index }) => {
-      this._showResult(correct, score);
+    // Server returns result for THIS player's answer
+    socket.on('answer_received', ({ correct, score, question_index, correct_answer }) => {
+      this._showResult(correct, score, correct_answer);
+    });
+
+    // All questions done — host will end game
+    socket.on('wkb_all_done', () => {
+      this._renderAllDone();
     });
   },
 
@@ -36,26 +43,27 @@ const WhoKnowsBest = {
         <div class="waiting-title">${K4App.escapeHtml(this.gameData.game.title)}</div>
         <div class="waiting-sub">${K4App.escapeHtml(this.gameData.game.subtitle)}</div>
         <div class="waiting-dots"><span></span><span></span><span></span></div>
-        <div class="waiting-hint">Host will send questions one at a time</div>
+        <div class="waiting-hint">First question coming up...</div>
       </div>`;
   },
 
   _renderQuestion(idx, question) {
+    clearInterval(this.timerInterval);
     this.currentQ = { idx, text: question.text || question };
-    this.answered.has(idx) ? this._renderAnswered() : this._renderActive(idx);
-    // Progress
     const total = this.gameData.game.questions.length;
-    const pct = Math.round((idx / total) * 100);
-    const pb = document.getElementById('progressFill');
+    const pct   = Math.round(((idx - 1) / total) * 100);
+    const pb    = document.getElementById('progressFill');
     if (pb) pb.style.width = pct + '%';
     const qnum = document.getElementById('qNum');
     if (qnum) qnum.textContent = `${idx} / ${total}`;
-  },
 
-  _renderActive(idx) {
+    if (this.answered.has(idx)) {
+      this._renderAnswered();
+      return;
+    }
+
     const content = document.getElementById('gameContent');
     if (!content) return;
-    const total = this.gameData.game.questions.length;
     content.innerHTML = `
       <div class="q-badge">Question ${idx} of ${total}</div>
       <div class="q-card q-enter">
@@ -73,9 +81,10 @@ const WhoKnowsBest = {
           Submit Answer
         </button>
       </div>`;
+
     const inp = document.getElementById('wkbInput');
     inp?.addEventListener('keypress', e => { if (e.key === 'Enter') this.submit(); });
-    setTimeout(() => inp?.focus(), 400);
+    setTimeout(() => inp?.focus(), 300);
     this._startTimer(30);
   },
 
@@ -90,64 +99,66 @@ const WhoKnowsBest = {
       </div>`;
   },
 
+  _renderAllDone() {
+    clearInterval(this.timerInterval);
+    const content = document.getElementById('gameContent');
+    if (!content) return;
+    const pb = document.getElementById('progressFill');
+    if (pb) pb.style.width = '100%';
+    content.innerHTML = `
+      <div class="waiting-screen">
+        <div class="waiting-title">All Questions Done! 🎉</div>
+        <div class="waiting-sub">Waiting for the host to end the game...</div>
+        <div class="waiting-dots"><span></span><span></span><span></span></div>
+      </div>`;
+  },
+
   _startTimer(seconds) {
     clearInterval(this.timerInterval);
     let t = seconds;
-    const fill = document.getElementById('timerFill');
-    const num  = document.getElementById('timerNum');
     const tick = () => {
+      const fill = document.getElementById('timerFill');
+      const num  = document.getElementById('timerNum');
       if (fill) fill.style.width = (t / seconds * 100) + '%';
       if (num)  num.textContent = t;
       if (t <= 5) {
         if (num)  num.classList.add('timer-urgent');
         if (fill) fill.style.background = '#FF4757';
       }
-      if (t <= 0) {
-        clearInterval(this.timerInterval);
-        this._autoTimeout();
-      }
+      if (t <= 0) { clearInterval(this.timerInterval); this.submit(''); }
       t--;
     };
     tick();
     this.timerInterval = setInterval(tick, 1000);
   },
 
-  _autoTimeout() {
-    const btn = document.getElementById('wkbBtn');
-    if (btn && !btn.disabled) {
-      // Submit empty — server gives 0 score
-      this.submit('');
-    }
-  },
-
   submit(forceAnswer) {
     clearInterval(this.timerInterval);
-    const inp = document.getElementById('wkbInput');
-    const btn = document.getElementById('wkbBtn');
+    const inp    = document.getElementById('wkbInput');
+    const btn    = document.getElementById('wkbBtn');
     const answer = forceAnswer !== undefined ? forceAnswer : (inp?.value.trim() || '');
 
     if (!answer && forceAnswer === undefined) {
-      K4App.toast('Type your answer first!', 'warning');
-      inp?.focus();
-      return;
+      K4App.toast('Type your answer!', 'warning'); inp?.focus(); return;
     }
     if (btn) { btn.disabled = true; btn.textContent = 'Submitted...'; }
-    this.answered.add(this.currentQ.idx);
+    if (this.currentQ) this.answered.add(this.currentQ.idx);
 
     this.socket.emit('submit_answer', {
       player_id:      this.player.player_id,
       event_id:       this.player.event_id,
       game_name:      'who_knows_best',
-      question_index: this.currentQ.idx,
+      question_index: this.currentQ?.idx || 1,
       answer,
-      is_correct:     false  // server decides via QuizAnswer table
+      is_correct:     false // server decides
     });
   },
 
-  _showResult(correct, score) {
+  _showResult(correct, score, correctAnswer) {
     clearInterval(this.timerInterval);
     const content = document.getElementById('gameContent');
     if (!content) return;
+
     if (correct) {
       this.totalScore += score;
       const sc = document.getElementById('currentScore');
@@ -158,6 +169,7 @@ const WhoKnowsBest = {
           <div class="result-icon">🎉</div>
           <div class="result-score">+${score}</div>
           <div class="result-title">Correct!</div>
+          ${correctAnswer ? `<div class="result-answer">Answer: <strong>${K4App.escapeHtml(correctAnswer)}</strong></div>` : ''}
           <div class="result-sub">Next question coming...</div>
         </div>`;
     } else {
@@ -165,7 +177,8 @@ const WhoKnowsBest = {
         <div class="result-card result-wrong">
           <div class="result-icon">😅</div>
           <div class="result-title">Not This Time!</div>
-          <div class="result-sub">Waiting for next question...</div>
+          ${correctAnswer ? `<div class="result-answer">Answer was: <strong>${K4App.escapeHtml(correctAnswer)}</strong></div>` : ''}
+          <div class="result-sub">Next question coming...</div>
         </div>`;
     }
   },
@@ -174,5 +187,6 @@ const WhoKnowsBest = {
     clearInterval(this.timerInterval);
     this.socket.off('question_show');
     this.socket.off('answer_received');
+    this.socket.off('wkb_all_done');
   }
 };

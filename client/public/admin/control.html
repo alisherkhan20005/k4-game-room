@@ -5,6 +5,46 @@
   <title>Control Panel — K4 Game Room</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css"><link rel="stylesheet" href="/css/admin.css">
+  <style>
+    .game-panel { display:none; }
+    .game-panel.visible { display:block; }
+    .wkb-row { display:flex;align-items:flex-start;gap:0.65rem;padding:0.6rem 0;border-bottom:1px solid #F4F6FB; }
+    .wkb-row:last-child { border-bottom:none; }
+    .wkb-num  { font-size:0.68rem;color:#9EA3AC;font-weight:700;min-width:20px;padding-top:0.6rem;flex-shrink:0; }
+    .wkb-q    { flex:1;font-size:0.75rem;color:#374151;line-height:1.35;padding-top:0.55rem; }
+    .wkb-ans  { width:140px;flex-shrink:0; }
+    .wkb-ans input { width:100%;padding:0.35rem 0.6rem;border:1.5px solid #E4E6EA;border-radius:8px;font-size:0.72rem;font-family:'Poppins',sans-serif;outline:none;color:#1F2937; }
+    .wkb-ans input:focus { border-color:var(--pink);box-shadow:0 0 0 2px rgba(255,107,157,0.1); }
+    .wkb-send { flex-shrink:0; }
+    .emoji-row { display:flex;align-items:center;gap:0.75rem;padding:0.55rem 0;border-bottom:1px solid #F4F6FB; }
+    .emoji-row:last-child { border-bottom:none; }
+    .emoji-num   { font-size:0.68rem;color:#9EA3AC;font-weight:700;min-width:18px;flex-shrink:0; }
+    .emoji-icons { font-size:1.4rem;min-width:60px;letter-spacing:0.05em; }
+    .emoji-ans   { flex:1;font-size:0.75rem;font-weight:600;color:#374151; }
+    .clue-row { display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0;border-bottom:1px solid #F4F6FB; }
+    .clue-row:last-child { border-bottom:none; }
+    .clue-num  { font-size:0.65rem;color:#9EA3AC;font-weight:700;min-width:18px;flex-shrink:0; }
+    .clue-free { background:rgba(155,127,212,0.1);border-radius:6px;padding:0.2rem 0.5rem;font-size:0.65rem;font-weight:700;color:var(--lavender);flex-shrink:0; }
+    .clue-text { flex:1;font-size:0.73rem;color:#374151; }
+    .word-row  { display:flex;align-items:center;gap:0.75rem;padding:0.45rem 0;border-bottom:1px solid #F4F6FB; }
+    .word-row:last-child { border-bottom:none; }
+    .word-num  { font-size:0.68rem;color:#9EA3AC;font-weight:700;min-width:18px;flex-shrink:0; }
+    .word-scrambled { font-family:'Playfair Display',serif;font-size:1rem;font-weight:900;color:var(--pink);letter-spacing:0.08em;min-width:100px; }
+    .word-arr  { color:#9EA3AC;font-size:0.8rem; }
+    .word-answer { font-size:0.8rem;font-weight:700;color:#00A876; }
+    .price-row { display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;border-bottom:1px solid #F4F6FB; }
+    .price-row:last-child { border-bottom:none; }
+    .price-emoji { font-size:1.2rem;flex-shrink:0; }
+    .price-name  { flex:1;font-size:0.75rem;font-weight:600;color:#374151; }
+    .price-inp   { display:flex;align-items:center;gap:0.25rem;flex-shrink:0; }
+    .price-inp span { font-size:0.8rem;color:#9EA3AC;font-weight:700; }
+    .price-inp input { width:80px;padding:0.32rem 0.5rem;border:1.5px solid #E4E6EA;border-radius:8px;font-size:0.8rem;font-family:'Poppins',sans-serif;outline:none;text-align:center;color:#1F2937; }
+    .price-inp input:focus { border-color:var(--yellow);box-shadow:0 0 0 2px rgba(255,217,61,0.15); }
+    .wkb-progress { background:#F0F2F5;border-radius:var(--r-full);height:6px;margin-bottom:0.875rem;overflow:hidden; }
+    .wkb-progress-fill { height:100%;background:var(--grad-primary);border-radius:var(--r-full);transition:width 0.4s ease; }
+    .info-banner { background:rgba(107,158,255,0.07);border:1px solid rgba(107,158,255,0.18);border-radius:10px;padding:0.65rem 0.875rem;font-size:0.72rem;color:#4B7EC5;margin-bottom:0.875rem;line-height:1.45; }
+    .info-banner b { font-weight:700; }
+  </style>
 </head>
 <body class="admin-body">
 <div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
@@ -25,20 +65,15 @@
   <div class="admin-topbar">
     <div class="topbar-left">
       <button class="topbar-hamburger" onclick="openSidebar()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
-      <div>
-        <div class="admin-page-title" id="pageTitleEl">Control Panel</div>
-        <div class="admin-page-sub" id="pageSubEl">Loading event...</div>
-      </div>
+      <div><div class="admin-page-title" id="pageTitleEl">Control Panel</div><div class="admin-page-sub" id="pageSubEl">Loading...</div></div>
     </div>
     <div class="topbar-actions">
       <div class="notif-bell" onclick="toggleBell()">
         <div class="notif-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
-        <div class="notif-count" id="notifCount">3</div>
+        <div class="notif-count" id="notifCount">1</div>
         <div class="notif-dropdown" id="notifDropdown">
           <div class="nd-head">Notifications</div>
-          <div class="nd-item"><div class="nd-dot" style="background:#00C896"></div><div><div class="nd-text">Player joined the room</div><div class="nd-time">Just now</div></div></div>
-          <div class="nd-item"><div class="nd-dot" style="background:#FFD93D"></div><div><div class="nd-text">5 players waiting in lobby</div><div class="nd-time">2 min ago</div></div></div>
-          <div class="nd-item"><div class="nd-dot" style="background:#6B9EFF"></div><div><div class="nd-text">Price Check prices not set</div><div class="nd-time">Reminder</div></div></div>
+          <div class="nd-item"><div class="nd-dot" style="background:#6B9EFF"></div><div><div class="nd-text">For Who Knows Best: enter correct answers before launching</div><div class="nd-time">Reminder</div></div></div>
         </div>
       </div>
       <div class="rcd"><div class="rcd-label">Room</div><div class="rcd-code" id="topRoomCode">------</div></div>
@@ -46,16 +81,16 @@
   </div>
 
   <div class="admin-content">
-    <!-- Quick stats: 4 columns -->
+    <!-- Quick stats -->
     <div class="qs-grid">
       <div class="qs-card"><div class="qs-icon si-green"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div><div class="qs-val" id="qsPlayers">0</div><div class="qs-lbl">Players Online</div></div></div>
       <div class="qs-card"><div class="qs-icon si-pink"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF6B9D" stroke-width="2" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div><div class="qs-val qs-val-sm" id="qsGame">None</div><div class="qs-lbl">Current Game</div></div></div>
-      <div class="qs-card"><div class="qs-icon si-purple"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9B7FD4" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div><div class="qs-val" id="qsQSent">0</div><div class="qs-lbl">Questions Sent</div></div></div>
+      <div class="qs-card"><div class="qs-icon si-purple"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9B7FD4" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div><div class="qs-val" id="qsQSent">0</div><div class="qs-lbl">Q Sent</div></div></div>
       <div class="qs-card"><div class="qs-icon si-yellow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div><div class="qs-val" id="qsTop">0</div><div class="qs-lbl">Top Score</div></div></div>
     </div>
 
-    <!-- Two-column: controls left, players right -->
     <div class="ctrl-grid">
+      <!-- LEFT: game controls -->
       <div>
         <!-- Game selector -->
         <div class="admin-card">
@@ -68,42 +103,86 @@
             <div class="game-btn-admin" data-game="word_scramble" onclick="selectGame('word_scramble')"><div class="gba-letter">S</div>Word Scramble</div>
           </div>
           <div style="display:flex;gap:0.75rem;margin-top:0.875rem">
-            <button class="btn btn-primary" style="flex:2" id="launchBtn" onclick="launchGame()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              Launch Game
-            </button>
+            <button class="btn btn-primary" style="flex:2" onclick="launchGame()">▶ Launch Game</button>
             <button class="btn" style="flex:1;background:#FFF0F0;border:1px solid #FFD0D0;color:#E05555" onclick="endGame()">End Game</button>
           </div>
         </div>
 
-        <!-- Who Knows Best questions -->
-        <div class="admin-card" id="wkbPanel" style="display:none">
+        <!-- WHO KNOWS BEST panel -->
+        <div class="admin-card game-panel" id="panelWKB">
           <div class="admin-card-head">
-            <div class="admin-card-title">Send Questions</div>
-            <div class="admin-card-link" id="qSentCount">0 sent</div>
+            <div class="admin-card-title">Who Knows Best — Questions</div>
+            <div class="admin-card-link" id="wkbStatus">Ready</div>
           </div>
-          <div id="questionList" style="max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:0.5rem"></div>
+          <div class="info-banner">
+            <b>How it works:</b> Questions auto-show to players one by one. Fill in the correct answer for each question so players get marked right/wrong. Then click <b>Launch Game</b>.
+          </div>
+          <div class="info-banner" style="background:rgba(0,200,150,0.06);border-color:rgba(0,200,150,0.2);color:#007A5A;">
+            <b>Auto-flow:</b> After launching, click <b>Send Next Question</b> to push each question to all players. Players have 30s to answer, then you send the next one.
+          </div>
+          <div style="margin-bottom:0.5rem">
+            <div class="wkb-progress"><div class="wkb-progress-fill" id="wkbProgressFill" style="width:0%"></div></div>
+          </div>
+          <div style="display:flex;gap:0.5rem;font-size:0.62rem;color:#9EA3AC;margin-bottom:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:0 0 0.3rem;border-bottom:1px solid #EEF0F5">
+            <span style="min-width:20px">#</span><span style="flex:1">Question</span><span style="width:140px">Correct Answer</span><span style="width:60px;text-align:center">Action</span>
+          </div>
+          <div id="wkbQuestionList" style="max-height:380px;overflow-y:auto"></div>
+          <div style="display:flex;gap:0.75rem;margin-top:1rem">
+            <button class="btn btn-success" style="flex:1" onclick="saveWKBAnswers()">Save Answers</button>
+            <button class="btn" style="flex:1;background:#F0F2F5;border:1px solid #E4E6EA;color:#374151" onclick="signalWKBDone()">All Done — End Game</button>
+          </div>
         </div>
 
-        <!-- Price check -->
-        <div class="admin-card" id="pricePanel" style="display:none">
+        <!-- EMOJINARY panel -->
+        <div class="admin-card game-panel" id="panelEmojinary">
           <div class="admin-card-head">
-            <div class="admin-card-title">Set Real Prices</div>
-            <div class="admin-card-link">Set before launching</div>
+            <div class="admin-card-title">Emoji-nary — All Items</div>
+            <div class="admin-card-link">Players see emojis, guess the phrase</div>
           </div>
-          <div id="priceList" style="display:flex;flex-direction:column;gap:0.5rem"></div>
-          <button class="btn btn-success btn-full" style="margin-top:1rem" onclick="savePrices()">Save Prices</button>
+          <div class="info-banner"><b>How it works:</b> Launch the game and players automatically go through all emoji puzzles at their own pace. Each correct answer = 150 pts.</div>
+          <div id="emojinaryList" style="max-height:360px;overflow-y:auto"></div>
         </div>
 
-        <!-- Danger -->
+        <!-- PRICE CHECK panel -->
+        <div class="admin-card game-panel" id="panelPriceCheck">
+          <div class="admin-card-head">
+            <div class="admin-card-title">Price Check — Set Real Prices</div>
+            <div class="admin-card-link">Set before launching!</div>
+          </div>
+          <div class="info-banner"><b>Important:</b> Enter the real prices for each item before launching. Players guess the price — closest wins up to 300 pts.</div>
+          <div id="priceCheckList" style="max-height:340px;overflow-y:auto"></div>
+          <button class="btn btn-success btn-full" style="margin-top:1rem" onclick="savePrices()">Save All Prices</button>
+        </div>
+
+        <!-- FIRST IMPRESSIONS panel -->
+        <div class="admin-card game-panel" id="panelFirstImpressions">
+          <div class="admin-card-head">
+            <div class="admin-card-title">First Impressions — Bingo Clues</div>
+            <div class="admin-card-link">25 clues · 5×5 grid</div>
+          </div>
+          <div class="info-banner"><b>How it works:</b> Each player gets a 5×5 bingo card with these clues. They tap cells when they find someone matching. First to get 5 in a row shouts BINGO!</div>
+          <div id="firstImpressionsList" style="max-height:360px;overflow-y:auto"></div>
+        </div>
+
+        <!-- WORD SCRAMBLE panel -->
+        <div class="admin-card game-panel" id="panelWordScramble">
+          <div class="admin-card-head">
+            <div class="admin-card-title">Word Scramble — All Words</div>
+            <div class="admin-card-link">Players have 30s per word</div>
+          </div>
+          <div class="info-banner"><b>How it works:</b> Players see the scrambled word and must unscramble it in 30 seconds. Each correct answer = 100 pts. They can skip.</div>
+          <div id="wordScrambleList" style="max-height:360px;overflow-y:auto"></div>
+        </div>
+
+        <!-- Danger zone -->
         <div class="danger-card">
           <div class="danger-title">Danger Zone</div>
-          <div class="danger-sub">End the entire event and show final leaderboard to all players</div>
+          <div class="danger-sub">End the entire event — all players on lobby AND game screen will see the final leaderboard immediately.</div>
           <button class="act-btn act-btn-red" onclick="endEvent()" style="padding:0.5rem 1.25rem">End Entire Event</button>
         </div>
       </div>
 
-      <!-- Right: players -->
+      <!-- RIGHT: live players -->
       <div>
         <div class="admin-card" style="padding:0.875rem;margin-bottom:0.875rem">
           <div class="search-input-wrap" style="width:100%">
@@ -113,7 +192,7 @@
         </div>
         <div class="live-panel">
           <div class="lp-title"><span>Live Players</span><span class="abadge ab-green" id="playerCountBadge">0 online</span></div>
-          <div id="livePlayerList"><div style="text-align:center;color:#9EA3AC;font-size:0.72rem;padding:1rem">No players yet</div></div>
+          <div id="livePlayerList"><div style="text-align:center;color:#9EA3AC;font-size:0.72rem;padding:1rem">Waiting...</div></div>
         </div>
         <div class="live-panel">
           <div class="lp-title"><span>Top 3</span></div>
@@ -135,13 +214,14 @@
   function closeSidebar() { document.getElementById('adminSidebar').classList.remove('open'); document.getElementById('sbOverlay').classList.remove('visible'); }
   function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 
-  let eventId=null,roomCode=null,eventType=null,activeGame=null,qSentCount=0,allPlayers=[];
+  let eventId=null, roomCode=null, eventType=null, activeGame=null, allPlayers=[];
+  let wkbQuestions=[], wkbCurrentQ=0, socket=null;
 
   (async()=>{
     if(!await K4App.requireAdmin()) return;
     eventId=K4App.getParam('event');
     if(!eventId){K4App.toast('No event selected','error');window.location.href='/admin/dashboard.html';return;}
-    try{
+    try {
       const data=await K4App.api('/events/all');
       const event=data.data.find(e=>String(e.id)===String(eventId));
       if(!event){K4App.toast('Event not found','error');return;}
@@ -149,14 +229,12 @@
       document.getElementById('pageTitleEl').textContent=`${K4App.escapeHtml(event.celebrant_name)}'s Event`;
       document.getElementById('pageSubEl').textContent=`${event.event_type==='bridal'?'Bridal':'Baby'} Shower · ${event.room_code}`;
       document.getElementById('topRoomCode').textContent=event.room_code;
-      if(event.current_game) selectGame(event.current_game,false);
       initSocket();
-      loadPriceCheckData();
-      loadWKBQuestions();
+      await loadAllGameData();
+      if(event.current_game) selectGame(event.current_game);
     }catch(err){K4App.toast(err.message,'error');}
   })();
 
-  let socket;
   function initSocket(){
     socket=io({transports:['websocket','polling']});
     socket.on('connect',()=>socket.emit('host_join',{room_code:roomCode}));
@@ -172,90 +250,186 @@
   function renderPlayers(players){
     const list=document.getElementById('livePlayerList');
     const top3=document.getElementById('top3List');
-    const ranks=['🥇','🥈','🥉'];
-    if(!players.length){
-      list.innerHTML=`<div style="text-align:center;color:#9EA3AC;font-size:0.72rem;padding:1rem">No players joined yet</div>`;
-      top3.innerHTML=`<div style="text-align:center;color:#9EA3AC;font-size:0.72rem;padding:0.5rem">Waiting...</div>`;
-      return;
-    }
-    list.innerHTML=players.map(p=>`<div class="lp-row" data-name="${esc(p.name.toLowerCase())}"><div class="lp-av" style="background:${p.avatar_color||'#FF6B9D'}">${esc((p.name||'?').charAt(0).toUpperCase())}</div><span class="lp-name">${esc(p.name||'Player')}</span><span class="lp-score">${p.total_score||0}</span></div>`).join('');
-    top3.innerHTML=players.slice(0,3).map((p,i)=>`<div class="lp-row"><span style="font-size:1rem">${ranks[i]}</span><span class="lp-name" style="font-weight:700">${esc(p.name||'Player')}</span><span class="lp-score">${p.total_score||0}</span></div>`).join('');
+    const r=['🥇','🥈','🥉'];
+    if(!players.length){list.innerHTML=`<div style="text-align:center;color:#9EA3AC;font-size:0.72rem;padding:1rem">No players yet</div>`;top3.innerHTML=`<div style="text-align:center;color:#9EA3AC;font-size:0.72rem;padding:0.5rem">Waiting...</div>`;return;}
+    list.innerHTML=players.map(p=>`<div class="lp-row" data-name="${esc((p.name||'').toLowerCase())}"><div class="lp-av" style="background:${p.avatar_color||'#FF6B9D'}">${esc((p.name||'?').charAt(0).toUpperCase())}</div><span class="lp-name">${esc(p.name||'Player')}</span><span class="lp-score">${p.total_score||0}</span></div>`).join('');
+    top3.innerHTML=players.slice(0,3).map((p,i)=>`<div class="lp-row"><span style="font-size:1rem">${r[i]}</span><span class="lp-name" style="font-weight:700">${esc(p.name||'Player')}</span><span class="lp-score">${p.total_score||0}</span></div>`).join('');
   }
-
   function searchPlayers(q){document.querySelectorAll('#livePlayerList .lp-row').forEach(row=>{row.style.display=row.dataset.name?.includes(q.toLowerCase())?'':'none';});}
 
-  function selectGame(name,loadPanel=true){
+  // Load all game data for display
+  async function loadAllGameData(){
+    try {
+      // WKB
+      const wkb=await fetch(`/api/games/${roomCode}/who_knows_best`).then(r=>r.json());
+      if(wkb.success){
+        wkbQuestions=wkb.data.game.questions||[];
+        renderWKBPanel(wkbQuestions);
+      }
+      // Emojinary
+      const em=await fetch(`/api/games/${roomCode}/emojinary`).then(r=>r.json());
+      if(em.success) renderEmojinaryPanel(em.data.game.items||[]);
+      // Price check
+      const pc=await fetch(`/api/games/${roomCode}/price_check`).then(r=>r.json());
+      if(pc.success) renderPricePanel(pc.data.game.items||[]);
+      // First impressions
+      const fi=await fetch(`/api/games/${roomCode}/first_impressions`).then(r=>r.json());
+      if(fi.success) renderFirstImpressionsPanel(fi.data.game.clues||[]);
+      // Word scramble
+      const ws=await fetch(`/api/games/${roomCode}/word_scramble`).then(r=>r.json());
+      if(ws.success) renderWordScramblePanel(ws.data.game.words||[]);
+    }catch(e){console.error('loadAllGameData',e);}
+  }
+
+  function renderWKBPanel(questions){
+    const list=document.getElementById('wkbQuestionList');
+    list.innerHTML=questions.map((q,i)=>`
+      <div class="wkb-row">
+        <span class="wkb-num">${q.index||i+1}</span>
+        <span class="wkb-q">${esc(q.text)}</span>
+        <div class="wkb-ans"><input type="text" id="wkb-ans-${i}" placeholder="Correct answer" maxlength="100" autocomplete="off"></div>
+        <div class="wkb-send">
+          <button class="act-btn" id="wkb-send-${i}" onclick="sendWKBQuestion(${i})" style="font-size:0.65rem;padding:0.25rem 0.6rem">Send</button>
+        </div>
+      </div>`).join('');
+  }
+
+  function renderEmojinaryPanel(items){
+    const list=document.getElementById('emojinaryList');
+    list.innerHTML=items.map((item,i)=>`
+      <div class="emoji-row">
+        <span class="emoji-num">${item.index||i+1}</span>
+        <span class="emoji-icons">${item.emojis}</span>
+        <span class="emoji-ans">${esc(item.answer)}</span>
+      </div>`).join('');
+  }
+
+  function renderPricePanel(items){
+    const list=document.getElementById('priceCheckList');
+    list.innerHTML=items.map((item,i)=>`
+      <div class="price-row">
+        <span class="price-emoji">${item.emoji||'🛍️'}</span>
+        <span class="price-name">${esc(item.name)}</span>
+        <div class="price-inp">
+          <span>£</span>
+          <input type="number" class="price-real-input" data-index="${i}"
+            placeholder="0.00" min="0" step="0.01"
+            value="${item.real_price&&item.real_price>0?item.real_price:''}">
+        </div>
+      </div>`).join('');
+  }
+
+  function renderFirstImpressionsPanel(clues){
+    const list=document.getElementById('firstImpressionsList');
+    list.innerHTML=clues.map((c,i)=>`
+      <div class="clue-row">
+        <span class="clue-num">${i+1}</span>
+        ${c.is_free_space?`<span class="clue-free">FREE</span>`:''}
+        <span class="clue-text">${esc(c.text||c.content||'')}</span>
+      </div>`).join('');
+  }
+
+  function renderWordScramblePanel(words){
+    const list=document.getElementById('wordScrambleList');
+    list.innerHTML=words.map((w,i)=>`
+      <div class="word-row">
+        <span class="word-num">${w.index||i+1}</span>
+        <span class="word-scrambled">${esc(w.scrambled)}</span>
+        <span class="word-arr">→</span>
+        <span class="word-answer">${esc(w.answer)}</span>
+      </div>`).join('');
+  }
+
+  // Game selection
+  function selectGame(name){
     activeGame=name;
     document.querySelectorAll('.game-btn-admin').forEach(b=>b.classList.toggle('active',b.dataset.game===name));
-    document.getElementById('wkbPanel').style.display=name==='who_knows_best'?'block':'none';
-    document.getElementById('pricePanel').style.display=name==='price_check'?'block':'none';
+    document.querySelectorAll('.game-panel').forEach(p=>p.classList.remove('visible'));
+    const panelMap={who_knows_best:'panelWKB',emojinary:'panelEmojinary',price_check:'panelPriceCheck',first_impressions:'panelFirstImpressions',word_scramble:'panelWordScramble'};
+    const panel=document.getElementById(panelMap[name]);
+    if(panel) panel.classList.add('visible');
     document.getElementById('qsGame').textContent=name.replace(/_/g,' ');
   }
 
+  // Launch game
   function launchGame(){
     if(!activeGame){K4App.toast('Select a game first','warning');return;}
     if(!socket){K4App.toast('Not connected','error');return;}
-    qSentCount=0; document.getElementById('qSentCount').textContent='0 sent';
+    wkbCurrentQ=0;
+    document.getElementById('qsQSent').textContent='0';
     socket.emit('start_game',{room_code:roomCode,game_name:activeGame});
-    document.querySelectorAll('.q-send-btn').forEach(b=>{b.disabled=false;b.textContent='Send';b.style.background='';b.style.color='';b.style.borderColor='';});
     K4App.toast(`${activeGame.replace(/_/g,' ')} launched!`,'success');
-  }
-  function endGame(){if(!socket)return;socket.emit('end_game',{room_code:roomCode,game_name:activeGame});K4App.toast('Game ended','info');}
-  function endEvent(){if(!confirm('End the entire event?'))return;socket.emit('end_event',{room_code:roomCode});K4App.toast('Event ended — final results shown','success');}
-
-  function loadWKBQuestions(){
-    if(!roomCode)return;
-    fetch(`/api/games/${roomCode}/who_knows_best`).then(r=>r.json()).then(data=>{
-      if(!data.success)return;
-      const questions=data.data.game.questions||[];
-      const list=document.getElementById('questionList');
-      list.innerHTML=questions.map((q,i)=>`
-        <div style="display:flex;align-items:center;gap:0.65rem;padding:0.45rem 0;border-bottom:1px solid #F4F6FB">
-          <span style="font-size:0.68rem;color:#9EA3AC;min-width:18px;font-weight:700;flex-shrink:0">${i+1}</span>
-          <span style="flex:1;font-size:0.73rem;color:#374151;line-height:1.3">${esc(q.text)}</span>
-          <button class="act-btn q-send-btn" onclick="sendQuestion(${i},this)" style="flex-shrink:0;font-size:0.65rem;padding:0.22rem 0.65rem">Send</button>
-        </div>`).join('');
-    }).catch(()=>{});
+    document.getElementById('wkbStatus').textContent='Running...';
+    // Reset send buttons
+    document.querySelectorAll('[id^="wkb-send-"]').forEach(b=>{b.disabled=false;b.textContent='Send';b.style.background='';b.style.color='';});
   }
 
-  function sendQuestion(idx,btn){
+  // WKB: send specific question
+  function sendWKBQuestion(idx){
     if(!socket){K4App.toast('Not connected','error');return;}
-    const rows=document.querySelectorAll('#questionList > div');
-    const qText=rows[idx]?.querySelector('span:nth-child(2)')?.textContent||'';
-    socket.emit('next_question',{room_code:roomCode,question_index:idx+1,question:{text:qText,index:idx+1}});
-    btn.disabled=true;btn.textContent='✓ Sent';btn.style.background='#E8FFF8';btn.style.color='#00A876';btn.style.borderColor='#A8F0DC';
-    qSentCount++;
-    document.getElementById('qSentCount').textContent=`${qSentCount} sent`;
-    document.getElementById('qsQSent').textContent=qSentCount;
+    const q=wkbQuestions[idx];
+    if(!q)return;
+    socket.emit('wkb_send_question',{room_code:roomCode,question_index:q.index||idx+1,question_text:q.text});
+    const btn=document.getElementById(`wkb-send-${idx}`);
+    if(btn){btn.textContent='✓ Sent';btn.disabled=true;btn.style.background='#E8FFF8';btn.style.color='#00A876';}
+    wkbCurrentQ=idx+1;
+    const pct=Math.round((wkbCurrentQ/wkbQuestions.length)*100);
+    const fill=document.getElementById('wkbProgressFill');
+    if(fill) fill.style.width=pct+'%';
+    const qsSent=document.getElementById('qsQSent');
+    if(qsSent) qsSent.textContent=wkbCurrentQ;
+    document.getElementById('wkbStatus').textContent=`${wkbCurrentQ}/${wkbQuestions.length} sent`;
   }
 
-  function loadPriceCheckData(){
-    if(!roomCode)return;
-    fetch(`/api/games/${roomCode}/price_check`).then(r=>r.json()).then(data=>{
-      if(!data.success)return;
-      const items=data.data.game.items||[];
-      document.getElementById('priceList').innerHTML=items.map((item,i)=>`
-        <div style="display:flex;align-items:center;gap:0.75rem;padding:0.45rem 0;border-bottom:1px solid #F4F6FB">
-          <span style="font-size:1.1rem">${item.emoji||'🛍️'}</span>
-          <span style="flex:1;font-size:0.75rem;color:#374151;font-weight:600">${esc(item.name)}</span>
-          <div style="display:flex;align-items:center;gap:0.25rem">
-            <span style="font-size:0.78rem;color:#9EA3AC;font-weight:700">£</span>
-            <input type="number" class="af-input price-real-input" data-index="${i}"
-              style="width:80px;padding:0.35rem 0.5rem;font-size:0.8rem;text-align:center"
-              placeholder="0.00" min="0" step="0.01"
-              value="${item.real_price&&item.real_price>0?item.real_price:''}">
-          </div>
-        </div>`).join('');
-    }).catch(()=>{});
+  // Save WKB correct answers to DB
+  async function saveWKBAnswers(){
+    const answers=[];
+    wkbQuestions.forEach((q,i)=>{
+      const val=document.getElementById(`wkb-ans-${i}`)?.value.trim();
+      if(val){
+        answers.push({question_index:q.index||i+1,question_text:q.text,correct_answer:val});
+      }
+    });
+    if(!answers.length){K4App.toast('Enter at least one correct answer','warning');return;}
+    try{
+      await K4App.api(`/events/${eventId}/quiz-answers`,{method:'POST',body:{answers}});
+      K4App.toast(`${answers.length} answer${answers.length!==1?'s':''} saved!`,'success');
+    }catch(err){K4App.toast(err.message,'error');}
   }
 
+  // Signal WKB all questions done
+  function signalWKBDone(){
+    if(!socket)return;
+    socket.emit('wkb_done',{room_code:roomCode});
+    K4App.toast('Players notified — all questions done','info');
+  }
+
+  // Save price check prices
   async function savePrices(){
     const inputs=document.querySelectorAll('.price-real-input');
     const items=[];let hasPrice=false;
-    inputs.forEach((inp,i)=>{const p=parseFloat(inp.value);if(p>0)hasPrice=true;items.push({display_order:i,real_price:p>0?p:0,item_name:'',item_emoji:''});});
+    inputs.forEach((inp,i)=>{
+      const p=parseFloat(inp.value);
+      if(p>0)hasPrice=true;
+      items.push({display_order:i,real_price:p>0?p:0,item_name:'',item_emoji:''});
+    });
     if(!hasPrice){K4App.toast('Enter at least one price','warning');return;}
-    try{await K4App.api(`/events/${eventId}/prices`,{method:'POST',body:{items}});K4App.toast('Prices saved!','success');}
-    catch(err){K4App.toast(err.message,'error');}
+    try{
+      await K4App.api(`/events/${eventId}/prices`,{method:'POST',body:{items}});
+      K4App.toast('Prices saved!','success');
+    }catch(err){K4App.toast(err.message,'error');}
+  }
+
+  function endGame(){
+    if(!socket||!activeGame)return;
+    socket.emit('end_game',{room_code:roomCode,game_name:activeGame});
+    K4App.toast('Game ended — leaderboard shown to players','info');
+  }
+
+  function endEvent(){
+    if(!confirm('End the entire event? ALL players (lobby + game screen) will see the final leaderboard immediately.'))return;
+    socket.emit('end_event',{room_code:roomCode});
+    K4App.toast('Event ended — final results sent to all players','success');
   }
 
   function toggleBell(){document.getElementById('notifDropdown').classList.toggle('show');document.getElementById('notifCount').style.display='none';}
