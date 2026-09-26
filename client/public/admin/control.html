@@ -7,355 +7,264 @@
   <link rel="stylesheet" href="/css/main.css"><link rel="stylesheet" href="/css/admin.css">
 </head>
 <body class="admin-body">
-<div class="admin-layout">
-  <!-- Sidebar -->
-  <aside class="admin-sidebar">
-    <div class="sb-logo"><div class="sb-logo-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div><div><div class="sb-logo-name">K4 Game Room</div><div class="sb-logo-sub">by Kreate 4</div></div></div>
-    <nav class="sb-nav">
-      <div class="sb-section">Main</div>
-      <a href="/admin/dashboard.html" class="sb-item"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
-      <a href="/admin/create-event.html" class="sb-item"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Create Event</a>
-      <a href="/admin/events.html" class="sb-item"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>All Events</a>
-      <div class="sb-section">Account</div>
-      <button class="sb-item" onclick="K4App.clearAdmin();window.location.href='/admin/login.html'"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</button>
-    </nav>
-  </aside>
+<div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
+<aside class="admin-sidebar" id="adminSidebar">
+  <button class="sb-close" onclick="closeSidebar()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  <div class="sb-logo"><div class="sb-logo-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div><div><div class="sb-logo-name">K4 Game Room</div><div class="sb-logo-sub">by Kreate 4</div></div></div>
+  <nav class="sb-nav">
+    <div class="sb-section">Main</div>
+    <a href="/admin/dashboard.html" class="sb-item"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a href="/admin/create-event.html" class="sb-item"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Create Event</a>
+    <a href="/admin/events.html" class="sb-item"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>All Events</a>
+    <div class="sb-section">Account</div>
+    <button class="sb-item" onclick="K4App.clearAdmin();window.location.href='/admin/login.html'"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</button>
+  </nav>
+</aside>
 
-  <!-- Main -->
-  <main class="admin-main">
-    <div class="admin-topbar">
+<main class="admin-main">
+  <div class="admin-topbar">
+    <div class="topbar-left">
+      <button class="topbar-hamburger" onclick="openSidebar()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
       <div>
         <div class="admin-page-title" id="pageTitleEl">Control Panel</div>
         <div class="admin-page-sub" id="pageSubEl">Loading event...</div>
       </div>
-      <div style="display:flex;align-items:center;gap:0.875rem">
-        <!-- Notification Bell -->
-        <div class="notif-bell" onclick="toggleBell()">
-          <div class="notif-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          </div>
-          <div class="notif-count" id="notifCount">3</div>
-        </div>
+    </div>
+    <div class="topbar-actions">
+      <div class="notif-bell" onclick="toggleBell()">
+        <div class="notif-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+        <div class="notif-count" id="notifCount">3</div>
         <div class="notif-dropdown" id="notifDropdown">
           <div class="nd-head">Notifications</div>
           <div class="nd-item"><div class="nd-dot" style="background:#00C896"></div><div><div class="nd-text">Player joined the room</div><div class="nd-time">Just now</div></div></div>
           <div class="nd-item"><div class="nd-dot" style="background:#FFD93D"></div><div><div class="nd-text">5 players waiting in lobby</div><div class="nd-time">2 min ago</div></div></div>
           <div class="nd-item"><div class="nd-dot" style="background:#6B9EFF"></div><div><div class="nd-text">Price Check prices not set</div><div class="nd-time">Reminder</div></div></div>
         </div>
-        <div class="rcd"><div class="rcd-label">Room Code</div><div class="rcd-code" id="topRoomCode">------</div></div>
       </div>
+      <div class="rcd"><div class="rcd-label">Room</div><div class="rcd-code" id="topRoomCode">------</div></div>
     </div>
-    <div class="admin-content">
+  </div>
 
-      <!-- Quick Stats -->
-      <div class="qs-grid">
-        <div class="qs-card"><div class="qs-icon si-green"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div><div class="qs-val" id="qsPlayers">0</div><div class="qs-lbl">Players Online</div></div></div>
-        <div class="qs-card"><div class="qs-icon si-pink"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF6B9D" stroke-width="2" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div><div class="qs-val qs-val-sm" id="qsGame">None</div><div class="qs-lbl">Current Game</div></div></div>
-        <div class="qs-card"><div class="qs-icon si-purple"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9B7FD4" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div><div class="qs-val" id="qsQSent">0</div><div class="qs-lbl">Questions Sent</div></div></div>
-        <div class="qs-card"><div class="qs-icon si-yellow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div><div class="qs-val" id="qsTop">0</div><div class="qs-lbl">Top Score</div></div></div>
-      </div>
+  <div class="admin-content">
+    <!-- Quick stats: 4 columns -->
+    <div class="qs-grid">
+      <div class="qs-card"><div class="qs-icon si-green"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div><div class="qs-val" id="qsPlayers">0</div><div class="qs-lbl">Players Online</div></div></div>
+      <div class="qs-card"><div class="qs-icon si-pink"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF6B9D" stroke-width="2" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div><div class="qs-val qs-val-sm" id="qsGame">None</div><div class="qs-lbl">Current Game</div></div></div>
+      <div class="qs-card"><div class="qs-icon si-purple"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9B7FD4" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div><div class="qs-val" id="qsQSent">0</div><div class="qs-lbl">Questions Sent</div></div></div>
+      <div class="qs-card"><div class="qs-icon si-yellow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div><div class="qs-val" id="qsTop">0</div><div class="qs-lbl">Top Score</div></div></div>
+    </div>
 
-      <div class="ctrl-grid">
-        <!-- Left: Game Controls -->
-        <div>
-          <!-- Game Selector -->
-          <div class="admin-card">
-            <div class="admin-card-head"><div class="admin-card-title">Select Game</div></div>
-            <div class="game-grid-admin" id="gameGrid">
-              <div class="game-btn-admin" data-game="who_knows_best" onclick="selectGame('who_knows_best')">
-                <div class="gba-letter">W</div>Who Knows Best
-              </div>
-              <div class="game-btn-admin" data-game="emojinary" onclick="selectGame('emojinary')">
-                <div class="gba-letter">E</div>Emoji-nary
-              </div>
-              <div class="game-btn-admin" data-game="price_check" onclick="selectGame('price_check')">
-                <div class="gba-letter">P</div>Price Check
-              </div>
-              <div class="game-btn-admin" data-game="first_impressions" onclick="selectGame('first_impressions')">
-                <div class="gba-letter">F</div>First Impressions
-              </div>
-              <div class="game-btn-admin" data-game="word_scramble" onclick="selectGame('word_scramble')">
-                <div class="gba-letter">S</div>Word Scramble
-              </div>
-            </div>
-            <div style="display:flex;gap:0.75rem;margin-top:0.875rem">
-              <button class="btn btn-primary" style="flex:2" id="launchBtn" onclick="launchGame()">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                Launch Game
-              </button>
-              <button class="btn" style="flex:1;background:#FFF0F0;border:1px solid #FFD0D0;color:#E05555" id="endGameBtn" onclick="endGame()">
-                End Game
-              </button>
-            </div>
+    <!-- Two-column: controls left, players right -->
+    <div class="ctrl-grid">
+      <div>
+        <!-- Game selector -->
+        <div class="admin-card">
+          <div class="admin-card-head"><div class="admin-card-title">Select Game</div></div>
+          <div class="game-grid-admin">
+            <div class="game-btn-admin" data-game="who_knows_best" onclick="selectGame('who_knows_best')"><div class="gba-letter">W</div>Who Knows Best</div>
+            <div class="game-btn-admin" data-game="emojinary" onclick="selectGame('emojinary')"><div class="gba-letter">E</div>Emoji-nary</div>
+            <div class="game-btn-admin" data-game="price_check" onclick="selectGame('price_check')"><div class="gba-letter">P</div>Price Check</div>
+            <div class="game-btn-admin" data-game="first_impressions" onclick="selectGame('first_impressions')"><div class="gba-letter">F</div>First Impressions</div>
+            <div class="game-btn-admin" data-game="word_scramble" onclick="selectGame('word_scramble')"><div class="gba-letter">S</div>Word Scramble</div>
           </div>
-
-          <!-- Who Knows Best Questions -->
-          <div class="admin-card" id="wkbPanel" style="display:none">
-            <div class="admin-card-head">
-              <div class="admin-card-title">Send Questions</div>
-              <div class="admin-card-link" id="qSentCount">0 sent</div>
-            </div>
-            <div id="questionList" style="max-height:340px;overflow-y:auto;display:flex;flex-direction:column;gap:0.6rem"></div>
+          <div style="display:flex;gap:0.75rem;margin-top:0.875rem">
+            <button class="btn btn-primary" style="flex:2" id="launchBtn" onclick="launchGame()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Launch Game
+            </button>
+            <button class="btn" style="flex:1;background:#FFF0F0;border:1px solid #FFD0D0;color:#E05555" onclick="endGame()">End Game</button>
           </div>
-
-          <!-- Price Check -->
-          <div class="admin-card" id="pricePanel" style="display:none">
-            <div class="admin-card-head">
-              <div class="admin-card-title">Set Real Prices</div>
-              <div class="admin-card-link">Set before launching</div>
-            </div>
-            <div id="priceList" style="display:flex;flex-direction:column;gap:0.6rem"></div>
-            <button class="btn btn-success btn-full" style="margin-top:1rem" onclick="savePrices()">Save Prices</button>
-          </div>
-
-          <!-- Danger Zone -->
-          <div class="danger-card">
-            <div class="danger-title">Danger Zone</div>
-            <div class="danger-sub">End the entire event and show final leaderboard to all players</div>
-            <button class="act-btn act-btn-red" onclick="endEvent()" style="padding:0.5rem 1.25rem">End Entire Event</button>
-          </div>
-
         </div>
 
-        <!-- Right: Live players -->
-        <div>
-          <!-- Search -->
-          <div class="admin-card" style="padding:0.875rem;margin-bottom:0.875rem">
-            <div class="search-input-wrap" style="width:100%">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9EA3AC" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input class="search-input" style="width:100%" placeholder="Search players..." oninput="searchPlayers(this.value)" id="playerSearch">
-            </div>
+        <!-- Who Knows Best questions -->
+        <div class="admin-card" id="wkbPanel" style="display:none">
+          <div class="admin-card-head">
+            <div class="admin-card-title">Send Questions</div>
+            <div class="admin-card-link" id="qSentCount">0 sent</div>
           </div>
-          <!-- Player list -->
-          <div class="live-panel">
-            <div class="lp-title">
-              <span>Live Players</span>
-              <span class="abadge ab-green" id="playerCountBadge">0 online</span>
-            </div>
-            <div id="livePlayerList"><div style="text-align:center;color:#9EA3AC;font-size:0.72rem;padding:1rem">No players yet</div></div>
+          <div id="questionList" style="max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:0.5rem"></div>
+        </div>
+
+        <!-- Price check -->
+        <div class="admin-card" id="pricePanel" style="display:none">
+          <div class="admin-card-head">
+            <div class="admin-card-title">Set Real Prices</div>
+            <div class="admin-card-link">Set before launching</div>
           </div>
-          <!-- Top 3 -->
-          <div class="live-panel">
-            <div class="lp-title"><span>Top 3</span></div>
-            <div id="top3List"><div style="text-align:center;color:#9EA3AC;font-size:0.72rem;padding:0.5rem">Waiting...</div></div>
-          </div>
-          <!-- Print -->
-          <button class="btn btn-full" style="background:#F0F2F5;border:1px solid #E4E6EA;color:#374151;font-size:0.82rem" onclick="printLeaderboard()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-            Print Leaderboard
-          </button>
+          <div id="priceList" style="display:flex;flex-direction:column;gap:0.5rem"></div>
+          <button class="btn btn-success btn-full" style="margin-top:1rem" onclick="savePrices()">Save Prices</button>
+        </div>
+
+        <!-- Danger -->
+        <div class="danger-card">
+          <div class="danger-title">Danger Zone</div>
+          <div class="danger-sub">End the entire event and show final leaderboard to all players</div>
+          <button class="act-btn act-btn-red" onclick="endEvent()" style="padding:0.5rem 1.25rem">End Entire Event</button>
         </div>
       </div>
+
+      <!-- Right: players -->
+      <div>
+        <div class="admin-card" style="padding:0.875rem;margin-bottom:0.875rem">
+          <div class="search-input-wrap" style="width:100%">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9EA3AC" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input class="search-input" style="width:100%" placeholder="Search players..." oninput="searchPlayers(this.value)">
+          </div>
+        </div>
+        <div class="live-panel">
+          <div class="lp-title"><span>Live Players</span><span class="abadge ab-green" id="playerCountBadge">0 online</span></div>
+          <div id="livePlayerList"><div style="text-align:center;color:#9EA3AC;font-size:0.72rem;padding:1rem">No players yet</div></div>
+        </div>
+        <div class="live-panel">
+          <div class="lp-title"><span>Top 3</span></div>
+          <div id="top3List"><div style="text-align:center;color:#9EA3AC;font-size:0.72rem;padding:0.5rem">Waiting...</div></div>
+        </div>
+        <button class="btn btn-full" style="background:#F0F2F5;border:1px solid #E4E6EA;color:#374151;font-size:0.82rem" onclick="printLeaderboard()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Print Leaderboard
+        </button>
+      </div>
     </div>
-  </main>
-</div>
+  </div>
+</main>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/app.js"></script>
 <script>
-  let eventId   = null, roomCode = null, eventType = null;
-  let gameData  = {};
-  let activeGame = null, qSentCount = 0;
-  let allPlayers = [];
+  function openSidebar()  { document.getElementById('adminSidebar').classList.add('open'); document.getElementById('sbOverlay').classList.add('visible'); }
+  function closeSidebar() { document.getElementById('adminSidebar').classList.remove('open'); document.getElementById('sbOverlay').classList.remove('visible'); }
+  function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+  let eventId=null,roomCode=null,eventType=null,activeGame=null,qSentCount=0,allPlayers=[];
 
   (async()=>{
-    if (!await K4App.requireAdmin()) return;
-    eventId = K4App.getParam('event');
-    if (!eventId) { K4App.toast('No event selected','error'); window.location.href='/admin/dashboard.html'; return; }
-    try {
-      const data   = await K4App.api('/events/all');
-      const event  = data.data.find(e=>String(e.id)===String(eventId));
-      if (!event)  { K4App.toast('Event not found','error'); return; }
-      roomCode  = event.room_code;
-      eventType = event.event_type;
-      document.getElementById('pageTitleEl').textContent = `Control — ${K4App.escapeHtml(event.celebrant_name)}'s Event`;
-      document.getElementById('pageSubEl').textContent   = `${event.event_type==='bridal'?'Bridal':'Baby'} Shower · Room: ${event.room_code}`;
-      document.getElementById('topRoomCode').textContent = event.room_code;
-      if (event.current_game) {
-        selectGame(event.current_game, false);
-        document.getElementById('qsGame').textContent = event.current_game.replace(/_/g,' ');
-      }
+    if(!await K4App.requireAdmin()) return;
+    eventId=K4App.getParam('event');
+    if(!eventId){K4App.toast('No event selected','error');window.location.href='/admin/dashboard.html';return;}
+    try{
+      const data=await K4App.api('/events/all');
+      const event=data.data.find(e=>String(e.id)===String(eventId));
+      if(!event){K4App.toast('Event not found','error');return;}
+      roomCode=event.room_code; eventType=event.event_type;
+      document.getElementById('pageTitleEl').textContent=`${K4App.escapeHtml(event.celebrant_name)}'s Event`;
+      document.getElementById('pageSubEl').textContent=`${event.event_type==='bridal'?'Bridal':'Baby'} Shower · ${event.room_code}`;
+      document.getElementById('topRoomCode').textContent=event.room_code;
+      if(event.current_game) selectGame(event.current_game,false);
       initSocket();
       loadPriceCheckData();
       loadWKBQuestions();
-    } catch(err) { K4App.toast(err.message,'error'); }
+    }catch(err){K4App.toast(err.message,'error');}
   })();
 
-  function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
-
-  // Socket — host joins room
   let socket;
-  function initSocket() {
-    socket = io({transports:['websocket','polling']});
-    socket.on('connect', () => {
-      socket.emit('host_join', { room_code: roomCode });
-    });
-    socket.on('players_updated', ({ players }) => {
-      allPlayers = players;
+  function initSocket(){
+    socket=io({transports:['websocket','polling']});
+    socket.on('connect',()=>socket.emit('host_join',{room_code:roomCode}));
+    socket.on('players_updated',({players})=>{
+      allPlayers=players;
       renderPlayers(players);
-      document.getElementById('qsPlayers').textContent = players.length;
-      document.getElementById('playerCountBadge').textContent = `${players.length} online`;
-      if (players.length) document.getElementById('qsTop').textContent = players[0].total_score || 0;
+      document.getElementById('qsPlayers').textContent=players.length;
+      document.getElementById('playerCountBadge').textContent=`${players.length} online`;
+      if(players.length) document.getElementById('qsTop').textContent=players[0].total_score||0;
     });
   }
 
-  function renderPlayers(players) {
-    const list  = document.getElementById('livePlayerList');
-    const top3  = document.getElementById('top3List');
-    const ranks = ['🥇','🥈','🥉'];
-    if (!players.length) {
+  function renderPlayers(players){
+    const list=document.getElementById('livePlayerList');
+    const top3=document.getElementById('top3List');
+    const ranks=['🥇','🥈','🥉'];
+    if(!players.length){
       list.innerHTML=`<div style="text-align:center;color:#9EA3AC;font-size:0.72rem;padding:1rem">No players joined yet</div>`;
       top3.innerHTML=`<div style="text-align:center;color:#9EA3AC;font-size:0.72rem;padding:0.5rem">Waiting...</div>`;
       return;
     }
-    list.innerHTML = players.map(p=>`
-      <div class="lp-row" data-name="${esc(p.name.toLowerCase())}">
-        <div class="lp-av" style="background:${p.avatar_color||'#FF6B9D'}">${esc((p.name||'?').charAt(0).toUpperCase())}</div>
-        <span class="lp-name">${esc(p.name||'Player')}</span>
-        <span class="lp-score">${p.total_score||0}</span>
-      </div>`).join('');
-    top3.innerHTML = players.slice(0,3).map((p,i)=>`
-      <div class="lp-row">
-        <span style="font-size:1rem">${ranks[i]}</span>
-        <span class="lp-name" style="font-weight:700">${esc(p.name||'Player')}</span>
-        <span class="lp-score">${p.total_score||0}</span>
-      </div>`).join('');
+    list.innerHTML=players.map(p=>`<div class="lp-row" data-name="${esc(p.name.toLowerCase())}"><div class="lp-av" style="background:${p.avatar_color||'#FF6B9D'}">${esc((p.name||'?').charAt(0).toUpperCase())}</div><span class="lp-name">${esc(p.name||'Player')}</span><span class="lp-score">${p.total_score||0}</span></div>`).join('');
+    top3.innerHTML=players.slice(0,3).map((p,i)=>`<div class="lp-row"><span style="font-size:1rem">${ranks[i]}</span><span class="lp-name" style="font-weight:700">${esc(p.name||'Player')}</span><span class="lp-score">${p.total_score||0}</span></div>`).join('');
   }
 
-  function searchPlayers(q) {
-    document.querySelectorAll('#livePlayerList .lp-row').forEach(row=>{
-      row.style.display = row.dataset.name?.includes(q.toLowerCase()) ? '' : 'none';
-    });
+  function searchPlayers(q){document.querySelectorAll('#livePlayerList .lp-row').forEach(row=>{row.style.display=row.dataset.name?.includes(q.toLowerCase())?'':'none';});}
+
+  function selectGame(name,loadPanel=true){
+    activeGame=name;
+    document.querySelectorAll('.game-btn-admin').forEach(b=>b.classList.toggle('active',b.dataset.game===name));
+    document.getElementById('wkbPanel').style.display=name==='who_knows_best'?'block':'none';
+    document.getElementById('pricePanel').style.display=name==='price_check'?'block':'none';
+    document.getElementById('qsGame').textContent=name.replace(/_/g,' ');
   }
 
-  // Game selection
-  function selectGame(name, loadPanel=true) {
-    activeGame = name;
-    document.querySelectorAll('.game-btn-admin').forEach(b=>b.classList.toggle('active', b.dataset.game===name));
-    document.getElementById('wkbPanel').style.display   = name==='who_knows_best' ? 'block' : 'none';
-    document.getElementById('pricePanel').style.display = name==='price_check'    ? 'block' : 'none';
-  }
-
-  // Launch game
-  function launchGame() {
-    if (!activeGame) { K4App.toast('Select a game first','warning'); return; }
-    if (!socket)     { K4App.toast('Not connected','error'); return; }
-    qSentCount = 0;
-    document.getElementById('qSentCount').textContent = '0 sent';
-    socket.emit('start_game', { room_code: roomCode, game_name: activeGame });
-    document.getElementById('qsGame').textContent = activeGame.replace(/_/g,' ');
+  function launchGame(){
+    if(!activeGame){K4App.toast('Select a game first','warning');return;}
+    if(!socket){K4App.toast('Not connected','error');return;}
+    qSentCount=0; document.getElementById('qSentCount').textContent='0 sent';
+    socket.emit('start_game',{room_code:roomCode,game_name:activeGame});
+    document.querySelectorAll('.q-send-btn').forEach(b=>{b.disabled=false;b.textContent='Send';b.style.background='';b.style.color='';b.style.borderColor='';});
     K4App.toast(`${activeGame.replace(/_/g,' ')} launched!`,'success');
-    // Reset question buttons
-    document.querySelectorAll('.q-send-btn').forEach(b=>{ b.disabled=false; b.textContent='Send'; b.style.background=''; });
+  }
+  function endGame(){if(!socket)return;socket.emit('end_game',{room_code:roomCode,game_name:activeGame});K4App.toast('Game ended','info');}
+  function endEvent(){if(!confirm('End the entire event?'))return;socket.emit('end_event',{room_code:roomCode});K4App.toast('Event ended — final results shown','success');}
+
+  function loadWKBQuestions(){
+    if(!roomCode)return;
+    fetch(`/api/games/${roomCode}/who_knows_best`).then(r=>r.json()).then(data=>{
+      if(!data.success)return;
+      const questions=data.data.game.questions||[];
+      const list=document.getElementById('questionList');
+      list.innerHTML=questions.map((q,i)=>`
+        <div style="display:flex;align-items:center;gap:0.65rem;padding:0.45rem 0;border-bottom:1px solid #F4F6FB">
+          <span style="font-size:0.68rem;color:#9EA3AC;min-width:18px;font-weight:700;flex-shrink:0">${i+1}</span>
+          <span style="flex:1;font-size:0.73rem;color:#374151;line-height:1.3">${esc(q.text)}</span>
+          <button class="act-btn q-send-btn" onclick="sendQuestion(${i},this)" style="flex-shrink:0;font-size:0.65rem;padding:0.22rem 0.65rem">Send</button>
+        </div>`).join('');
+    }).catch(()=>{});
   }
 
-  // End game
-  function endGame() {
-    if (!socket) return;
-    socket.emit('end_game', { room_code: roomCode, game_name: activeGame });
-    K4App.toast('Game ended — interim leaderboard shown to players','info');
-  }
-
-  // End event
-  function endEvent() {
-    if (!confirm('End the entire event? All players will see the final leaderboard.')) return;
-    socket.emit('end_event', { room_code: roomCode });
-    K4App.toast('Event ended — final results shown to all players','success');
-  }
-
-  // Who Knows Best questions
-  function loadWKBQuestions() {
-    if (!eventType) return;
-    // We load the data from the API the same way game.html does
-    fetch(`/api/games/${roomCode}/who_knows_best`)
-      .then(r=>r.json()).then(data=>{
-        if (!data.success) return;
-        const questions = data.data.game.questions || [];
-        const list = document.getElementById('questionList');
-        list.innerHTML = questions.map((q,i)=>`
-          <div style="display:flex;align-items:center;gap:0.65rem;padding:0.5rem 0;border-bottom:1px solid #F4F6FB">
-            <span style="font-size:0.7rem;color:#9EA3AC;min-width:20px;font-weight:700">${i+1}</span>
-            <span style="flex:1;font-size:0.75rem;color:#374151">${esc(q.text)}</span>
-            <button class="act-btn q-send-btn" onclick="sendQuestion(${i},this)" style="flex-shrink:0">Send</button>
-          </div>`).join('');
-      }).catch(()=>{});
-  }
-
-  function sendQuestion(idx, btn) {
-    if (!socket) { K4App.toast('Not connected','error'); return; }
-    const allQuestions = document.querySelectorAll('#questionList > div');
-    const qText = allQuestions[idx]?.querySelector('span:nth-child(2)')?.textContent;
-    socket.emit('next_question', {
-      room_code:      roomCode,
-      question_index: idx + 1,  // 1-based index
-      question:       { text: qText, index: idx + 1 }
-    });
-    btn.disabled = true; btn.textContent = '✓ Sent'; btn.style.background = '#E8FFF8'; btn.style.color = '#00A876'; btn.style.borderColor='#A8F0DC';
+  function sendQuestion(idx,btn){
+    if(!socket){K4App.toast('Not connected','error');return;}
+    const rows=document.querySelectorAll('#questionList > div');
+    const qText=rows[idx]?.querySelector('span:nth-child(2)')?.textContent||'';
+    socket.emit('next_question',{room_code:roomCode,question_index:idx+1,question:{text:qText,index:idx+1}});
+    btn.disabled=true;btn.textContent='✓ Sent';btn.style.background='#E8FFF8';btn.style.color='#00A876';btn.style.borderColor='#A8F0DC';
     qSentCount++;
-    document.getElementById('qSentCount').textContent = `${qSentCount} sent`;
-    document.getElementById('qsQSent').textContent = qSentCount;
+    document.getElementById('qSentCount').textContent=`${qSentCount} sent`;
+    document.getElementById('qsQSent').textContent=qSentCount;
   }
 
-  // Price check data
-  function loadPriceCheckData() {
-    if (!roomCode) return;
-    fetch(`/api/games/${roomCode}/price_check`)
-      .then(r=>r.json()).then(data=>{
-        if (!data.success) return;
-        const items = data.data.game.items || [];
-        const list  = document.getElementById('priceList');
-        list.innerHTML = items.map((item,i)=>`
-          <div style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;border-bottom:1px solid #F4F6FB">
-            <span style="font-size:1.2rem">${item.emoji||'🛍️'}</span>
-            <span style="flex:1;font-size:0.78rem;color:#374151;font-weight:600">${esc(item.name)}</span>
-            <div style="display:flex;align-items:center;gap:0.3rem">
-              <span style="font-size:0.8rem;color:#9EA3AC;font-weight:700">£</span>
-              <input type="number" class="af-input price-real-input" data-index="${i}"
-                style="width:90px;padding:0.4rem 0.6rem;font-size:0.82rem;text-align:center"
-                placeholder="0.00" min="0" step="0.01"
-                value="${item.real_price && item.real_price>0 ? item.real_price : ''}">
-            </div>
-          </div>`).join('');
-      }).catch(()=>{});
+  function loadPriceCheckData(){
+    if(!roomCode)return;
+    fetch(`/api/games/${roomCode}/price_check`).then(r=>r.json()).then(data=>{
+      if(!data.success)return;
+      const items=data.data.game.items||[];
+      document.getElementById('priceList').innerHTML=items.map((item,i)=>`
+        <div style="display:flex;align-items:center;gap:0.75rem;padding:0.45rem 0;border-bottom:1px solid #F4F6FB">
+          <span style="font-size:1.1rem">${item.emoji||'🛍️'}</span>
+          <span style="flex:1;font-size:0.75rem;color:#374151;font-weight:600">${esc(item.name)}</span>
+          <div style="display:flex;align-items:center;gap:0.25rem">
+            <span style="font-size:0.78rem;color:#9EA3AC;font-weight:700">£</span>
+            <input type="number" class="af-input price-real-input" data-index="${i}"
+              style="width:80px;padding:0.35rem 0.5rem;font-size:0.8rem;text-align:center"
+              placeholder="0.00" min="0" step="0.01"
+              value="${item.real_price&&item.real_price>0?item.real_price:''}">
+          </div>
+        </div>`).join('');
+    }).catch(()=>{});
   }
 
-  async function savePrices() {
-    const inputs = document.querySelectorAll('.price-real-input');
-    const items  = [];
-    let hasPrice = false;
-    inputs.forEach((inp, i) => {
-      const price = parseFloat(inp.value);
-      if (price > 0) hasPrice = true;
-      items.push({ display_order: i, real_price: price > 0 ? price : 0, item_name: '', item_emoji: '' });
-    });
-    if (!hasPrice) { K4App.toast('Enter at least one price','warning'); return; }
-    try {
-      await K4App.api(`/events/${eventId}/prices`,{method:'POST',body:{items}});
-      K4App.toast('Prices saved!','success');
-    } catch(err) { K4App.toast(err.message,'error'); }
+  async function savePrices(){
+    const inputs=document.querySelectorAll('.price-real-input');
+    const items=[];let hasPrice=false;
+    inputs.forEach((inp,i)=>{const p=parseFloat(inp.value);if(p>0)hasPrice=true;items.push({display_order:i,real_price:p>0?p:0,item_name:'',item_emoji:''});});
+    if(!hasPrice){K4App.toast('Enter at least one price','warning');return;}
+    try{await K4App.api(`/events/${eventId}/prices`,{method:'POST',body:{items}});K4App.toast('Prices saved!','success');}
+    catch(err){K4App.toast(err.message,'error');}
   }
 
-  function toggleBell() {
-    document.getElementById('notifDropdown').classList.toggle('show');
-    document.getElementById('notifCount').style.display='none';
-  }
-  document.addEventListener('click', e => {
-    if (!e.target.closest('.notif-bell')) document.getElementById('notifDropdown').classList.remove('show');
-  });
+  function toggleBell(){document.getElementById('notifDropdown').classList.toggle('show');document.getElementById('notifCount').style.display='none';}
+  document.addEventListener('click',e=>{if(!e.target.closest('.notif-bell'))document.getElementById('notifDropdown').classList.remove('show');});
 
-  function printLeaderboard() {
-    if (!allPlayers.length) { K4App.toast('No players yet','warning'); return; }
-    const w = window.open('','_blank');
-    w.document.write(`<html><head><title>Leaderboard — K4 Game Room</title>
-    <style>body{font-family:sans-serif;padding:2rem;max-width:500px}
-    h1{font-size:1.5rem;margin-bottom:1rem} table{width:100%;border-collapse:collapse}
-    th{background:#f0f0f0;padding:0.5rem;text-align:left;font-size:0.75rem}
-    td{padding:0.6rem 0.5rem;border-bottom:1px solid #eee;font-size:0.85rem}
-    .gold{font-weight:800;color:#B8860B}</style></head>
-    <body><h1>Final Leaderboard</h1>
-    <table><thead><tr><th>Rank</th><th>Name</th><th>Score</th></tr></thead><tbody>
-    ${allPlayers.map((p,i)=>`<tr><td class="${i<3?'gold':''}">${['🥇','🥈','🥉'][i]||i+1}</td><td>${K4App.escapeHtml(p.name)}</td><td style="font-weight:700">${p.total_score||0} pts</td></tr>`).join('')}
-    </tbody></table></body></html>`);
+  function printLeaderboard(){
+    if(!allPlayers.length){K4App.toast('No players yet','warning');return;}
+    const w=window.open('','_blank');
+    w.document.write(`<html><head><title>Leaderboard</title><style>body{font-family:sans-serif;padding:2rem;max-width:500px}h1{margin-bottom:1rem}table{width:100%;border-collapse:collapse}th{background:#f0f0f0;padding:0.5rem;text-align:left;font-size:0.75rem}td{padding:0.6rem 0.5rem;border-bottom:1px solid #eee;font-size:0.85rem}.g{font-weight:800;color:#B8860B}</style></head><body><h1>Final Leaderboard</h1><table><thead><tr><th>Rank</th><th>Name</th><th>Score</th></tr></thead><tbody>${allPlayers.map((p,i)=>`<tr><td class="${i<3?'g':''}">${['🥇','🥈','🥉'][i]||i+1}</td><td>${K4App.escapeHtml(p.name)}</td><td style="font-weight:700">${p.total_score||0} pts</td></tr>`).join('')}</tbody></table></body></html>`);
     w.print();
   }
 </script>

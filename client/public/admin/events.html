@@ -7,36 +7,46 @@
   <link rel="stylesheet" href="/css/main.css"><link rel="stylesheet" href="/css/admin.css">
 </head>
 <body class="admin-body">
-<div class="admin-layout">
-  <aside class="admin-sidebar">
-    <div class="sb-logo"><div class="sb-logo-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div><div><div class="sb-logo-name">K4 Game Room</div><div class="sb-logo-sub">by Kreate 4</div></div></div>
-    <nav class="sb-nav">
-      <div class="sb-section">Main</div>
-      <a href="/admin/dashboard.html" class="sb-item"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
-      <a href="/admin/create-event.html" class="sb-item"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Create Event</a>
-      <a href="/admin/events.html" class="sb-item active"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>All Events</a>
-      <div class="sb-section">Account</div>
-      <button class="sb-item" onclick="K4App.clearAdmin();window.location.href='/admin/login.html'"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</button>
-    </nav>
-  </aside>
-  <main class="admin-main">
-    <div class="admin-topbar">
+<div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
+<aside class="admin-sidebar" id="adminSidebar">
+  <button class="sb-close" onclick="closeSidebar()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  <div class="sb-logo"><div class="sb-logo-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div><div><div class="sb-logo-name">K4 Game Room</div><div class="sb-logo-sub">by Kreate 4</div></div></div>
+  <nav class="sb-nav">
+    <div class="sb-section">Main</div>
+    <a href="/admin/dashboard.html" class="sb-item"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a href="/admin/create-event.html" class="sb-item"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Create Event</a>
+    <a href="/admin/events.html" class="sb-item active"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>All Events</a>
+    <div class="sb-section">Account</div>
+    <button class="sb-item" onclick="K4App.clearAdmin();window.location.href='/admin/login.html'"><svg class="sb-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</button>
+  </nav>
+</aside>
+
+<main class="admin-main">
+  <div class="admin-topbar">
+    <div class="topbar-left">
+      <button class="topbar-hamburger" onclick="openSidebar()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
       <div><div class="admin-page-title">All Events</div><div class="admin-page-sub">Manage all your game room sessions</div></div>
-      <a href="/admin/create-event.html" class="btn btn-primary">New Event</a>
     </div>
-    <div class="admin-content">
-      <div class="admin-table-wrap">
-        <table class="admin-table">
-          <thead><tr><th>Room Code</th><th>Celebrant</th><th>Type</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
-          <tbody id="eventsBody"><tr><td colspan="6" style="text-align:center;color:#9EA3AC;padding:3rem">Loading...</td></tr></tbody>
-        </table>
-      </div>
+    <div class="topbar-actions">
+      <a href="/admin/create-event.html" class="btn btn-primary">+ New Event</a>
     </div>
-  </main>
-</div>
+  </div>
+  <div class="admin-content">
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead><tr><th>Room Code</th><th>Celebrant</th><th>Type</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+        <tbody id="eventsBody"><tr><td colspan="6" style="text-align:center;color:#9EA3AC;padding:3rem">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
 <script src="/js/app.js"></script>
 <script>
+  function openSidebar()  { document.getElementById('adminSidebar').classList.add('open'); document.getElementById('sbOverlay').classList.add('visible'); }
+  function closeSidebar() { document.getElementById('adminSidebar').classList.remove('open'); document.getElementById('sbOverlay').classList.remove('visible'); }
   function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
   (async()=>{
     if(!await K4App.requireAdmin()) return;
     const data=await K4App.api('/events/all');
@@ -50,12 +60,13 @@
         <td><span class="abadge ${e.event_type==='bridal'?'ab-pink':'ab-blue'}">${e.event_type==='bridal'?'Bridal':'Baby'}</span></td>
         <td><span class="abadge ${e.status==='active'?'ab-green':e.status==='waiting'?'ab-yellow':'ab-purple'}">${e.status}</span></td>
         <td style="font-size:0.78rem;color:#9EA3AC">${new Date(e.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</td>
-        <td><div style="display:flex;gap:0.4rem">
+        <td><div style="display:flex;gap:0.4rem;flex-wrap:wrap">
           <a href="/admin/control.html?event=${e.id}"><button class="act-btn act-btn-green">Control</button></a>
           <button class="act-btn act-btn-red" onclick="del(${e.id})">Delete</button>
         </div></td>
       </tr>`).join('');
   })();
+
   async function del(id){
     if(!confirm('Delete this event?')) return;
     try{await K4App.api(`/events/${id}`,{method:'DELETE'});K4App.toast('Deleted','success');location.reload();}

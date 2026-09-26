@@ -1,7 +1,7 @@
 /* K4 GAMES CSS — All 5 games + leaderboard */
 
 /* Shell */
-.game-shell { min-height:100vh;background:var(--grad-dark);display:flex;flex-direction:column;position:relative;overflow:hidden; }
+.game-shell { min-height:100vh;background:var(--grad-dark);display:flex;flex-direction:column;position:relative;overflow-x:hidden; }
 .game-shell::before { content:'';position:fixed;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(255,107,157,0.08),transparent 70%);top:-150px;right:-150px;pointer-events:none; }
 
 /* Topbar */
@@ -165,4 +165,12 @@
   .bingo-cell   { font-size:0.4rem; }
   .scramble-tile{ width:32px;height:40px;font-size:0.95rem; }
   .emoji-display{ font-size:2.5rem; }
+}
+
+/* Responsive fixes for player pages */
+@media (max-width: 480px) {
+  .game-shell { min-height: 100dvh; }
+  .game-body  { padding-bottom: 3rem; }
+  .lb-overlay, .final-overlay { padding: 1.5rem 0.875rem 2.5rem; }
+  .podium-stage { height: 190px; }
 }

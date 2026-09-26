@@ -9,65 +9,120 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
   <style>
-    body { background:#0D0D1A; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem 1rem; position:relative; overflow:hidden; }
-    .orb { position:fixed; border-radius:50%; filter:blur(70px); pointer-events:none; }
-    .o1 { width:350px;height:350px;background:rgba(255,107,157,0.15);top:-100px;right:-80px; }
-    .o2 { width:280px;height:280px;background:rgba(107,158,255,0.12);bottom:-80px;left:-60px; }
-    .o3 { width:200px;height:200px;background:rgba(0,200,150,0.08);top:45%;left:38%; }
-    /* Type badges */
-    .type-badges { position:relative;z-index:2;display:flex;gap:0.5rem;margin-bottom:1rem; }
-    .type-badge { padding:0.28rem 0.875rem;border-radius:var(--r-full);font-size:0.72rem;font-weight:600;letter-spacing:0.04em; }
-    .badge-bridal { background:rgba(255,107,157,0.1);border:1px solid rgba(255,107,157,0.25);color:rgba(255,181,200,0.9); }
-    .badge-baby   { background:rgba(107,158,255,0.1);border:1px solid rgba(107,158,255,0.25);color:rgba(180,210,255,0.9); }
-    /* Headline */
-    .headline { position:relative;z-index:2;text-align:center;margin-bottom:1rem; }
-    .headline h1 { font-family:'Playfair Display',serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:900;color:#fff;margin-bottom:0.3rem; }
-    .headline h1 em { font-style:italic;color:var(--pink); }
-    .headline p { font-size:0.82rem;color:rgba(255,255,255,0.38); }
-    /* Live count */
-    .live-count { position:relative;z-index:2;margin-bottom:1rem;background:rgba(0,200,150,0.08);border:1px solid rgba(0,200,150,0.2);border-radius:var(--r-full);padding:0.3rem 0.875rem;display:flex;align-items:center;gap:0.4rem; }
-    .live-dot { width:7px;height:7px;border-radius:50%;background:#00C896;animation:livePulse 1.8s ease-in-out infinite; }
+    * { box-sizing: border-box; }
+    html, body {
+      background: #0D0D1A;
+      min-height: 100vh;
+      /* NO overflow:hidden — allow scroll on small screens */
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 3rem;
+      position: relative;
+    }
+    .orb { position: fixed; border-radius: 50%; filter: blur(70px); pointer-events: none; z-index: 0; }
+    .o1 { width: 350px; height: 350px; background: rgba(255,107,157,0.15); top: -100px; right: -80px; }
+    .o2 { width: 280px; height: 280px; background: rgba(107,158,255,0.12); bottom: -80px; left: -60px; }
+    .o3 { width: 200px; height: 200px; background: rgba(0,200,150,0.08); top: 45%; left: 38%; }
+
+    /* All content above orbs */
+    .type-badges, .headline, .live-count, .join-card, .steps, .game-pills, .footer {
+      position: relative; z-index: 2;
+    }
+
+    .type-badges { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; justify-content: center; }
+    .type-badge  { padding: 0.28rem 0.875rem; border-radius: var(--r-full); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; }
+    .badge-bridal { background: rgba(255,107,157,0.1); border: 1px solid rgba(255,107,157,0.25); color: rgba(255,181,200,0.9); }
+    .badge-baby   { background: rgba(107,158,255,0.1); border: 1px solid rgba(107,158,255,0.25); color: rgba(180,210,255,0.9); }
+
+    .headline { text-align: center; margin-bottom: 1rem; }
+    .headline h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 900; color: #fff; margin-bottom: 0.3rem; line-height: 1.25; }
+    .headline h1 em { font-style: italic; color: var(--pink); }
+    .headline p { font-size: 0.82rem; color: rgba(255,255,255,0.38); }
+
+    .live-count {
+      margin-bottom: 1rem;
+      background: rgba(0,200,150,0.08); border: 1px solid rgba(0,200,150,0.2);
+      border-radius: var(--r-full); padding: 0.3rem 0.875rem;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #00C896; animation: livePulse 1.8s ease-in-out infinite; }
     @keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.5)} }
-    .live-count span { font-size:0.75rem;color:rgba(0,200,150,0.9);font-weight:600; }
-    /* Card */
-    .join-card { position:relative;z-index:2;width:100%;max-width:340px;background:rgba(255,255,255,0.055);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:2rem 1.75rem;box-shadow:0 24px 60px rgba(0,0,0,0.4); }
-    .card-brand { text-align:center;margin-bottom:1.5rem; }
-    .brand-icon { width:52px;height:52px;background:var(--grad-primary);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 0.6rem;box-shadow:var(--shadow-pink); }
-    .brand-name { font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900;color:#fff; }
-    .brand-by   { font-size:0.62rem;color:rgba(255,255,255,0.28);text-transform:uppercase;letter-spacing:0.12em;margin-top:0.15rem; }
-    .field-label { display:block;font-size:0.67rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.32);margin-bottom:0.4rem; }
-    .field-input { width:100%;padding:0.82rem 1rem;background:rgba(0,0,0,0.3);border:1.5px solid rgba(255,255,255,0.08);border-radius:10px;color:#fff;font-size:0.88rem;font-weight:500;font-family:'Poppins',sans-serif;outline:none;margin-bottom:0.95rem;display:block;transition:border-color 0.2s; }
-    .field-input:focus { border-color:var(--pink);background:rgba(255,107,157,0.06);box-shadow:0 0 0 3px rgba(255,107,157,0.1); }
-    .field-input::placeholder { color:rgba(255,255,255,0.22); }
-    .play-btn { width:100%;padding:0.9rem;border:none;border-radius:var(--r-full);background:var(--pink);color:#fff;font-size:0.95rem;font-weight:700;font-family:'Poppins',sans-serif;cursor:pointer;box-shadow:var(--shadow-pink);transition:all 0.2s;margin-bottom:0.75rem;display:block; }
-    .play-btn:hover { background:#ff5488;transform:translateY(-2px);box-shadow:0 10px 28px rgba(255,107,157,0.5); }
-    .play-btn:disabled { opacity:0.55;cursor:not-allowed;transform:none; }
-    .or-line { display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem; }
-    .or-line::before,.or-line::after { content:'';flex:1;height:1px;background:rgba(255,255,255,0.07); }
-    .or-line span { font-size:0.7rem;color:rgba(255,255,255,0.18); }
-    .host-btn { width:100%;padding:0.82rem;border:1.5px solid rgba(155,127,212,0.35);border-radius:var(--r-full);background:rgba(155,127,212,0.1);color:rgba(210,185,255,0.88);font-size:0.85rem;font-weight:600;font-family:'Poppins',sans-serif;cursor:pointer;transition:all 0.2s;display:block; }
-    .host-btn:hover { background:rgba(155,127,212,0.2);border-color:rgba(155,127,212,0.55);color:#fff; }
-    /* How it works */
-    .steps { position:relative;z-index:2;display:flex;align-items:center;margin-top:1.25rem;max-width:340px;width:100%; }
-    .step { flex:1;text-align:center; }
-    .step-num { width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:800;margin:0 auto 0.3rem; }
-    .s1 { background:rgba(255,107,157,0.15);border:1px solid rgba(255,107,157,0.3);color:var(--pink); }
-    .s2 { background:rgba(155,127,212,0.15);border:1px solid rgba(155,127,212,0.3);color:var(--lavender); }
-    .s3 { background:rgba(0,200,150,0.15);border:1px solid rgba(0,200,150,0.3);color:var(--mint); }
-    .step-label { font-size:0.66rem;color:rgba(255,255,255,0.38);font-weight:500; }
-    .step-line { width:28px;height:1px;background:rgba(255,255,255,0.08); }
-    /* Game pills */
-    .game-pills { position:relative;z-index:2;display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:1rem;justify-content:center;max-width:360px; }
-    .game-pill { padding:0.26rem 0.7rem;border-radius:var(--r-full);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.42);font-size:0.68rem;font-weight:500; }
-    /* Footer */
-    .footer { position:relative;z-index:2;margin-top:1.25rem;font-size:0.67rem;color:rgba(255,255,255,0.14);letter-spacing:0.06em; }
-    .footer span { color:rgba(255,107,157,0.38);font-weight:700; }
-    /* Loading */
-    .loading-overlay { position:fixed;inset:0;background:rgba(13,13,26,0.9);backdrop-filter:blur(10px);z-index:1000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:1.25rem; }
-    .loading-overlay.active { display:flex; }
-    .loading-spinner { width:48px;height:48px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--pink);border-radius:50%;animation:spin 0.8s linear infinite; }
-    .loading-text { color:#fff;font-size:0.9rem;font-weight:600; }
-    @keyframes spin { to{transform:rotate(360deg)} }
+    .live-count span { font-size: 0.75rem; color: rgba(0,200,150,0.9); font-weight: 600; }
+
+    .join-card {
+      width: 100%; max-width: 380px;
+      background: rgba(255,255,255,0.055); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 24px;
+      padding: 2rem 1.75rem;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+    }
+    .card-brand  { text-align: center; margin-bottom: 1.5rem; }
+    .brand-icon  { width: 52px; height: 52px; background: var(--grad-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.6rem; box-shadow: var(--shadow-pink); }
+    .brand-name  { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 900; color: #fff; }
+    .brand-by    { font-size: 0.62rem; color: rgba(255,255,255,0.28); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 0.15rem; }
+
+    .field-label { display: block; font-size: 0.67rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.32); margin-bottom: 0.4rem; }
+    .field-input {
+      width: 100%; padding: 0.82rem 1rem;
+      background: rgba(0,0,0,0.3); border: 1.5px solid rgba(255,255,255,0.08);
+      border-radius: 10px; color: #fff; font-size: 0.88rem; font-weight: 500;
+      font-family: 'Poppins', sans-serif; outline: none; margin-bottom: 0.95rem;
+      display: block; transition: border-color 0.2s;
+    }
+    .field-input:focus { border-color: var(--pink); background: rgba(255,107,157,0.06); box-shadow: 0 0 0 3px rgba(255,107,157,0.1); }
+    .field-input::placeholder { color: rgba(255,255,255,0.22); }
+
+    .play-btn {
+      width: 100%; padding: 0.9rem; border: none; border-radius: var(--r-full);
+      background: var(--pink); color: #fff; font-size: 0.95rem; font-weight: 700;
+      font-family: 'Poppins', sans-serif; cursor: pointer;
+      box-shadow: var(--shadow-pink); transition: all 0.2s; margin-bottom: 0.75rem; display: block;
+    }
+    .play-btn:hover:not(:disabled) { background: #ff5488; transform: translateY(-2px); box-shadow: 0 10px 28px rgba(255,107,157,0.5); }
+    .play-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    .or-line { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .or-line::before, .or-line::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.07); }
+    .or-line span { font-size: 0.7rem; color: rgba(255,255,255,0.18); }
+
+    .host-btn {
+      width: 100%; padding: 0.82rem; border: 1.5px solid rgba(155,127,212,0.35);
+      border-radius: var(--r-full); background: rgba(155,127,212,0.1);
+      color: rgba(210,185,255,0.88); font-size: 0.85rem; font-weight: 600;
+      font-family: 'Poppins', sans-serif; cursor: pointer; transition: all 0.2s; display: block;
+    }
+    .host-btn:hover { background: rgba(155,127,212,0.2); border-color: rgba(155,127,212,0.55); color: #fff; }
+
+    .steps { display: flex; align-items: center; margin-top: 1.25rem; max-width: 340px; width: 100%; }
+    .step  { flex: 1; text-align: center; }
+    .step-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; margin: 0 auto 0.3rem; }
+    .s1 { background: rgba(255,107,157,0.15); border: 1px solid rgba(255,107,157,0.3); color: var(--pink); }
+    .s2 { background: rgba(155,127,212,0.15); border: 1px solid rgba(155,127,212,0.3); color: var(--lavender); }
+    .s3 { background: rgba(0,200,150,0.15); border: 1px solid rgba(0,200,150,0.3); color: var(--mint); }
+    .step-label { font-size: 0.66rem; color: rgba(255,255,255,0.38); font-weight: 500; }
+    .step-line  { width: 28px; height: 1px; background: rgba(255,255,255,0.08); }
+
+    .game-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 1rem; justify-content: center; max-width: 360px; }
+    .game-pill  { padding: 0.26rem 0.7rem; border-radius: var(--r-full); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.42); font-size: 0.68rem; font-weight: 500; }
+
+    .footer { margin-top: 1.25rem; font-size: 0.67rem; color: rgba(255,255,255,0.14); letter-spacing: 0.06em; }
+    .footer span { color: rgba(255,107,157,0.38); font-weight: 700; }
+
+    .loading-overlay { position: fixed; inset: 0; background: rgba(13,13,26,0.9); backdrop-filter: blur(10px); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 1.25rem; }
+    .loading-overlay.active { display: flex; }
+    .loading-spinner { width: 48px; height: 48px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--pink); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    .loading-text { color: #fff; font-size: 0.9rem; font-weight: 600; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Mobile tweaks */
+    @media (max-width: 480px) {
+      body { padding: 1.5rem 0.875rem 2.5rem; }
+      .join-card { padding: 1.5rem 1.25rem; }
+      .headline h1 { font-size: 1.5rem; }
+    }
   </style>
 </head>
 <body>
@@ -154,7 +209,7 @@
       const roomCode   = roomInput.value.trim();
       const playerName = nameInput.value.trim();
       if (!roomCode || roomCode.length !== 6) { K4App.toast('Enter a 6-character room code','error'); roomInput.focus(); return; }
-      if (!playerName)  { K4App.toast('Enter your name','error'); nameInput.focus(); return; }
+      if (!playerName) { K4App.toast('Enter your name','error'); nameInput.focus(); return; }
 
       const btn = document.getElementById('playBtn');
       btn.disabled = true;
