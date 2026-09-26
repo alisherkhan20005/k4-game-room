@@ -155,7 +155,7 @@ router.post('/:id/quiz-answers', authenticateAdmin, async (req, res) => {
 router.get('/:id/leaderboard', async (req, res) => {
   try {
     const players = await Player.findAll({
-      where: { event_id: req.params.id, is_active: true },
+      where: { event_id: req.params.id },
       order: [['total_score', 'DESC']],
       attributes: ['id', 'name', 'total_score', 'avatar_color']
     });

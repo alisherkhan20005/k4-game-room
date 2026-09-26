@@ -163,7 +163,7 @@ module.exports = (io, socket) => {
       const event = await Event.findOne({ where: { room_code } });
       if (!event) return;
       const players = await Player.findAll({
-        where: { event_id: event.id, is_active: true },
+        where: { event_id: event.id },
         order: [['total_score', 'DESC']],
         attributes: ['id', 'name', 'total_score', 'avatar_color']
       });
@@ -179,7 +179,7 @@ module.exports = (io, socket) => {
       if (!event) return;
       await event.update({ status: 'finished' });
       const players = await Player.findAll({
-        where: { event_id: event.id, is_active: true },
+        where: { event_id: event.id },
         order: [['total_score', 'DESC']],
         attributes: ['id', 'name', 'total_score', 'avatar_color']
       });
@@ -222,7 +222,7 @@ async function broadcastLeaderboard(io, event_id) {
   const event = await Event.findByPk(event_id);
   if (!event) return;
   const players = await Player.findAll({
-    where: { event_id, is_active: true },
+    where: { event_id },
     order: [['total_score', 'DESC']],
     attributes: ['id', 'name', 'total_score', 'avatar_color']
   });
